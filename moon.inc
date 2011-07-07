@@ -22,31 +22,33 @@
 			+ 1737.400
 	}
 
-#declare Geoid_Table =
-	function { pigment { image_map {
-		png "GeoidData.png"
-		map_type 1 // spherical
-		interpolate 2 // bilinear
-	}}}
+#declare Geoid_Pigment =
+    pigment {
+        image_map {
+            png "GeoidData.png"
+            map_type 1 // spherical
+            interpolate 2 // bilinear
+        }
+        rotate y*180
+    }
 
-// The geoid data is in the form of byte-scaled data where the value is:
+#declare Geoid_Table = function { pigment { Geoid_Pigment } }
+
+// The geoid data has range 1081.1 and offset 525.3. Povray reads it out of
+// the file as unit-scaled values, so we actually get the elevation with:
 //
-//   byte = (elevation + 271.90) / 2.922
+//   elevation = (sample * 1081.1) - 525.3
 //
-// Povray then naturally unit scales this:
+// The units are in metres.
 //
-//   sample = (elevation + 271.90) / (2.922*256)
-//
-// Therefore the reverse calculation is:
-//
-//   elevation = (2.922*256)*sample - 271.90
+// Note, however, that the geoid imagemap is from -180 to +179 longitude on
+// the X axis, while the topography map is from 0 to +359 longitude. 
 
 // returns delta in kilometres
 #declare Geoid_Altitude =
 	function(x, y, z)
 	{
-		(Geoid_Table(x, y, z).gray * 2.922 * 256) / 1000
-			+ Geoid_Altitude_Delta
+		(Geoid_Table(x, y, z).gray * 1.0811) - 0.5253
 	}
 
 #local Surface_Noise =
@@ -92,6 +94,12 @@
 	}
 
 
+#local Geoid_Texture =
+    texture
+    {
+        Geoid_Pigment
+    }
+    
 #local Moon_Texture =
 	texture
 	{
@@ -263,7 +271,7 @@
 // =======================================================================
 
 //#local Sea_Colour = rgb <57/256, 63/256, 86/256>;
-#local Sea_Colour = rgbt <0, 0.2, 0.6, 0>;
+#local Sea_Colour = rgbt <0, 0.2, 0.4, 0>;
 
 #local Sea_Texture =
     texture
@@ -296,7 +304,7 @@
             specular 1
             diffuse 0.3
             reflection {
-                0, 1
+                0, 0.5
                 fresnel on
             }
             conserve_energy
@@ -329,7 +337,8 @@
 // Note! Media units are all in kilometres!
 
 #local Bottom_Of_Atmosphere = Nominal_Terrain_Radius + Sea_Level
-	+ Cloud_Base + Cloud_Height + 0.001;
+    + 0.001;
+	//+ Cloud_Base + Cloud_Height + 0.001;
 #local Top_Of_Atmosphere = Bottom_Of_Atmosphere
 	+ Atmospheric_Depth;
 
@@ -379,7 +388,7 @@
 		scattering
 		{
 			RAYLEIGH_SCATTERING
-			color Rayleigh_Colour / Atmospheric_Scale
+			color 2.3 * Rayleigh_Colour / Atmospheric_Scale
 			extinction 1
 		}
 		density
@@ -435,7 +444,7 @@
 #local Clouds_Media =
 	media
 	{
-		samples 40
+		samples 3
 //		jitter 0.1
 		scattering
 		{
@@ -528,6 +537,6 @@
 		object { Moon_Object }
 		object { Sea_Object }
 		object { Sky_Object }
-		object { Clouds_Object }
+//		object { Clouds_Object }
 	}
 
