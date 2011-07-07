@@ -1,0 +1,10 @@
+The Kaguya spaceprobe produced three sets of topographic data: a low-res
+elevation map of the entire Moon, and high-res maps of the north and south
+poles. As the maps use a spherical projection the low-res map is particularly
+poor near the poles, so we combine the three to produce a high-res map of
+the entire moon. This directory contains the data files and scripts to do
+this.
+
+The Kaguya datasets are available from their website here:
+
+http://ltvt.wikispaces.com/Obtaining+Kaguya+DEM+data

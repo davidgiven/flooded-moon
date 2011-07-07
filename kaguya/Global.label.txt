@@ -1,0 +1,58 @@
+/* BASICS */                                                                                                                                                    
+PDS_VERSION_ID                 = PDS3                                                                                                                           
+RECORD_TYPE                    = UNDEFINED                                                                                                                      
+FILE_NAME                      = LALT_GGT_MAP.IMG                                                                                                               
+MISSION_NAME                   = SELENE                                                                                                                         
+SPACECRAFT_NAME                = SELENE-M                                                                                                                       
+INSTRUMENT_NAME                = "LALT"                                                                                                                         
+PRODUCT_SET_ID                 = LALT_GGT_MAP                                                                                                                   
+PRODUCT_VERSION_ID             = 20091002                                                                                                                       
+TARGET_NAME                    = MOON                                                                                                                           
+COMMENT_TEXT                   = "LALT GGT_MAP is a lunar global topographic MAP data extracted                                                                 
+                                  from LALT_GGT_NUM that is processed from the LALT_LGT_TS created                                                              
+                                  by 'surface' command in Generic Mapping Tool (Wessel and Smith, 1991).                                                        
+                                  Altitude values were rounded off to the third decimal place.                                                                  
+                                  Data are ordered from +89.96875 to -89.96875 degrees in latitude                                                              
+                                  and from +0.03125 to +359.96875 degrees in longitude. They are                                                                
+                                  referenced to the sphere of 1737.4km radius based on the gravity center of the Mean                                           
+                                  Earth/Polar Axis body-fixed coordinates of the Moon. Grid resolution is 0.0625 (1/16) degree.                                 
+                                  PI: Dr. Hiroshi ARAKI (arakih@miz.nao.ac.jp)."                                                                                
+                                                                                                                                                                
+^IMAGE = 9559 <BYTES>                                                                                                                                           
+                                                                                                                                                                
+/* IMAGE */                                                                                                                                                     
+OBJECT                         = IMAGE                                                                                                                          
+                                                                                                                                                                
+  BAND_STORAGE_TYPE              = BAND_SEQUENTIAL                                                                                                              
+  BANDS                          = 1                                                                                                                            
+  ENCODING_TYPE                  = N/A                                                                                                                          
+  INVALID_CONSTANT               = 0                                                                                                                            
+  LINE_SAMPLES                   = 5760                                                                                                                         
+  LINES                          = 2880                                                                                                                         
+  DUMMY_DATA                     = 99.999                                                                                                                       
+  OFFSET                         = 0.0000                                                                                                                       
+  SAMPLE_BITS                    = 32                                                                                                                           
+  SCALING_FACTOR                 = 1                                                                                                                            
+  SAMPLE_TYPE                    = 4BYTE_FLOAT                                                                                                                  
+  UNIT                           = KM                                                                                                                           
+  STRETCHED_FLAG                 = FALSE                                                                                                                        
+                                                                                                                                                                
+END_OBJECT                     = IMAGE                                                                                                                          
+                                                                                                                                                                
+/* IMAGE_MAP_PROJECTION */                                                                                                                                      
+OBJECT                         = IMAGE_MAP_PROJECTION                                                                                                           
+                                                                                                                                                                
+A_AXIS_RADIUS                  = 1737.400<km>                                                                                                                   
+  B_AXIS_RADIUS                  = 1737.400<km>                                                                                                                 
+  C_AXIS_RADIUS                  = 1737.400<km>                                                                                                                 
+  COORDINATE_SYSTEM_NAME         = PLANETOCENTRIC                                                                                                               
+  COORDINATE_SYSTEM_TYPE         = BODY-FIXED ROTATING                                                                                                          
+  EASTERNMOST_LONGITUDE          = +359.96875                                                                                                                   
+  WESTERNMOST_LONGITUDE          =   +0.03125                                                                                                                   
+  MAXIMUM_LATITUDE               =  +89.96875                                                                                                                   
+  MINIMUM_LATITUDE               =  -89.96875                                                                                                                   
+  MAP_PROJECTION_TYPE            = MERCATOR                                                                                                                     
+  MAP_RESOLUTION                 = 16 <PIXEL/DEGREE>                                                                                                            
+                                                                                                                                                                
+END_OBJECT                     = IMAGE_MAP_PROJECTION                                                                                                           
+                                                                                                                                                                
