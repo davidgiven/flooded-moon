@@ -1,0 +1,13 @@
+Coordinates of interesting photos I have taken:
+
+*** North-east into Huygens Sound
+
+#declare Time_Of_Day            = 6;
+#declare Altitude               = 5;
+#declare Latitude               = 20;
+#declare Longitude              = -3.5;
+#declare Pitch                  = -10;
+#declare Bearing                = 40;
+#declare Displacement           = 0;
+#declare Field_Of_View          = 50;
+
