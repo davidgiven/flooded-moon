@@ -1,0 +1,7 @@
+The geoid data comes from:
+
+http://pds-geosciences.wustl.edu/lunar01/lp-l-rss-5-gravity-v1/lp_1001/ascii/
+
+...using the jol090j1 file. It's a 360x180 raster of the geoid elevation in
+standard ASCII 'image' format, suitable for conversion with
+convert_from_image.lua.
