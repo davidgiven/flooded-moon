@@ -280,31 +280,23 @@
             colour rgbt 1
         }
 
-        // sea swell        
-        normal { 
-//            ripples 0.5
-//            frequency 100
-//            scale 0.01 * km
-//            translate <0, 1, 0>
-
-            waves 0.1
-            scale 0.001 * km
-        }
-        
-        // local waves
-//        normal { 
-//            ripples 1
-//            translate <-0.5, -0.5, -0.5>
-//            scale 0.001 * km
-//            translate <0, 1, 0>
-//        }
+        normal {
+            wrinkles 0.2
+            scale 0.01 * km
+        }        
+        //normal {
+        //    bozo 0.8
+        //    scale 0.002 * km
+        //} 
         
         finish {
             ambient 0
-            specular 1
+            specular 0.8
+            roughness 0.03
             diffuse 0.3
             reflection {
-                0, 0.5
+                0, 1.0
+                falloff 2
                 fresnel on
             }
             conserve_energy
