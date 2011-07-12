@@ -14,13 +14,13 @@
 #declare Cloud_Height           = 10;
 
 #declare Time_Of_Day            = 6;
-#declare Altitude               = 5;
-#declare Latitude               = 20;
-#declare Longitude              = -3.5;
-#declare Pitch                  = -10;
-#declare Bearing                = 80;
+#declare Altitude               = 2;
+#declare Latitude               = 19.9;
+#declare Longitude              = -3.35;
+#declare Pitch                  = 0;
+#declare Bearing                = 45;
 #declare Displacement           = 0;
-#declare Field_Of_View          = 90;
+#declare Field_Of_View          = 60;
 
 #declare Contours               = .1;
 
@@ -39,28 +39,31 @@ global_settings
 	}
 }
 
+#include "moon.inc"
+
 camera
 {
-	angle Field_Of_View
-	location <0, 0, 0>
-	sky <0, -1, 0>
-	look_at <0, 0, 1>
-	translate Displacement
-	rotate x * Pitch
-	rotate y * -Bearing
-	translate <0, -(Nominal_Terrain_Radius + Sea_Level + Altitude), 0> 
-	rotate <-Latitude, 0, -Longitude>
-//	rotate <-90, -0, 0>
-//	translate <1, -4000, 0>	
+    angle Field_Of_View
+    location <0, 0, 0>
+    sky <0, -1, 0>
+    look_at <0, 0, 1>
+    translate Displacement
+    Place_On_Surface(Longitude, Latitude, Bearing, Pitch, Altitude)
 }
 
 background
 {
-	rgb <0, 0, 0>
+    rgb <0, 0, 0>
 }
 
-#include "moon.inc"
 object { Moon }
+
+//box
+//{
+//    <-0.5, -0.5, -0.5>, <0.5, 0.5, 0.5>
+//    pigment { colour Red }
+//    Place_On_Surface(-3.25, 19.9, 0, 0, 0)
+//}
 
 light_source
 {
@@ -84,5 +87,4 @@ light_source
 
 	translate <-100000, 0, 0>
 	rotate z*(Time_Of_Day*360/24)
-
 }
