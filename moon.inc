@@ -6,19 +6,38 @@
 
 #warning concat("Current horizon distance is: ", str(Horizon_Distance, 0, 1), "\n")
 
+#declare Slopemap_Table =
+    function {
+        pigment {
+            image_map {
+                png "SlopemapLowRes.png"
+                map_type 1 // spherical
+                interpolate 3 // bicubic
+            }
+            rotate x*90
+            rotate z*-90
+        }
+    }
+    
 #declare Topography_Table =
-	function { pigment { image_map {
-		png "KaguyaTopographyDataLowRes.png"
-		//png "KaguyaTopographyData.png"
-		map_type 1 // spherical
-		interpolate 3 // bicubic
-	}}}
+	function {
+        pigment {
+            image_map {
+                png "KaguyaTopographyDataLowRes.png"
+                //png "KaguyaTopographyData.png"
+                map_type 1 // spherical
+                interpolate 3 // bicubic
+            }
+		    rotate x*90
+            rotate z*-90
+        }
+    }
 
 // returns altitude in kilometres
 #declare Topography_Altitude =
 	function(x, y, z)
 	{
-		(Topography_Table(x, y, z).gray - 0.5) * 22
+		(Topography_Table(x, y, z).grey - 0.5) * 22
 			+ 1737.400
 	}
 
@@ -30,6 +49,8 @@
             interpolate 2 // bilinear
         }
         rotate y*180
+        rotate x*90
+        rotate z*-90
     }
 
 #declare Geoid_Table = function { pigment { Geoid_Pigment } }
@@ -51,23 +72,40 @@
 		(Geoid_Table(x, y, z).gray * 1.0811) - 0.5253
 	}
 
-#local Surface_Noise =
+#local Steep_Noise =
     function {
         pigment {
-            bozo
-            turbulence 0.5
+            granite
+            scale 0.25
+            warp {
+                turbulence 0.33
+            }
+            scale 0.2
+            warp {
+                turbulence 0.33
+                octaves 9
+                lambda 2
+            }
+            scale 200
+           
             color_map {
-                [0 color rgb 0]
-                [1 color rgb 1]
+                [0 color rgb -0.5]
+                [1 color rgb 0.5]
             }
         }
+    }
+
+#local Surface_Noise =
+    function {
+        Steep_Noise(x, y, z).red
+            * Slopemap_Table(x, y, z).red
     }
     
 #declare Moon_Altitude = 
 	function(x, y, z)
 	{
 		Topography_Altitude(x, y, z) - Geoid_Altitude(x, y, z)
-			//+ Surface_Noise(x*3e3, y*3e3, z*3e3).gray * 0.02
+			+ Surface_Noise(x/km, y/km, z/km)
 	}
 
 #declare Moon_Mesh =
@@ -90,7 +128,7 @@
 		}
 
         max_gradient 1.5
-		accuracy 0.00001
+		accuracy 0.0001
 	}
 
 
@@ -373,9 +411,9 @@
 #declare Moon_Texture =
     texture
     {
-        slope
+        function
         {
-            point_at <0, 0, 0>, 0.8, 1.0
+            Slopemap_Table(x, y, z).red
         }
         texture_map
         {
@@ -395,8 +433,6 @@
 		}
 
         scale Lunar_Sphere
-        rotate x*90
-        rotate z*-90
 	}
 
 
@@ -412,6 +448,7 @@
     {
         pigment {
             colour rgbt 1
+            quick_colour rgbt <0, 0, 1, 0>
         }
 
         normal {
