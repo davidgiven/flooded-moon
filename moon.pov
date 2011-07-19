@@ -3,6 +3,7 @@
 #include "stones.inc"
 #include "textures.inc"
 #include "functions.inc"
+#include "transforms.inc"
 
 #declare Lunar_Sphere           = 1750.000; // enclosing diameter of model
 #declare Nominal_Terrain_Radius = 1737.400; // 0 level for sea
@@ -13,14 +14,14 @@
 #declare Cloud_Base             = 5;
 #declare Cloud_Height           = 10;
 
-#declare Time_Of_Day            = 6;
+#declare Time_Of_Day            = 8;
 #declare Altitude               = 2;
 #declare Latitude               = 19.9;
-#declare Longitude              = -3.35;
-#declare Pitch                  = 0;
-#declare Bearing                = 45;
+#declare Longitude              = -3.2969;
+#declare Pitch                  = -30;
+#declare Bearing                = 60;
 #declare Displacement           = 0;
-#declare Field_Of_View          = 60;
+#declare Field_Of_View          = 90;
 
 #declare Contours               = .1;
 
@@ -40,6 +41,7 @@ global_settings
 }
 
 #include "moon.inc"
+#include "animationpath.inc"
 
 camera
 {
@@ -47,7 +49,28 @@ camera
     location <0, 0, 0>
     sky <0, -1, 0>
     look_at <0, 0, 1>
-    translate Displacement
+
+/*    
+    Place_Camera(
+        spline
+        {
+            natural_spline
+            0.00, <0, 0>
+            0.01, <0, 0>
+            0.10, <0, 10>
+            0.20, <-20, 30>
+            0.30, <-20, 35>
+            0.40, <55, 40>
+            0.60, <60, 50>
+            0.70, <55, 45>
+            0.80, <0, 50>
+            0.90, <-20, 30>
+            0.99, <0, 0>
+            1.00, <0, 0>
+        }
+    )
+    */
+    
     Place_On_Surface(Longitude, Latitude, Bearing, Pitch, Altitude)
 }
 

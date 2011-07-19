@@ -108,16 +108,20 @@
 			+ Surface_Noise(x/km, y/km, z/km)
 	}
 
+#declare Scaled_Moon_Altitude =
+    function(x, y, z)
+    {
+        #local scaling_factor = 1.0 / Lunar_Sphere;
+        (Lunar_Sphere - Moon_Altitude(x, y, z))
+            *scaling_factor
+    }
+    
 #declare Moon_Mesh =
 	isosurface
 	{
 		function
 		{
-			#local scaling_factor = 1.0 / Lunar_Sphere;
-			f_sphere(x, y, z, 1) +
-				(Lunar_Sphere - Moon_Altitude(x, y, z))
-					*scaling_factor
-
+            f_sphere(x, y, z, 1) + Scaled_Moon_Altitude(x, y, z)
 		}
 		contained_by
 		{
@@ -411,10 +415,18 @@
 #declare Moon_Texture =
     texture
     {
+        /* The slopemap table is all fuzzy, which looks better than the very
+         * accurate built-in slope function. */
         function
         {
             Slopemap_Table(x, y, z).red
         }
+        /*
+        slope
+        {
+            point_at <0, 0, 0>, 0.8, 1.0
+        }
+        */
         texture_map
         {
             [0.0 Flat_Surface ]
@@ -435,6 +447,99 @@
         scale Lunar_Sphere
 	}
 
+// =======================================================================
+//                               VEGETATION
+// =======================================================================
+
+#local Vegetation_Noise =
+    function
+    {
+        #local noise =
+            function
+            {
+                pigment {
+                    bumps
+                    
+                    scale 0.00001
+                    color_map {
+                        [0.8 colour rgb 0]
+                        [1 colour rgb 2]
+                    }
+                }    
+            }
+            
+        noise(f_th(x, y, z)*cos(y), f_r(x, y, z)/16, f_ph(x, y, z)).red    
+    }
+
+/*
+#local Vegetation_Noise =
+    function
+    {
+        //sin(f_th(x, y, z) * 20) * sin(f_ph(x, y, z) * 20) *
+        //    (f_r(x, y, z) - 1500)
+            
+        f_
+        f_sphere(sin(f_th(x, y, z)*20),
+            f_r(x, y, z) - 1500,
+            sin(f_ph(x, y, z)*20), 100)
+    }
+*/
+
+#local Spikes_Density = 64000;
+#local Tree_Height = 0.2;
+#local Spikes =
+    function
+    {
+        max(
+            f_bumps(f_th(x, y, z)*Spikes_Density, 0, f_ph(x, y, z)*Spikes_Density) - 0.2,
+            f_r(x, y, z) - (1+Tree_Height*km)*Moon_Altitude(x, y, z)/Lunar_Sphere
+        )
+    }
+    
+#declare Vegetation_Altitude = 
+    function(x, y, z)
+    {
+        //Topography_Altitude(x, y, z) - Geoid_Altitude(x, y, z) - 0.25
+            //Lunar_Sphere - 100
+             //+ Vegetation_Noise(x, y, z)
+             Spikes(x, y, z)
+    }
+
+#declare Vegetation_Mesh =
+    isosurface
+    {
+        function
+        {
+            #local scaling_factor = 1.0 / Lunar_Sphere;
+            //f_sphere(x, y, z, 1) +
+            //    (Lunar_Sphere - Vegetation_Altitude(x, y, z))
+            //        *scaling_factor
+            Spikes(x, y, z)
+        }
+        contained_by
+        {
+            sphere
+            {
+                <0, 0, 0>, 1
+            }
+        }
+
+        #local f = 0.4;
+        #local g = Spikes_Density / 10;
+        //evaluate g, sqrt(g / (g*f)), 0.7
+        max_gradient 1e5
+        accuracy 0.001
+    }
+
+#declare Vegetation_Object =
+    object
+    {
+        object {
+            Vegetation_Mesh
+        }
+
+        scale Lunar_Sphere
+    }
 
 // =======================================================================
 //                                  SEA   
@@ -696,6 +801,7 @@
 	union
 	{
 		object { Moon_Object texture { Moon_Texture }}
+		object { Vegetation_Object pigment { colour Green }}
 		object { Sea_Object }
 		object { Sky_Object }
 //		object { Clouds_Object }
