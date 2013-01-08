@@ -15,7 +15,7 @@
 
 const double RADIUS = 1737.400;
 const double FOV = 60;
-const int SHMIXELS = 1500;
+const int SHMIXELS = 256;
 const double SCALE = 0.01;
 
 #include "utils.h"
@@ -162,13 +162,34 @@ int main(int argc, const char* argv[])
 {
 	try
 	{
-		Terrain terrain("/home/dg/shared/workspace/flooded-moon/calibrate.pgm");
+		Terrain terrain("/home/dg/shared/workspace/flooded-moon/topography.pgm");
+
+		double latitude = 20.73;
+		double longitude = -3.8;
+		double altitude = 1780;
+		double azimuth = -10;
+		double bearing = 90;
 
 		Transform view;
-//		view = view.lookAt(Vector::ORIGIN, Vector::Y, Vector::Z);
-		view = view.translate(Vector(0, 10000, 0));
+		view = view.lookAt(Vector::ORIGIN, Vector::Y, Vector::Z);
+		view = view.rotate(Vector::Y, -longitude);
+		view = view.rotate(Vector::X, -latitude);
+		view = view.rotate(Vector::X, -90);
+		view = view.translate(Vector(0, altitude, 0));
+		view = view.rotate(Vector::Y, -bearing);
+		view = view.rotate(Vector::X, 90 + azimuth);
 
 		Vector camera = view.untransform(Vector::ORIGIN);
+		std::cerr << "camera at (" << camera.x << ", " << camera.y
+				<< ", " << camera.z << ")\n";
+
+		Vector forwards = (view.untransform(Vector::Y) - camera).normalise();
+		std::cerr << "facing (" << forwards.x << ", " << forwards.y
+				<< ", " << forwards.z << ")\n";
+
+		Vector up = (view.untransform(Vector::Z) - camera).normalise();
+		std::cerr << "up (" << up.x << ", " << up.y
+				<< ", " << up.z << ")\n";
 
 		Transform row = view.rotate(Vector::X, -FOV/2 + SHMIXELSTEP/2);
 		for (int y=0; y<SHMIXELS; y++)

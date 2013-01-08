@@ -185,63 +185,130 @@ public:
 
     Matrix invert() const
     {
-    	Matrix result = *this;
+    	double inv[16];
 
-    	int indxc[4], indxr[4];
-    	int ipiv[4];
-    	memset(ipiv, 0, sizeof(int)*4);
+        inv[0] = m[5]  * m[10] * m[15] -
+                 m[5]  * m[11] * m[14] -
+                 m[9]  * m[6]  * m[15] +
+                 m[9]  * m[7]  * m[14] +
+                 m[13] * m[6]  * m[11] -
+                 m[13] * m[7]  * m[10];
 
-    	for (int i=0; i<4; i++)
-    	{
-    		int irow = -1, icol = -1;
-    		double big = 0;
-    		for (int j=0; j<4; j++)
-    		{
-    			if (ipiv[j] != 1)
-    			{
-    				for (int k=0; k<4; k++)
-    				{
-    					if (ipiv[k] == 0)
-    					{
-    						if (abs(result(j,k)) >= big)
-    						{
-    							big = abs(result(j,k));
-    							irow = j;
-    							icol = k;
-    						}
-    					}
-    					assert(ipiv[k] <= 1); // uninvertible
-    				}
-    			}
-    		}
-    		++ipiv[icol];
-    		if (irow != icol)
-    		{
-    			for (int k=0; k<4; ++k)
-    				swap(result(irow, k), result(icol, k));
-    		}
-    		indxr[i] = irow;
-    		indxc[i] = icol;
-    		assert(result(icol, icol) != 0); // uninvertible
-    		double pivinv = 1 / result(icol, icol);
-    		result(icol, icol) = 1.f;
-    		for (int j = 0; j < 4; j++)
-    			result(icol, j) *= pivinv;
-    		for (int j = 0; j < 4; j++) {
-    			if (j != icol) {
-    				double save = result(j, icol);
-    				result(j, icol) = 0;
-    				for (int k = 0; k < 4; k++)
-    					result(j, k) -= result(icol, k)*save;
-    			}
-    		}
-    	}
-    	for (int j = 4-1; j >= 0; j--) {
-    		if (indxr[j] != indxc[j]) {
-    			for (int k = 0; k < 4; k++)
-    				swap(result(k, indxr[j]), result(k, indxc[j]));
-    		}
-    	}
+        inv[4] = -m[4]  * m[10] * m[15] +
+                  m[4]  * m[11] * m[14] +
+                  m[8]  * m[6]  * m[15] -
+                  m[8]  * m[7]  * m[14] -
+                  m[12] * m[6]  * m[11] +
+                  m[12] * m[7]  * m[10];
+
+        inv[8] = m[4]  * m[9] * m[15] -
+                 m[4]  * m[11] * m[13] -
+                 m[8]  * m[5] * m[15] +
+                 m[8]  * m[7] * m[13] +
+                 m[12] * m[5] * m[11] -
+                 m[12] * m[7] * m[9];
+
+        inv[12] = -m[4]  * m[9] * m[14] +
+                   m[4]  * m[10] * m[13] +
+                   m[8]  * m[5] * m[14] -
+                   m[8]  * m[6] * m[13] -
+                   m[12] * m[5] * m[10] +
+                   m[12] * m[6] * m[9];
+
+        inv[1] = -m[1]  * m[10] * m[15] +
+                  m[1]  * m[11] * m[14] +
+                  m[9]  * m[2] * m[15] -
+                  m[9]  * m[3] * m[14] -
+                  m[13] * m[2] * m[11] +
+                  m[13] * m[3] * m[10];
+
+        inv[5] = m[0]  * m[10] * m[15] -
+                 m[0]  * m[11] * m[14] -
+                 m[8]  * m[2] * m[15] +
+                 m[8]  * m[3] * m[14] +
+                 m[12] * m[2] * m[11] -
+                 m[12] * m[3] * m[10];
+
+        inv[9] = -m[0]  * m[9] * m[15] +
+                  m[0]  * m[11] * m[13] +
+                  m[8]  * m[1] * m[15] -
+                  m[8]  * m[3] * m[13] -
+                  m[12] * m[1] * m[11] +
+                  m[12] * m[3] * m[9];
+
+        inv[13] = m[0]  * m[9] * m[14] -
+                  m[0]  * m[10] * m[13] -
+                  m[8]  * m[1] * m[14] +
+                  m[8]  * m[2] * m[13] +
+                  m[12] * m[1] * m[10] -
+                  m[12] * m[2] * m[9];
+
+        inv[2] = m[1]  * m[6] * m[15] -
+                 m[1]  * m[7] * m[14] -
+                 m[5]  * m[2] * m[15] +
+                 m[5]  * m[3] * m[14] +
+                 m[13] * m[2] * m[7] -
+                 m[13] * m[3] * m[6];
+
+        inv[6] = -m[0]  * m[6] * m[15] +
+                  m[0]  * m[7] * m[14] +
+                  m[4]  * m[2] * m[15] -
+                  m[4]  * m[3] * m[14] -
+                  m[12] * m[2] * m[7] +
+                  m[12] * m[3] * m[6];
+
+        inv[10] = m[0]  * m[5] * m[15] -
+                  m[0]  * m[7] * m[13] -
+                  m[4]  * m[1] * m[15] +
+                  m[4]  * m[3] * m[13] +
+                  m[12] * m[1] * m[7] -
+                  m[12] * m[3] * m[5];
+
+        inv[14] = -m[0]  * m[5] * m[14] +
+                   m[0]  * m[6] * m[13] +
+                   m[4]  * m[1] * m[14] -
+                   m[4]  * m[2] * m[13] -
+                   m[12] * m[1] * m[6] +
+                   m[12] * m[2] * m[5];
+
+        inv[3] = -m[1] * m[6] * m[11] +
+                  m[1] * m[7] * m[10] +
+                  m[5] * m[2] * m[11] -
+                  m[5] * m[3] * m[10] -
+                  m[9] * m[2] * m[7] +
+                  m[9] * m[3] * m[6];
+
+        inv[7] = m[0] * m[6] * m[11] -
+                 m[0] * m[7] * m[10] -
+                 m[4] * m[2] * m[11] +
+                 m[4] * m[3] * m[10] +
+                 m[8] * m[2] * m[7] -
+                 m[8] * m[3] * m[6];
+
+        inv[11] = -m[0] * m[5] * m[11] +
+                   m[0] * m[7] * m[9] +
+                   m[4] * m[1] * m[11] -
+                   m[4] * m[3] * m[9] -
+                   m[8] * m[1] * m[7] +
+                   m[8] * m[3] * m[5];
+
+        inv[15] = m[0] * m[5] * m[10] -
+                  m[0] * m[6] * m[9] -
+                  m[4] * m[1] * m[10] +
+                  m[4] * m[2] * m[9] +
+                  m[8] * m[1] * m[6] -
+                  m[8] * m[2] * m[5];
+
+        double det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
+
+        if (det == 0)
+            throw "uninvertable matrix";
+
+        det = 1.0 / det;
+
+        Matrix result;
+        for (int i = 0; i < 16; i++)
+        	result.m[i] = inv[i] * det;
 
     	return result;
     }
@@ -264,27 +331,37 @@ Matrix Matrix::ZERO(
 struct Transform
 {
 	Matrix t;
-	Matrix it;
 
+private:
+	bool _itset;
+	Matrix _it;
+
+public:
 	Transform():
-		t(Matrix::IDENTITY), it(Matrix::IDENTITY)
+		t(Matrix::IDENTITY),
+		_itset(false),
+		_it(Matrix::IDENTITY)
 	{
 	}
 
-	Transform(const Matrix& t, const Matrix& it):
-		t(t), it(it)
+	Transform(const Matrix& t):
+		t(t),
+		_itset(false),
+		_it(Matrix::IDENTITY)
 	{
 	}
 
 	Transform(const Transform& o):
-		t(o.t), it(o.it)
+		t(o.t),
+		_itset(false),
+		_it(Matrix::IDENTITY)
 	{
 	}
 
 	Transform& operator = (const Transform& o)
 	{
 		t = o.t;
-		it = o.it;
+		_itset = false;
 	}
 
 	Vector transform(const Vector& v) const
@@ -292,19 +369,25 @@ struct Transform
 		return t * v;
 	}
 
-	Vector untransform(const Vector& v) const
+	const Matrix& inverse()
 	{
-		return it * v;
+		if (!_itset)
+		{
+			_it = t.invert();
+			_itset = true;
+		}
+		return _it;
 	}
 
-    Transform apply(const Matrix& o, const Matrix& io) const
-    {
-    	return Transform(o*t, it*io);
-    }
+	Vector untransform(const Vector& v)
+	{
+
+		return inverse() * v;
+	}
 
     Transform apply(const Matrix& o) const
     {
-    	return apply(o, o.invert());
+    	return Transform(o*t);
     }
 
     Transform translate(const Vector& v) const
@@ -314,12 +397,6 @@ struct Transform
 				1, 0, 0, v.x,
 				0, 1, 0, v.y,
 				0, 0, 1, v.z,
-				0, 0, 0, 1
-			),
-			Matrix(
-				1, 0, 0, -v.x,
-				0, 1, 0, -v.y,
-				0, 0, 1, -v.z,
 				0, 0, 0, 1
 			)
 		);
@@ -333,12 +410,6 @@ struct Transform
 				0,   v.y, 0,   0,
 				0,   0,   v.z, 0,
 				0,   0,   0,   1
-			),
-    		Matrix(
-				1.0/v.x, 0,       0,       0,
-				0,       1.0/v.y, 0,       0,
-				0,       0,       1.0/v.z, 0,
-				0,       0,       0,       1
 			)
 		);
     }
@@ -377,7 +448,7 @@ struct Transform
 			1
 		);
 
-    	return apply(t, t.transpose());
+    	return apply(t);
     }
 
     Transform lookAt(const Vector& p, const Vector& t, const Vector& up) const

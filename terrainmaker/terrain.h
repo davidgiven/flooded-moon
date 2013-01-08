@@ -77,13 +77,11 @@ public:
 		double lat = acos(vv.y / r);
 		double lon = atan2(vv.z, vv.x);
 
+		//lat -= M_PI_2;
 		lon = M_PI_2 - lon;
 
 		//return sin(lon*20)*50 + RADIUS;
 		double m = altitude(lon, lat);
-		double sealevel = RADIUS - 2;
-		if (m < sealevel)
-			return sealevel;
 		return m;
 	}
 };
