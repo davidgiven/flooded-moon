@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<scene version="0.4.0">
+	<sensor type="perspective">
+		<float name="focusDistance" value="1.25668"/>
+		<float name="fov" value="45.8402"/>
+		<string name="fovAxis" value="x"/>
+		<transform name="toWorld">
+			<rotate z="1" angle="180"/>
+			<LOOKAT/>
+		</transform>
+
+		<sampler type="ldsampler">
+			<integer name="sampleCount" value="64"/>
+		</sampler>
+
+		<film type="ldrfilm">
+			<integer name="height" value="512"/>
+			<integer name="width" value="512"/>
+
+			<rfilter type="gaussian"/>
+		</film>
+	</sensor>
+
+	<shape type="sphere">
+		<point name="center" x="-2000" y="-4000" z="0"/>
+		<float name="radius" value="1"/>
+
+		<emitter type="area">
+			<spectrum name="radiance" value="4000000"/>
+		</emitter>
+	</shape>
+</scene>

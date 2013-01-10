@@ -12,15 +12,21 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 const double RADIUS = 1737.400;
+const double SEALEVEL = -2;
+const double SPHEREFUDGE = 10;
 const double FOV = 60;
-const int SHMIXELS = 256;
-const double SCALE = 0.01;
+const int SHMIXELS = 512;
+const double SCALE = 1;
 
 #include "utils.h"
 #include "matrix.h"
 #include "terrain.h"
+#include "meshwriter.h"
+#include "camerawriter.h"
 
 const double SHMIXELSTEP = FOV / (double)SHMIXELS;
 
@@ -49,7 +55,8 @@ static double intersect(const Ray& ray)
 	double l_dot_D = ray.direction.dot(D);
 	double D_squared = D.dot(D);
 
-	double sqrt_term = l_dot_D*l_dot_D - D_squared + RADIUS*RADIUS;
+	double r = RADIUS - SPHEREFUDGE;
+	double sqrt_term = l_dot_D*l_dot_D - D_squared + r*r;
 	double t0 = -l_dot_D + sqrt(sqrt_term);
 	double t1 = -l_dot_D - sqrt(sqrt_term);
 
@@ -118,6 +125,8 @@ static void write_terrain(std::ostream& s)
 		}
 	}
 
+	MeshWriter writer;
+
 
 	s << "ply\n"
 		 "format ascii 1.0\n"
@@ -126,7 +135,7 @@ static void write_terrain(std::ostream& s)
 		 "property float y\n"
 		 "property float z\n"
 		 "element face " << facelist.size()/3 << "\n"
-		 "property list uchar int vertex_index\n"
+		 "property list uchar int vertex_indices\n"
 		 "end_header\n";
 
 	/* Write out the vertices. */
@@ -135,17 +144,24 @@ static void write_terrain(std::ostream& s)
 	{
 		const Vector& v = *indextopoint[i];
 		s << v.x*SCALE << " " << v.y*SCALE << " " << v.z*SCALE << "\n";
+
+		writer.addPoint(v);
 	}
 
 	/* Write out the faces. */
 
 	for (int i=0; i<facelist.size(); i+=3)
 	{
-		s << "3 "
-		  << pointtoindex[facelist[i+0]] << " "
-		  << pointtoindex[facelist[i+1]] << " "
-		  << pointtoindex[facelist[i+2]] << "\n";
+		int a = pointtoindex[facelist[i+0]];
+		int b = pointtoindex[facelist[i+1]];
+		int c = pointtoindex[facelist[i+2]];
+
+		s << "3 " << c << " " << b << " " << a << "\n";
+
+		writer.addFace(a, b, c);
 	}
+
+	writer.writeTo("/tmp/moon.serialized");
 }
 
 static Vector mapToTerrain(const Terrain& terrain, const Vector& p)
@@ -166,8 +182,8 @@ int main(int argc, const char* argv[])
 
 		double latitude = 20.73;
 		double longitude = -3.8;
-		double altitude = 1780;
-		double azimuth = -10;
+		double altitude = RADIUS+SEALEVEL+100;
+		double azimuth = -90;
 		double bearing = 90;
 
 		Transform view;
@@ -180,16 +196,11 @@ int main(int argc, const char* argv[])
 		view = view.rotate(Vector::X, 90 + azimuth);
 
 		Vector camera = view.untransform(Vector::ORIGIN);
-		std::cerr << "camera at (" << camera.x << ", " << camera.y
-				<< ", " << camera.z << ")\n";
+		CameraWriter().write("mitsuba/camera.xml", "mitsuba/camera.tmpl.xml", view);
 
-		Vector forwards = (view.untransform(Vector::Y) - camera).normalise();
-		std::cerr << "facing (" << forwards.x << ", " << forwards.y
-				<< ", " << forwards.z << ")\n";
-
-		Vector up = (view.untransform(Vector::Z) - camera).normalise();
-		std::cerr << "up (" << up.x << ", " << up.y
-				<< ", " << up.z << ")\n";
+		std::cerr << "height of terrain at camera is "
+				<< terrain.altitude(camera.normalise()) - RADIUS
+				<< "\n";
 
 		Transform row = view.rotate(Vector::X, -FOV/2 + SHMIXELSTEP/2);
 		for (int y=0; y<SHMIXELS; y++)
