@@ -30,6 +30,22 @@ private:
 	double _wscale, _hscale;
 	const unsigned char* _samples;
 
+	double getsample(int x, int y) const
+	{
+		int i;
+		if (_depth < 0x100)
+		{
+			const unsigned char* p = _samples + ((y*_width) + x);
+			i = *p;
+		}
+		else
+		{
+			const unsigned char* p = _samples + ((y*_width) + x) * 2;
+			i = (p[0] << 8) + p[1];
+		}
+		return (double)i / (double)_depth;
+	}
+
 public:
 	double lookup(double lon, double lat) const
 	{
@@ -44,25 +60,25 @@ public:
 		assert(lat >= 0);
 		assert(lat < M_PI);
 
-		int w = (int)(lon * _wscale);
-		int h = (int)(lat * _hscale);
+		double x = lon * _wscale;
+		double y = lat * _hscale;
 
-		assert(w >= 0);
-		assert(w < _width);
-		assert(h >= 0);
-		assert(h < _height);
+		assert(x >= 0);
+		assert(x < _width);
+		assert(y >= 0);
+		assert(y < _height);
 
-		int i;
-		if (_depth < 0x100)
-		{
-			const unsigned char* p = _samples + ((h*_width) + w);
-			i = *p;
-		}
-		else
-		{
-			const unsigned char* p = _samples + ((h*_width) + w) * 2;
-			i = (p[0] << 8) + p[1];
-		}
-		return (double)i / (double)_depth;
+		double tl = getsample(floor(x), floor(y));
+		double tr = getsample(ceil(x), floor(y));
+		double bl = getsample(floor(x), ceil(y));
+		double br = getsample(ceil(x), ceil(y));
+
+		x = x - floor(x);
+		y = y - floor(y);
+
+		return ((1-x) * (1-y) * tl) +
+				(x * (1-y) * tr) +
+				((1-x) * y * bl) +
+				(x * y * br);
 	}
 };

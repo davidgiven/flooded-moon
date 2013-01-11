@@ -19,7 +19,7 @@ const double RADIUS = 1737.400;
 const double SEALEVEL = -2;
 const double SPHEREFUDGE = 10;
 const double FOV = 50;
-const int SHMIXELS = 1024;
+const int SHMIXELS = 256;
 const double SCALE = 1;
 
 #include "utils.h"
@@ -182,8 +182,8 @@ int main(int argc, const char* argv[])
 		Terrain terrain("topography.pgm", "geoid.pgm");
 
 		double latitude = 20.73;
-		double longitude = -3.8;
-		double altitude = RADIUS+SEALEVEL+10;
+		double longitude = -3.2;
+		double altitude = RADIUS+SEALEVEL+5;
 		double azimuth = -20;
 		double bearing = 70;
 
