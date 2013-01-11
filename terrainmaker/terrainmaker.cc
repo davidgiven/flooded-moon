@@ -18,12 +18,13 @@
 const double RADIUS = 1737.400;
 const double SEALEVEL = -2;
 const double SPHEREFUDGE = 10;
-const double FOV = 60;
-const int SHMIXELS = 512;
+const double FOV = 50;
+const int SHMIXELS = 1024;
 const double SCALE = 1;
 
 #include "utils.h"
 #include "matrix.h"
+#include "spheremap.h"
 #include "terrain.h"
 #include "meshwriter.h"
 #include "camerawriter.h"
@@ -169,7 +170,7 @@ static Vector mapToTerrain(const Terrain& terrain, const Vector& p)
 	/* p is at the surface of our nominal sphere. */
 
 	Vector np = p.normalise();
-	double altitude = terrain.altitude(np);
+	double altitude = terrain.terrain(np);
 
 	return np*altitude;
 }
@@ -178,13 +179,13 @@ int main(int argc, const char* argv[])
 {
 	try
 	{
-		Terrain terrain("/home/dg/shared/workspace/flooded-moon/topography.pgm");
+		Terrain terrain("topography.pgm", "geoid.pgm");
 
 		double latitude = 20.73;
 		double longitude = -3.8;
 		double altitude = RADIUS+SEALEVEL+10;
 		double azimuth = -20;
-		double bearing = 90;
+		double bearing = 70;
 
 		Transform view;
 		view = view.lookAt(Vector::ORIGIN, Vector::Y, Vector::Z);
@@ -199,7 +200,7 @@ int main(int argc, const char* argv[])
 		CameraWriter().write("mitsuba/camera.xml", "mitsuba/camera.tmpl.xml", view);
 
 		std::cerr << "height of terrain at camera is "
-				<< terrain.altitude(camera.normalise()) - RADIUS
+				<< terrain.terrain(camera.normalise()) - RADIUS
 				<< "\n";
 
 		double angle_to_bottom = azimuth + 90 + FOV/2;

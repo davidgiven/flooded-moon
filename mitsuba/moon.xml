@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<scene version="0.4.0">
+	<integrator type="volpath_simple">
+		<integer name="maxDepth" value="8"/>
+	</integrator>
+
+<!--
+	<medium type="heterogeneous" id="terrain">
+		<string name="method" value="woodcock"/>
+
+		<volume name="density" type="dllvolume">
+			<string name="filename" value="volume.so"/>
+		</volume>
+
+		<volume name="albedo" type="constvolume">
+			<spectrum name="value" value="0.9"/>
+		</volume>
+		<float name="scale" value="100"/>
+		<float name="stepSize" value="10"/>
+	</medium>
+-->
+
+<!--
+	<shape type="obj">
+		<string name="filename" value="bounds.obj"/>
+		<ref name="interior" id="terrain"/>
+	</shape>
+-->
+
+    <bsdf type="diffuse" id="white">
+		<spectrum name="reflectance" value="0.9"/>
+    </bsdf>
+
+    <bsdf type="diffuse" id="water">
+		<spectrum name="reflectance" value="600:0.9, 850:0.1"/>
+    </bsdf>
+
+	<shape type="ply">
+		<string name="filename" value="/tmp/moon.ply"/>
+		<transform name="toWorld">
+		</transform>
+		<ref id="white"/>
+	</shape>
+
+	<shape type="sphere">
+		<point name="center" x="0" y="0" z="0"/>
+		<float name="radius" value="1735.400"/>
+		<ref id="water"/>
+	</shape>
+	
+	<emitter type="constant">
+			<spectrum name="radiance" value="0.0"/>
+	</emitter>
+
+	<include filename="camera.xml"/>
+
+	<shape type="sphere">
+		<point name="center" x="-2000" y="-4000" z="0"/>
+		<float name="radius" value="1"/>
+
+		<emitter type="area">
+			<spectrum name="radiance" value="4000000"/>
+		</emitter>
+	</shape>
+</scene>
