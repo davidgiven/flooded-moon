@@ -27,6 +27,8 @@ public:
 		std::ofstream of;
 		of.open(filename, std::ios::out | std::ios::binary);
 		of.close();
+
+		std::cerr << _points.size() << " vertices and " << _faces.size() << " faces\n";
 	}
 
 private:

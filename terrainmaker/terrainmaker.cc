@@ -30,7 +30,7 @@ const double SCALE = 1;
 
 const double SHMIXELSTEP = FOV / (double)SHMIXELS;
 
-static Vector points[SHMIXELS*SHMIXELS];
+static Vector* points;
 
 static Vector& pointAt(int x, int y)
 {
@@ -70,7 +70,7 @@ static double intersect(const Ray& ray)
 	return t1;
 }
 
-static void write_terrain(std::ostream& s)
+static void write_terrain(std::ostream& s, int height)
 {
 	/* Each point may have a polygon below it and a polygon to the right of it:
 	 *
@@ -85,7 +85,7 @@ static void write_terrain(std::ostream& s)
 
 	std::map<const Vector*, int> pointtoindex;
 	std::map<int, const Vector*> indextopoint;
-	for (int y=0; y<SHMIXELS; y++)
+	for (int y=0; y<height; y++)
 	{
 		for (int x=0; x<SHMIXELS; x++)
 		{
@@ -100,7 +100,7 @@ static void write_terrain(std::ostream& s)
 	}
 
 	std::vector<const Vector*> facelist;
-	for (int y=0; y<SHMIXELS-1; y++)
+	for (int y=0; y<height-1; y++)
 	{
 		for (int x=0; x<SHMIXELS-1; x++)
 		{
@@ -156,7 +156,7 @@ static void write_terrain(std::ostream& s)
 		int b = pointtoindex[facelist[i+1]];
 		int c = pointtoindex[facelist[i+2]];
 
-		s << "3 " << c << " " << b << " " << a << "\n";
+		s << "3 " << a << " " << b << " " << c << "\n";
 
 		writer.addFace(a, b, c);
 	}
@@ -182,8 +182,8 @@ int main(int argc, const char* argv[])
 
 		double latitude = 20.73;
 		double longitude = -3.8;
-		double altitude = RADIUS+SEALEVEL+100;
-		double azimuth = -90;
+		double altitude = RADIUS+SEALEVEL+10;
+		double azimuth = -20;
 		double bearing = 90;
 
 		Transform view;
@@ -202,8 +202,13 @@ int main(int argc, const char* argv[])
 				<< terrain.altitude(camera.normalise()) - RADIUS
 				<< "\n";
 
-		Transform row = view.rotate(Vector::X, -FOV/2 + SHMIXELSTEP/2);
-		for (int y=0; y<SHMIXELS; y++)
+		double angle_to_bottom = azimuth + 90 + FOV/2;
+		int shmixels_to_bottom = (int)(angle_to_bottom / SHMIXELSTEP);
+		points = new Vector[SHMIXELS * shmixels_to_bottom];
+		std::cerr << "outputing mesh of " << SHMIXELS << "x" << shmixels_to_bottom << " shmixels\n";
+
+		Transform row = view.rotate(Vector::X, FOV/2 + SHMIXELSTEP/2);
+		for (int y=0; y<shmixels_to_bottom; y++)
 		{
 			Transform m = row.rotate(Vector::Z, -FOV/2 + SHMIXELSTEP/2);
 
@@ -221,12 +226,12 @@ int main(int argc, const char* argv[])
 				m = m.rotate(Vector::Z, SHMIXELSTEP);
 			}
 
-			std::cerr << y << "/" << SHMIXELS << "\r";
-			row = row.rotate(Vector::X, SHMIXELSTEP);
+			std::cerr << y << "/" << shmixels_to_bottom << "\r";
+			row = row.rotate(Vector::X, -SHMIXELSTEP);
 		}
 		std::cerr << "\n";
 
-		write_terrain(std::cout);
+		write_terrain(std::cout, shmixels_to_bottom);
 	}
 	catch (const char* e)
 	{
