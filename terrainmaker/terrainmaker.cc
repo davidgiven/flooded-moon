@@ -17,10 +17,13 @@
 
 const double RADIUS = 1737.400;
 const double SEALEVEL = -2;
-const double SPHEREFUDGE = 10;
+const double ATMOSPHERE = 20;
 const double FOV = 50;
-const int SHMIXELS = 256;
+const int SHMIXELS = 512;
 const double SCALE = 1;
+
+using std::min;
+using std::max;
 
 #include "utils.h"
 #include "matrix.h"
@@ -56,7 +59,7 @@ static double intersect(const Ray& ray)
 	double l_dot_D = ray.direction.dot(D);
 	double D_squared = D.dot(D);
 
-	double r = RADIUS - SPHEREFUDGE;
+	double r = RADIUS;
 	double sqrt_term = l_dot_D*l_dot_D - D_squared + r*r;
 	double t0 = -l_dot_D + sqrt(sqrt_term);
 	double t1 = -l_dot_D - sqrt(sqrt_term);
@@ -183,7 +186,7 @@ int main(int argc, const char* argv[])
 
 		double latitude = 20.73;
 		double longitude = -3.2;
-		double altitude = RADIUS+SEALEVEL+5;
+		double altitude = SEALEVEL+5;
 		double azimuth = -20;
 		double bearing = 70;
 
@@ -192,12 +195,13 @@ int main(int argc, const char* argv[])
 		view = view.rotate(Vector::Y, -longitude);
 		view = view.rotate(Vector::X, -latitude);
 		view = view.rotate(Vector::X, -90);
-		view = view.translate(Vector(0, altitude, 0));
+		view = view.translate(Vector(0, RADIUS+altitude, 0));
 		view = view.rotate(Vector::Y, -bearing);
 		view = view.rotate(Vector::X, 90 + azimuth);
 
 		Vector camera = view.untransform(Vector::ORIGIN);
-		CameraWriter().write("mitsuba/camera.xml", "mitsuba/camera.tmpl.xml", view);
+		CameraWriter().write("mitsuba/camera.xml", "mitsuba/camera.tmpl.xml",
+				view, altitude);
 
 		std::cerr << "height of terrain at camera is "
 				<< terrain.terrain(camera.normalise()) - RADIUS
@@ -205,6 +209,8 @@ int main(int argc, const char* argv[])
 
 		double angle_to_bottom = azimuth + 90 + FOV/2;
 		int shmixels_to_bottom = (int)(angle_to_bottom / SHMIXELSTEP);
+		shmixels_to_bottom = max(shmixels_to_bottom, SHMIXELS);
+
 		points = new Vector[SHMIXELS * shmixels_to_bottom];
 		std::cerr << "outputing mesh of " << SHMIXELS << "x" << shmixels_to_bottom << " shmixels\n";
 

@@ -5,8 +5,17 @@ public:
 	{
 	}
 
+private:
+	void replace(std::string& haystack, const std::string& needle,
+			const std::string& subst)
+	{
+		size_t replstart = haystack.find(needle);
+		haystack.replace(replstart, needle.size(), subst);
+	}
+
+public:
 	void write(const char* outfilename, const char* tmplfilename,
-			Transform& view)
+			Transform& view, double altitude)
 	{
 		std::ifstream templatef(tmplfilename);
 		std::stringstream templatebuffer;
@@ -33,8 +42,12 @@ public:
 				<< "up=\""
 				<< up.x << ", " << up.y << ", " << up.z << "\"/>\n";
 
-		size_t replstart = templates.find("<LOOKAT/>");
-		templates.replace(replstart, 9, lookatbuffer.str());
+		replace(templates, "<LOOKAT/>", lookatbuffer.str());
+
+		if (altitude > ATMOSPHERE)
+			replace(templates, "<AIR/>", "");
+		else
+			replace(templates, "<AIR/>", "<ref id=\"air\"/>");
 
 		std::ofstream outputf(outfilename, std::ios::out);
 		outputf << templates;

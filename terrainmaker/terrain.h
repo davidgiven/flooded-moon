@@ -24,7 +24,7 @@ public:
 
 	double geoid(double lon, double lat) const
 	{
-		double d = _geoid.lookup(lon-M_PI, lat);
+		double d = _geoid.lookup(lon - M_PI, lat);
 		return (d * 1081.1) - 525.3;
 	}
 
