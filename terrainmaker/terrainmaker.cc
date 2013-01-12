@@ -18,9 +18,15 @@
 const double RADIUS = 1737.400;
 const double SEALEVEL = -2;
 const double ATMOSPHERE = 20;
-const double FOV = 50;
-const int SHMIXELS = 512;
+const double FOV = 60;
+const int SHMIXELS = 32;
 const double SCALE = 1;
+
+double latitude = 20.73;
+double longitude = -3.2;
+double altitude = SEALEVEL+5;
+double azimuth = -20;
+double bearing = 70;
 
 using std::min;
 using std::max;
@@ -74,7 +80,7 @@ static double intersect(const Ray& ray)
 	return t1;
 }
 
-static void write_terrain(std::ostream& s, int height)
+static void write_terrain(int height)
 {
 	/* Each point may have a polygon below it and a polygon to the right of it:
 	 *
@@ -131,28 +137,11 @@ static void write_terrain(std::ostream& s, int height)
 
 	MeshWriter writer;
 
-
-	s << "ply\n"
-		 "format ascii 1.0\n"
-		 "element vertex " << indextopoint.size() << "\n"
-		 "property float x\n"
-		 "property float y\n"
-		 "property float z\n"
-		 "element face " << facelist.size()/3 << "\n"
-		 "property list uchar int vertex_indices\n"
-		 "end_header\n";
-
-	/* Write out the vertices. */
-
 	for (int i=0; i<indextopoint.size(); i++)
 	{
 		const Vector& v = *indextopoint[i];
-		s << v.x*SCALE << " " << v.y*SCALE << " " << v.z*SCALE << "\n";
-
 		writer.addPoint(v);
 	}
-
-	/* Write out the faces. */
 
 	for (int i=0; i<facelist.size(); i+=3)
 	{
@@ -160,12 +149,10 @@ static void write_terrain(std::ostream& s, int height)
 		int b = pointtoindex[facelist[i+1]];
 		int c = pointtoindex[facelist[i+2]];
 
-		s << "3 " << a << " " << b << " " << c << "\n";
-
 		writer.addFace(a, b, c);
 	}
 
-	writer.writeTo("/tmp/moon.serialized");
+	writer.writeTo("/tmp/moon.ply");
 }
 
 static Vector mapToTerrain(const Terrain& terrain, const Vector& p)
@@ -183,12 +170,6 @@ int main(int argc, const char* argv[])
 	try
 	{
 		Terrain terrain("topography.pgm", "geoid.pgm");
-
-		double latitude = 20.73;
-		double longitude = -3.2;
-		double altitude = SEALEVEL+5;
-		double azimuth = -20;
-		double bearing = 70;
 
 		Transform view;
 		view = view.lookAt(Vector::ORIGIN, Vector::Y, Vector::Z);
@@ -238,7 +219,7 @@ int main(int argc, const char* argv[])
 		}
 		std::cerr << "\n";
 
-		write_terrain(std::cout, shmixels_to_bottom);
+		write_terrain(shmixels_to_bottom);
 	}
 	catch (const char* e)
 	{

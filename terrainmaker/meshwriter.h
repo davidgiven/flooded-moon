@@ -25,35 +25,31 @@ public:
 	void writeTo(const char* filename)
 	{
 		std::ofstream of;
-		of.open(filename, std::ios::out | std::ios::binary);
-		of.close();
+		of.open(filename, std::ios::out);
+
+		of << "ply\n"
+			 "format ascii 1.0\n"
+			 "element vertex " << _points.size() << "\n"
+			 "property float x\n"
+			 "property float y\n"
+			 "property float z\n"
+			 "element face " << _faces.size() << "\n"
+			 "property list uchar int vertex_indices\n"
+			 "end_header\n";
 
 		std::cerr << _points.size() << " vertices and " << _faces.size() << " faces\n";
-	}
 
-private:
-	void write_u16(std::ofstream& of, u_int16_t v)
-	{
-		of << (u_int8_t) (v & 0xff);
-		of << (u_int8_t) (v >> 8);
-	}
+		for (int i=0; i<_points.size(); i++)
+		{
+			const Vector& v = _points[i];
+			of << v.x << " " << v.y << " " << v.z << "\n";
+		}
 
-	void write_u32(std::ofstream& of, u_int32_t v)
-	{
-		write_u16(of, v & 0xffff);
-		write_u16(of, v >> 16);
-	}
-
-	void write_u64(std::ofstream& of, u_int64_t v)
-	{
-		write_u32(of, v & 0xffffffff);
-		write_u32(of, v >> 32);
-	}
-
-	void write_double(std::ofstream& of, double d)
-	{
-		u_int8_t* p = (u_int8_t*) &d;
-
+		for (int i=0; i<_faces.size(); i++)
+		{
+			const Triangle& t = _faces[i];
+			of << "3 " << t.a << " " << t.b << " " << t.c << "\n";
+		}
 	}
 
 private:
