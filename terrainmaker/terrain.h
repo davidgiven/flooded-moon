@@ -10,6 +10,7 @@ public:
 private:
 	SphereMap _terrain;
 	SphereMap _geoid;
+	noise::module::Perlin _noise;
 
 public:
 	// The geoid data has range 1081.1 and offset 525.3. SphereMap reads it out of
@@ -36,6 +37,14 @@ public:
 		return (d - 0.5) * 22000.0;
 	}
 
+	// Procedurally perturbs the terrain.
+
+	double perturb(double altitude, const Point& p) const
+	{
+		double n = _noise.GetValue(p.x/1, p.y/1, p.z/1)*50;
+		return n;
+	}
+
 	double terrain(const Point& v) const
 	{
 		static Transform t = Transform().rotate(Vector::X, -90);
@@ -50,6 +59,11 @@ public:
 
 		//return sin(lon*20)*50 + RADIUS;
 		double m = altitude(lon, lat) - geoid(lon, lat);
-		return m/1000.0 + RADIUS;
+//		m = 0;
+		double alt = m/1000.0 + RADIUS;
+		Point nv(vv.x*alt/r, vv.y*alt/r, vv.z*alt/r);
+
+		alt += perturb(m, nv) / 1000.0;
+		return alt;
 	}
 };

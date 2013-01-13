@@ -14,6 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <libnoise/noise.h>
 
 const double RADIUS = 1737.400;
 const double SEALEVEL = -2;
@@ -23,7 +24,7 @@ const double FOV = 50;
 
 double latitude = 20.73;
 double longitude = -3.2;
-double altitude = 0.2;
+double altitude = 0.5;
 double azimuth = 0;
 double bearing = 70;
 

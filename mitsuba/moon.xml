@@ -51,8 +51,9 @@
 	<shape type="ply">
 		<string name="filename" value="/tmp/moon.ply"/>
 		<boolean name="faceNormals" value="false"/>
-		<!-- <ref id="white"/> -->
+		<ref id="white"/>
 		
+		<!--
 		<bsdf type="diffuse">
 			<texture type="wireframe" name="reflectance">
 				<rgb name="interiorColor" value="0.9,0.9,0.9"/>
@@ -60,6 +61,7 @@
 				<float name="lineWidth" value="0.01"/>
 			</texture>
 		</bsdf>
+		-->
 	</shape>
 	
 	<shape type="sphere">
@@ -76,7 +78,6 @@
 <!--
 		<ref name="interior" id="air"/>
 		-->
-		
 		<medium name="interior" type="heterogeneous">
 			<string name="method" value="woodcock"/>
 	
@@ -92,13 +93,11 @@
 		</medium>
 	</shape>
 	
-	<!--
 	<shape type="sphere">
 		<point name="center" x="0" y="0" z="0"/>
 		<float name="radius" value="1755.400"/>
 		<ref name="interior" id="air"/>
 	</shape>
-	-->
 	
 	<!--
 	<emitter type="envmap">
