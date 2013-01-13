@@ -22,15 +22,15 @@ public:
 		templatebuffer << templatef.rdbuf();
 		std::string templates = templatebuffer.str();
 
-		Vector camera = view.untransform(Vector::ORIGIN);
+		Point camera = view.untransform(Point::ORIGIN);
 		std::cerr << "camera at (" << camera.x << ", " << camera.y
 				<< ", " << camera.z << ")\n";
 
-		Vector target = view.untransform(Vector::Y);
+		Point target = view.untransform(Point(0, 1, 0));
 		std::cerr << "looking at (" << target.x << ", " << target.y
 				<< ", " << target.z << ")\n";
 
-		Vector up = (view.untransform(Vector::Z) - camera).normalise();
+		Vector up = (view.untransform(Point(0, 0, 1)) - camera).normalise();
 		std::cerr << "up (" << up.x << ", " << up.y
 				<< ", " << up.z << ")\n";
 

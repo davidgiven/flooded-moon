@@ -36,10 +36,10 @@ public:
 		return (d - 0.5) * 22000.0;
 	}
 
-	double terrain(const Vector& v) const
+	double terrain(const Point& v) const
 	{
 		static Transform t = Transform().rotate(Vector::X, -90);
-		Vector vv = t.transform(v);
+		Point vv = t.transform(v);
 
 		double r = vv.length();
 		double lat = acos(vv.y / r);

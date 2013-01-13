@@ -1,26 +1,21 @@
 struct Vector
 {
-	static Vector ORIGIN;
 	static Vector X;
 	static Vector Y;
 	static Vector Z;
 
-	double x, y, z, w;
+	double x, y, z;
 
 	Vector():
-		x(NAN), y(NAN), z(NAN), w(NAN)
-	{}
-
-	Vector(double xx, double yy, double zz, double ww):
-		x(xx), y(yy), z(zz), w(ww)
+		x(NAN), y(NAN), z(NAN)
 	{}
 
 	Vector(double xx, double yy, double zz):
-		x(xx), y(yy), z(zz), w(1.0)
+		x(xx), y(yy), z(zz)
 	{}
 
 	Vector(const Vector& o):
-		x(o.x), y(o.y), z(o.z), w(o.w)
+		x(o.x), y(o.y), z(o.z)
 	{}
 
 	Vector& operator = (const Vector& o)
@@ -28,8 +23,18 @@ struct Vector
 		x = o.x;
 		y = o.y;
 		z = o.z;
-		w = o.w;
 		return *this;
+	}
+
+	bool operator< (const Vector& o) const
+	{
+		if (x < o.x) return true;
+		if (x > o.x) return false;
+		if (y < o.y) return true;
+		if (y > o.y) return false;
+		if (z < o.z) return true;
+		if (z > o.z) return false;
+		return false;
 	}
 
 	bool isValid() const
@@ -39,22 +44,22 @@ struct Vector
 
 	Vector operator + (const Vector& o) const
 	{
-		return Vector(x + o.x, y + o.y, z + o.z, w + o.w);
+		return Vector(x + o.x, y + o.y, z + o.z);
 	}
 
 	Vector operator - (const Vector& o) const
 	{
-		return Vector(x - o.x, y - o.y, z - o.z, w - o.w);
+		return Vector(x - o.x, y - o.y, z - o.z);
 	}
 
 	Vector operator * (double f) const
 	{
-		return Vector(x*f, y*f, z*f, w*f);
+		return Vector(x*f, y*f, z*f);
 	}
 
 	Vector operator / (double f) const
 	{
-		return Vector(x/f, y/f, z/f, w/f);
+		return Vector(x/f, y/f, z/f);
 	}
 
 	double length() const
@@ -88,10 +93,79 @@ struct Vector
 	}
 };
 
-Vector Vector::ORIGIN(0, 0, 0);
 Vector Vector::X(1, 0, 0);
 Vector Vector::Y(0, 1, 0);
 Vector Vector::Z(0, 0, 1);
+
+struct Point
+{
+	static Point ORIGIN;
+
+	double x, y, z;
+
+	Point():
+		x(NAN), y(NAN), z(NAN)
+	{}
+
+	Point(double xx, double yy, double zz):
+		x(xx), y(yy), z(zz)
+	{}
+
+	Point(const Vector& o):
+		x(o.x), y(o.y), z(o.z)
+	{}
+
+	Point& operator = (const Vector& o)
+	{
+		x = o.x;
+		y = o.y;
+		z = o.z;
+		return *this;
+	}
+
+	bool operator < (const Point& o) const
+	{
+		if (x < o.x) return true;
+		if (x > o.x) return false;
+		if (y < o.y) return true;
+		if (y > o.y) return false;
+		if (z < o.z) return true;
+		if (z > o.z) return false;
+		return false;
+	}
+
+	Vector toVector() const
+	{
+		return Vector(x, y, z);
+	}
+
+	bool isValid() const
+	{
+		return !isnan(x);
+	}
+
+	Point operator + (const Vector& o) const
+	{
+		return Point(x+o.x, y+o.y, z+o.z);
+	}
+
+	Point operator - (const Vector& o) const
+	{
+		return Point(x-o.x, y-o.y, z-o.z);
+	}
+
+	Vector operator - (const Point& o) const
+	{
+		return Vector(x-o.x, y-o.y, z-o.z);
+	}
+
+	double length() const
+	{
+		return sqrt(x*x + y*y + z*z);
+	}
+};
+
+Point Point::ORIGIN(0, 0, 0);
 
 struct Matrix
 {
@@ -145,12 +219,19 @@ public:
     {
     	const Matrix& s = *this;
 
+		double x = s(0,0)*v.x + s(0,1)*v.y + s(0,2)*v.z + s(0,3);
+		double y = s(1,0)*v.x + s(1,1)*v.y + s(1,2)*v.z + s(1,3);
+		double z = s(2,0)*v.x + s(2,1)*v.y + s(2,2)*v.z + s(2,3);
+		double w = s(3,0)*v.x + s(3,1)*v.y + s(3,2)*v.z + s(3,3);
+		return Vector(x/w, y/w, z/w);
+#if 0
 		return Vector(
 			s(0,0)*v.x + s(0,1)*v.y + s(0,2)*v.z + s(0,3)*v.w,
 			s(1,0)*v.x + s(1,1)*v.y + s(1,2)*v.z + s(1,3)*v.w,
 			s(2,0)*v.x + s(2,1)*v.y + s(2,2)*v.z + s(2,3)*v.w,
 			s(3,0)*v.x + s(3,1)*v.y + s(3,2)*v.z + s(3,3)*v.w
 		);
+#endif
 	}
 
     Matrix operator * (const Matrix& o) const
@@ -364,9 +445,20 @@ public:
 		_itset = false;
 	}
 
-	Vector transform(const Vector& v) const
+private:
+	Point multiplyPoint(const Matrix& m, const Point& p) const
 	{
-		return t * v;
+		double x = m(0,0)*p.x + m(0,1)*p.y + m(0,2)*p.z + m(0,3);
+		double y = m(1,0)*p.x + m(1,1)*p.y + m(1,2)*p.z + m(1,3);
+		double z = m(2,0)*p.x + m(2,1)*p.y + m(2,2)*p.z + m(2,3);
+		double w = m(3,0)*p.x + m(3,1)*p.y + m(3,2)*p.z + m(3,3);
+		return Point(x/w, y/w, z/w);
+	}
+
+public:
+	Point transform(const Point& p) const
+	{
+		return multiplyPoint(t, p);
 	}
 
 	const Matrix& inverse()
@@ -379,10 +471,9 @@ public:
 		return _it;
 	}
 
-	Vector untransform(const Vector& v)
+	Point untransform(const Point& p)
 	{
-
-		return inverse() * v;
+		return multiplyPoint(inverse(), p);
 	}
 
     Transform apply(const Matrix& o) const
@@ -451,7 +542,7 @@ public:
     	return apply(t);
     }
 
-    Transform lookAt(const Vector& p, const Vector& t, const Vector& up) const
+    Transform lookAt(const Point& p, const Point& t, const Vector& up) const
     {
     	Vector dir = (t-p).normalise();
     	Vector left = up.cross(dir).normalise();

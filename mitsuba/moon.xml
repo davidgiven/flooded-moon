@@ -50,7 +50,16 @@
 
 	<shape type="ply">
 		<string name="filename" value="/tmp/moon.ply"/>
-		<ref id="white"/>
+		<boolean name="faceNormals" value="false"/>
+		<!-- <ref id="white"/> -->
+		
+		<bsdf type="diffuse">
+			<texture type="wireframe" name="reflectance">
+				<rgb name="interiorColor" value="0.9,0.9,0.9"/>
+				<rgb name="edgeColor" value="0,1,0"/>
+				<float name="lineWidth" value="0.01"/>
+			</texture>
+		</bsdf>
 	</shape>
 	
 	<shape type="sphere">
@@ -60,30 +69,43 @@
 		<!--
 	    <bsdf type="dielectric">
 		    <string name="intIOR" value="water"/>
-		    <string name="extIOR" value="air"/>
+		    <string name="extIOR" value="vacuum"/>
 	    </bsdf>
 	    -->
 
 <!--
-		<ref name="exterior" id="air"/>
+		<ref name="interior" id="air"/>
 		-->
 		
-		<!--
-		<medium name="interior" type="homogeneous">
-			<rgb name="sigmaS" value="1,0,0"/>
-			<rgb name="sigmaA" value="0,0,1"/>
-			<phase type="hg">
-				<float name="g" value="0.7"/>
-			</phase>
+		<medium name="interior" type="heterogeneous">
+			<string name="method" value="woodcock"/>
+	
+			<volume name="albedo" type="constvolume">
+				<rgb name="value" value="1,0,0"/>
+			</volume>
+	
+			<volume name="density" type="constvolume">
+				<float name="value" value="1"/>
+			</volume>
+			
+			<float name="stepSize" value="1000000"/>
 		</medium>
-		-->
 	</shape>
 	
+	<!--
 	<shape type="sphere">
 		<point name="center" x="0" y="0" z="0"/>
 		<float name="radius" value="1755.400"/>
 		<ref name="interior" id="air"/>
 	</shape>
+	-->
+	
+	<!--
+	<emitter type="envmap">
+		<string name="filename" value="../map.png"/>
+		<float name="scale" value="0.2"/>
+	</emitter>
+	-->
 	
 	<include filename="camera.xml"/>
 
@@ -96,7 +118,6 @@
 		</transform>
 		
 		<emitter type="area">
-			<!--<blackbody name="intensity" temperature="5777k" scale="0"/>-->
 			<spectrum name="radiance" value="50000"/>
 		</emitter>
 	</shape>
