@@ -66,4 +66,10 @@ public:
 		alt += perturb(m, nv) / 1000.0;
 		return alt;
 	}
+
+	Point mapToTerrain(const Point& p) const
+	{
+		double f = terrain(p) / p.length();
+		return Point(p.x*f, p.y*f, p.z*f);
+	}
 };

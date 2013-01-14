@@ -11,6 +11,8 @@
 #include <errno.h>
 #include <vector>
 #include <map>
+#include <list>
+#include <set>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -19,12 +21,12 @@
 const double RADIUS = 1737.400;
 const double SEALEVEL = -2;
 const double ATMOSPHERE = 20;
-const double SHMIXELS = 150;
+const double SHMIXELS = 1000;
 const double FOV = 50;
 
 double latitude = 20.73;
 double longitude = -3.2;
-double altitude = 0.5;
+double altitude = 1;
 double azimuth = 0;
 double bearing = 70;
 
@@ -37,6 +39,7 @@ using std::max;
 #include "terrain.h"
 #include "meshwriter.h"
 #include "camerawriter.h"
+#include "sphericalroam.h"
 
 static Point mapToTerrain(const Terrain& terrain, const Point& p)
 {
@@ -170,8 +173,9 @@ int main(int argc, const char* argv[])
 				<< "\n";
 
 		MeshWriter writer;
-		Generator g(writer, view, terrain);
-		g.icosahedron();
+		//Generator g(writer, view, terrain);
+		//g.icosahedron();
+		SphericalRoam(view, terrain, FOV / SHMIXELS).writeTo(writer);
 		writer.writeTo("/tmp/moon.ply");
 	}
 	catch (const char* e)

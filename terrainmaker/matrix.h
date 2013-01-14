@@ -62,9 +62,14 @@ struct Vector
 		return Vector(x/f, y/f, z/f);
 	}
 
+	double lengthSquared() const
+	{
+		return x*x + y*y + z*z;
+	}
+
 	double length() const
 	{
-		return sqrt(x*x + y*y + z*z);
+		return sqrt(lengthSquared());
 	}
 
 	double dot(const Vector& o) const
@@ -134,6 +139,11 @@ struct Point
 		return false;
 	}
 
+	bool operator == (const Point& o) const
+	{
+		return (x == o.x) && (y == o.y) && (z == o.z);
+	}
+
 	Vector toVector() const
 	{
 		return Vector(x, y, z);
@@ -159,9 +169,14 @@ struct Point
 		return Vector(x-o.x, y-o.y, z-o.z);
 	}
 
+	double lengthSquared() const
+	{
+		return x*x + y*y + z*z;
+	}
+
 	double length() const
 	{
-		return sqrt(x*x + y*y + z*z);
+		return sqrt(lengthSquared());
 	}
 };
 
