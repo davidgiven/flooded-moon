@@ -22,13 +22,13 @@ const double RADIUS = 1737.400;
 const double MAXHEIGHT = 22; // maximum height of any object on the surface
 const double SEALEVEL = -2;
 const double ATMOSPHERE = 20;
-const double SHMIXELS = 200;
+const double SHMIXELS = 50; //150;
 const double FOV = 50;
 
 double latitude = 20.73;
 double longitude = -3.2;
-double altitude = 50;
-double azimuth = -90;
+double altitude = 0.5;
+double azimuth = -30;
 double bearing = 70;
 
 using std::min;
@@ -41,6 +41,7 @@ using std::max;
 #include "meshwriter.h"
 #include "camerawriter.h"
 #include "sphericalroam.h"
+#include "propmaster.h"
 
 static Point mapToTerrain(const Terrain& terrain, const Point& p)
 {
@@ -174,10 +175,10 @@ int main(int argc, const char* argv[])
 				<< "\n";
 
 		MeshWriter writer;
-		//Generator g(writer, view, terrain);
-		//g.icosahedron();
 		SphericalRoam(view, terrain, FOV / SHMIXELS).writeTo(writer);
 		writer.writeTo("/tmp/moon.ply");
+
+		Propmaster(view, terrain, 5, 5);
 	}
 	catch (const char* e)
 	{
