@@ -60,13 +60,16 @@ public:
 		fa->setEdges(f1, f7, fb);
 		fb->setEdges(f2, f4, fa);
 
-		/* Calculate the distance to the horizon. */
+		/* Calculate the maximum sight distance. */
 
 		double cameradistance = view.transform(Point::ORIGIN).length();
 		std::cerr << "distance to core is " << cameradistance << "km\n";
-		double horizonsquared = cameradistance*cameradistance - RADIUS*RADIUS;
-		double horizon = sqrt(horizonsquared);
-		std::cerr << "distance to horizon is " << horizon << "km\n";
+		double tallest = MAXHEIGHT + RADIUS;
+		double horizon = sqrt(cameradistance*cameradistance - RADIUS*RADIUS);
+		double maxsight = horizon + sqrt(tallest*tallest - RADIUS*RADIUS);
+		double maxsightsquared = maxsight*maxsight;
+		std::cerr << "distance to horizon is " << horizon <<
+				"; maximum sight distance is " << maxsight << "\n";
 
 		int i = 0;
 		while (!_pendingFacets.empty())
@@ -75,29 +78,46 @@ public:
 			Facet* facet = *iterator;
 			_pendingFacets.erase(iterator);
 
-			double e = facet->getError(_view, _terrain);
-			if (e < _error)
-				_completedFacets.insert(facet);
-			else
+			/* Is this facet over the maxsight? (Make an exception for very
+			 * big facets.)
+			 */
+
+			Point va = view.transform(facet->pa);
+			Point vb = view.transform(facet->pb);
+			Point vc = view.transform(facet->pc);
+
+			double distancesquared = va.lengthSquared();
+			double sizesquared = (facet->pa - facet->pb).lengthSquared();
+			if ((sizesquared > maxsightsquared) ||
+					(distancesquared < maxsightsquared))
 			{
-				/* Cull facets that are way over the horizon.
-				 * (But make an exception for facets which are very big.)
-				 */
+				/* Calculate the apparent size of the facet. */
 
-				Point va = view.transform(facet->pa);
-				double distancesquared = va.lengthSquared();
-				double sizesquared = (facet->pa - facet->pb).lengthSquared();
+				Vector ca = va.toVector().normalise();
+				Vector cb = vb.toVector().normalise();
+				Vector cc = vc.toVector().normalise();
 
-				if ((sizesquared > horizonsquared) || (distancesquared < horizonsquared*2))
+				double dab = ca.dot(cb);
+				double dac = ca.dot(cc);
+				double dbc = cb.dot(cc);
+
+				double a = min(acos(dab), min(acos(dac), acos(dbc)));
+				if (a > _error)
+				{
+					/* Split this facet. */
 					split(facet);
+				}
 				else
 				{
-					/*
-					std::cerr << "culling " << sqrt(sizesquared) << " " << sqrt(horizonsquared) <<
-							" " << sqrt(distancesquared) << " " << sqrt(horizonsquared*4) << "\n";
-							*/
+					/* Otherwise, don't bother with it. */
 					_completedFacets.insert(facet);
 				}
+			}
+			else
+			{
+				/* Over maxsight facets just get dropped on the floor,
+				 * neither completed nor pending.
+				 */
 			}
 
 			i++;

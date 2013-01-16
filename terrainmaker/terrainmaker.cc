@@ -19,15 +19,16 @@
 #include <libnoise/noise.h>
 
 const double RADIUS = 1737.400;
+const double MAXHEIGHT = 22; // maximum height of any object on the surface
 const double SEALEVEL = -2;
 const double ATMOSPHERE = 20;
-const double SHMIXELS = 1000;
+const double SHMIXELS = 200;
 const double FOV = 50;
 
 double latitude = 20.73;
 double longitude = -3.2;
-double altitude = 1;
-double azimuth = 0;
+double altitude = 50;
+double azimuth = -90;
 double bearing = 70;
 
 using std::min;
