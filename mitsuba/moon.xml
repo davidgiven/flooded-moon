@@ -48,23 +48,20 @@
 		<float name="stepSize" value="10"/>
 	</medium>
 
-	<shape type="ply">
+	<shape type="ply" name="Terrain">
 		<string name="filename" value="/tmp/moon.ply"/>
 		<boolean name="faceNormals" value="false"/>
-		<ref id="white"/>
 		
-		<!--
 		<bsdf type="diffuse">
 			<texture type="wireframe" name="reflectance">
-				<rgb name="interiorColor" value="0.9,0.9,0.9"/>
-				<rgb name="edgeColor" value="0,1,0"/>
-				<float name="lineWidth" value="0.01"/>
+				<rgb name="interiorColor" value="0.6,0.6,0.6"/>
+				<rgb name="edgeColor" value="0,0.5,0"/>
+				<float name="lineWidth" value="0.001"/>
 			</texture>
 		</bsdf>
-		-->
 	</shape>
 	
-	<shape type="sphere">
+	<shape type="sphere" name="Ocean">
 		<point name="center" x="0" y="0" z="0"/>
 		<float name="radius" value="1735.400"/>
 		
@@ -93,11 +90,13 @@
 		</medium>
 	</shape>
 	
+	<!--
 	<shape type="sphere">
 		<point name="center" x="0" y="0" z="0"/>
 		<float name="radius" value="1755.400"/>
 		<ref name="interior" id="air"/>
 	</shape>
+	-->
 	
 	<!--
 	<emitter type="envmap">
@@ -107,13 +106,14 @@
 	-->
 	
 	<include filename="camera.xml"/>
+	<include filename="/tmp/props.xml"/>
 
 	<shape type="sphere">
 		<point name="center" x="-149597871" y="0" z="0"/>
 		<float name="radius" value="696342"/>
 
 		<transform name="toWorld">
-			<rotate y="1" angle="30"/>
+			<rotate z="1" angle="30"/>
 		</transform>
 		
 		<emitter type="area">

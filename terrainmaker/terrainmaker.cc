@@ -27,8 +27,8 @@ const double FOV = 50;
 
 double latitude = 20.73;
 double longitude = -3.2;
-double altitude = 0.5;
-double azimuth = -30;
+double altitude = SEALEVEL + 0.002;
+double azimuth = 0;
 double bearing = 70;
 
 using std::min;
@@ -50,106 +50,6 @@ static Point mapToTerrain(const Terrain& terrain, const Point& p)
 	double f = terrain.terrain(p) / p.length();
 	return Point(p.x*f, p.y*f, p.z*f);
 }
-
-class Generator
-{
-public:
-	Generator(MeshWriter& writer, const Transform& view, const Terrain& terrain):
-		_writer(writer),
-		_view(view),
-		_terrain(terrain),
-		_minangle(degToRad(FOV / SHMIXELS))
-	{
-	}
-
-	void commitFacet(const Point& va, const Point& vb, const Point& vc)
-	{
-		_writer.addFace(vc, vb, va);
-	}
-
-	void subdivide(const Point& va, const Point& vb, const Point& vc)
-	{
-		Point vab = Vector(va.x+vb.x, va.y+vb.y, va.z+vb.z).normalise() * RADIUS;
-		Point vbc = Vector(vb.x+vc.x, vb.y+vc.y, vb.z+vc.z).normalise() * RADIUS;
-		Point vca = Vector(vc.x+va.x, vc.y+va.y, vc.z+va.z).normalise() * RADIUS;
-
-		facet(va, vab, vca);
-		facet(vb, vbc, vab);
-		facet(vc, vca, vbc);
-		facet(vab, vbc, vca);
-	}
-
-	void facet(const Point& va, const Point& vb, const Point& vc)
-	{
-		Point ta = mapToTerrain(_terrain, va);
-		Point tb = mapToTerrain(_terrain, vb);
-		Point tc = mapToTerrain(_terrain, vc);
-
-		Vector ca = _view.transform(ta).toVector().normalise();
-		Vector cb = _view.transform(tb).toVector().normalise();
-		Vector cc = _view.transform(tc).toVector().normalise();
-
-		double dab = ca.dot(cb);
-		double dac = ca.dot(cc);
-		double dbc = cb.dot(cc);
-
-		double a = min(acos(dab), min(acos(dac), acos(dbc)));
-
-		if (a < _minangle)
-			commitFacet(ta, tb, tc);
-		else
-			subdivide(ta, tb, tc);
-	}
-
-	void icosahedron()
-	{
-		double x = 0.525731112119133606 * RADIUS;
-		double z = 0.850650808352039932 * RADIUS;
-
-		Point v0(-x, 0, z);
-		Point v1(x, 0, z);
-		Point v2(-x, 0, -z);
-		Point v3(x, 0, -z);
-		Point v4(0, z, x);
-		Point v5(0, z, -x);
-		Point v6(0, -z, x);
-		Point v7(0, -z, -x);
-		Point v8(z, x, 0);
-		Point v9(-z, x, 0);
-		Point va(z, -x, 0);
-		Point vb(-z, -x, 0);
-
-		facet(v0, v4, v1);
-		facet(v0, v9, v4);
-		facet(v9, v5, v4);
-		facet(v4, v5, v8);
-		facet(v4, v8, v1);
-
-		facet(v8, va, v1);
-		facet(v8, v3, va);
-		facet(v5, v3, v8);
-		facet(v5, v2, v3);
-		facet(v2, v7, v3);
-
-		facet(v7, va, v3);
-		facet(v7, v6, va);
-		facet(v7, vb, v6);
-		facet(vb, v0, v6);
-		facet(v0, v1, v6);
-
-		facet(v6, v1, va);
-		facet(v9, v0, vb);
-		facet(v9, vb, v2);
-		facet(v9, v2, v5);
-		facet(v7, v2, vb);
-	}
-
-private:
-	MeshWriter& _writer;
-	const Transform& _view;
-	const Terrain& _terrain;
-	double _minangle;
-};
 
 int main(int argc, const char* argv[])
 {
@@ -174,11 +74,8 @@ int main(int argc, const char* argv[])
 				<< (terrain.terrain(camera) - RADIUS - SEALEVEL)
 				<< "\n";
 
-		MeshWriter writer;
-		SphericalRoam(view, terrain, FOV / SHMIXELS).writeTo(writer);
-		writer.writeTo("/tmp/moon.ply");
-
-		Propmaster(view, terrain, 5, 5);
+		SphericalRoam(view, terrain, FOV / SHMIXELS).writeTo("/tmp/moon.ply");
+		Propmaster(view, terrain, 10, 40).writeTo("/tmp/props.xml");
 	}
 	catch (const char* e)
 	{

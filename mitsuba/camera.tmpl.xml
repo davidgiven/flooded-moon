@@ -3,6 +3,7 @@
 	<sensor type="perspective">
 		<float name="focusDistance" value="1.25668"/>
 		<float name="fov" value="45.8402"/>
+		<float name="farClip" value="1e9"/>
 		<string name="fovAxis" value="x"/>
 		<transform name="toWorld">
 			<rotate z="1" angle="180"/>
@@ -20,6 +21,6 @@
 			<rfilter type="gaussian"/>
 		</film>
 		
-		<AIR/>
+		<!-- <AIR/> -->
 	</sensor>
 </scene>
