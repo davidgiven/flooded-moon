@@ -1,6 +1,6 @@
 class Propmaster
 {
-	typedef u_int64_t SectorID;
+	typedef u_int32_t SectorID;
 
 	struct Sector
 	{
@@ -24,33 +24,16 @@ public:
 
 	void writeTo(const char* filename)
 	{
-		std::ofstream of;
-		of.open(filename, std::ios::out);
-		of.precision(10);
-		of << std::scientific;
-
-		of << "<?xml version='1.0' encoding='utf-8'?>\n"
-			  "<scene version='0.4.0'>\n";
+		MeshWriter writer;
 
 		for (Sectors::const_iterator i = _sectors.begin(),
 				e = _sectors.end(); i != e; i++)
 		{
 			Sector* sector = *i;
-
-			Point m(
-					(sector->pa.x+sector->pb.x+sector->pc.x) / 3,
-					(sector->pa.y+sector->pb.y+sector->pc.y) / 3,
-					(sector->pa.z+sector->pb.z+sector->pc.z) / 3
-				);
-			m = _terrain.mapToTerrain(sector->pa);
-
-			of << "<shape type='sphere'>"
-				  "<point name='center' x='" << m.x << "' y='" << m.y << "' z='" << m.z << "'/>"
-				  "<float name='radius' value='0.100'/>"
-				  "</shape>";
+			emitSector(writer, sector);
 		}
 
-		of << "</scene>\n";
+		writer.writeTo(filename);
 	}
 
 private:
@@ -160,6 +143,53 @@ private:
 		facet(v9, vb, v2, 17);
 		facet(v9, v2, v5, 18);
 		facet(v7, v2, vb, 19);
+	}
+
+	void emitTree(MeshWriter& writer, const Point& p, double width, double height)
+	{
+		Vector up = p.toVector().normalise();
+		Vector tocamera = (p - _camera).normalise();
+		Vector sideways = up.cross(tocamera);
+
+		Point top = p + up*height;
+		Point left = p + sideways*width;
+		Point right = p - sideways*width;
+
+		writer.addFace(right, top, left);
+	}
+
+	void emitSector(MeshWriter& writer, Sector* sector)
+	{
+		/* Calculate the area of the sector. */
+
+		double ab = (sector->pa - sector->pb).length();
+		double ac = (sector->pa - sector->pc).length();
+		double bc = (sector->pb - sector->pc).length();
+		double area = area_of_triangle(ab, ac, bc);
+
+		double density = 100; // trees per square kilometre
+		int treecount = (int)(area * density);
+
+		srand(sector->id);
+		for (int i = 0; i < treecount; i++)
+		{
+			double b0 = randf();
+			double b1 = (1-b0) * randf();
+			double b2 = 1 - b0 - b1;
+
+			Point p(
+					sector->pa.x*b0 + sector->pb.x*b1 + sector->pc.x*b2,
+					sector->pa.y*b0 + sector->pb.y*b1 + sector->pc.y*b2,
+					sector->pa.z*b0 + sector->pb.z*b1 + sector->pc.z*b2
+				);
+
+			double altitude = _terrain.terrain(p);
+			if (altitude > (RADIUS+SEALEVEL+0.02))
+			{
+				p = _terrain.mapToTerrain(p, altitude);
+				emitTree(writer, p, 0.01, 0.1);
+			}
+		}
 	}
 
 private:

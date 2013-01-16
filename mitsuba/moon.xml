@@ -61,6 +61,17 @@
 		</bsdf>
 	</shape>
 	
+	<shape type="ply" name="Props">
+		<string name="filename" value="/tmp/props.ply"/>
+		<boolean name="faceNormals" value="true"/>
+		
+		<bsdf type="twosided">
+			<bsdf type="diffuse">
+				<rgb name="reflectance" value="0.1328125,0.54296875,0.13671875"/>
+	    	</bsdf>
+	    </bsdf>
+	</shape>
+	
 	<shape type="sphere" name="Ocean">
 		<point name="center" x="0" y="0" z="0"/>
 		<float name="radius" value="1735.400"/>
@@ -90,13 +101,11 @@
 		</medium>
 	</shape>
 	
-	<!--
 	<shape type="sphere">
 		<point name="center" x="0" y="0" z="0"/>
 		<float name="radius" value="1755.400"/>
 		<ref name="interior" id="air"/>
 	</shape>
-	-->
 	
 	<!--
 	<emitter type="envmap">
@@ -106,7 +115,6 @@
 	-->
 	
 	<include filename="camera.xml"/>
-	<include filename="/tmp/props.xml"/>
 
 	<shape type="sphere">
 		<point name="center" x="-149597871" y="0" z="0"/>

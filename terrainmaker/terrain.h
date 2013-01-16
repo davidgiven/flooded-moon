@@ -69,7 +69,12 @@ public:
 
 	Point mapToTerrain(const Point& p) const
 	{
-		double f = terrain(p) / p.length();
+		return mapToTerrain(p, terrain(p));
+	}
+
+	Point mapToTerrain(const Point& p, double altitude) const
+	{
+		double f = altitude / p.length();
 		return Point(p.x*f, p.y*f, p.z*f);
 	}
 };

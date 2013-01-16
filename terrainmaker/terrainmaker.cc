@@ -25,11 +25,11 @@ const double ATMOSPHERE = 20;
 const double SHMIXELS = 50; //150;
 const double FOV = 50;
 
-double latitude = 20.73;
-double longitude = -3.2;
-double altitude = SEALEVEL + 0.002;
-double azimuth = 0;
-double bearing = 70;
+double latitude = 20.75;
+double longitude = -2.7;//-2.8;
+double altitude = SEALEVEL + 0.7;
+double azimuth = -20;
+double bearing = 90;
 
 using std::min;
 using std::max;
@@ -75,7 +75,7 @@ int main(int argc, const char* argv[])
 				<< "\n";
 
 		SphericalRoam(view, terrain, FOV / SHMIXELS).writeTo("/tmp/moon.ply");
-		Propmaster(view, terrain, 10, 40).writeTo("/tmp/props.xml");
+		Propmaster(view, terrain, 10, 60).writeTo("/tmp/props.ply");
 	}
 	catch (const char* e)
 	{

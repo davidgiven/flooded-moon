@@ -21,6 +21,6 @@
 			<rfilter type="gaussian"/>
 		</film>
 		
-		<!-- <AIR/> -->
+		<AIR/>
 	</sensor>
 </scene>
