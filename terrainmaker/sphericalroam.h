@@ -62,11 +62,12 @@ public:
 
 		/* Calculate the maximum sight distance. */
 
+		double r = RADIUS + SEALEVEL;
 		double cameradistance = view.transform(Point::ORIGIN).length();
 		std::cerr << "distance to core is " << cameradistance << "km\n";
-		double tallest = MAXHEIGHT + RADIUS;
-		double horizon = sqrt(cameradistance*cameradistance - RADIUS*RADIUS);
-		double maxsight = horizon + sqrt(tallest*tallest - RADIUS*RADIUS);
+		double tallest = MAXHEIGHT + r;
+		double horizon = sqrt(cameradistance*cameradistance - r*r);
+		double maxsight = horizon + sqrt(tallest*tallest - r*r);
 		double maxsightsquared = maxsight*maxsight;
 		std::cerr << "distance to horizon is " << horizon <<
 				"; maximum sight distance is " << maxsight << "\n";
@@ -152,14 +153,18 @@ public:
 		std::cerr << "\n";
 	}
 
-	void writeTo(MeshWriter& writer)
+	void writeTo(const char* filename)
 	{
+		MeshWriter writer;
+
 		for (std::set<Facet*>::const_iterator i = _completedFacets.begin(),
 				e = _completedFacets.end(); i != e; i++)
 		{
 			Facet* f = *i;
 			writer.addFace(f->pa, f->pb, f->pc);
 		}
+
+		writer.writeTo(filename);
 	}
 
 	/* Discard a facet (remove it from both lists) */
