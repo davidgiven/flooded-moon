@@ -187,7 +187,8 @@ private:
 			if (altitude > (RADIUS+SEALEVEL+0.02))
 			{
 				p = _terrain.mapToTerrain(p, altitude);
-				emitTree(writer, p, 0.01, 0.1);
+				double height = 0.03 + randf()*0.03;
+				emitTree(writer, p, 0.01, height);
 			}
 		}
 	}

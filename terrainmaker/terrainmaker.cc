@@ -22,14 +22,14 @@ const double RADIUS = 1737.400;
 const double MAXHEIGHT = 22; // maximum height of any object on the surface
 const double SEALEVEL = -2;
 const double ATMOSPHERE = 20;
-const double SHMIXELS = 50; //150;
+const double SHMIXELS = 150;
 const double FOV = 50;
 
 double latitude = 20.75;
-double longitude = -2.7;//-2.8;
-double altitude = SEALEVEL + 0.7;
+double longitude = -2.2;//-2.8;
+double altitude = SEALEVEL + 0.9;
 double azimuth = -20;
-double bearing = 90;
+double bearing = 50;
 
 using std::min;
 using std::max;
