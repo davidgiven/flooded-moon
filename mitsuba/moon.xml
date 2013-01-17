@@ -56,7 +56,7 @@
 			<texture type="wireframe" name="reflectance">
 				<rgb name="interiorColor" value="0.6,0.6,0.6"/>
 				<rgb name="edgeColor" value="0,0.5,0"/>
-				<float name="lineWidth" value="0.001"/>
+				<float name="lineWidth" value="0.0001"/>
 			</texture>
 		</bsdf>
 	</shape>
