@@ -5,6 +5,18 @@ poor near the poles, so we combine the three to produce a high-res map of
 the entire moon. This directory contains the data files and scripts to do
 this.
 
-The Kaguya datasets are available from their website here:
+A description of how to download the Kaguya datasets is here:
 
 http://ltvt.wikispaces.com/Obtaining+Kaguya+DEM+data
+
+...however the download URL has moved, and is now here:
+
+http://l2db.selene.darts.isas.jaxa.jp/index.html.en
+
+Direct download links are here:
+
+http://l2db.selene.darts.isas.jaxa.jp/dl/load_datafile.cgi?f=LALT_GGT_NUM
+http://l2db.selene.darts.isas.jaxa.jp/dl/load_datafile.cgi?f=LALT_GGT_MAP
+http://l2db.selene.darts.isas.jaxa.jp/dl/load_datafile.cgi?f=LALT_GT_NP_NUM
+http://l2db.selene.darts.isas.jaxa.jp/dl/load_datafile.cgi?f=LALT_GT_SP_NUM
+
