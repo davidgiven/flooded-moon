@@ -1,3 +1,10 @@
+/* TerrainMaker
+ * © 2013 David Given
+ *
+ * This software is licensed under the Simplified BSD license. See COPYING
+ * for the full text.
+ */
+
 class Propmaster
 {
 	typedef u_int32_t SectorID;
@@ -10,15 +17,24 @@ class Propmaster
 		Point pc;
 	};
 
+	std::ifstream _treeDensityFuncStream;
+	typedef double TreeDensityFunc(Compiler::Vector<3>* xyz);
+	Compiler::Program<TreeDensityFunc> _treeDensityFunc;
+
 public:
 	Propmaster(Transform& view, const Terrain& terrain, int maxrecursion,
 			double maxdistance):
+		_treeDensityFuncStream("treedensity.cal"),
+		_treeDensityFunc(calculonSymbols, _treeDensityFuncStream,
+				"(XYZ: vector*3): real"),
 		_view(view),
 		_terrain(terrain),
 		_camera(_view.untransform(Point::ORIGIN)),
 		_maxRecursion(maxrecursion),
 		_maxDistance(maxdistance)
 	{
+		_treeDensityFunc.dump();
+
 		icosahedron();
 	}
 
@@ -167,12 +183,32 @@ private:
 		double bc = (sector->pb - sector->pc).length();
 		double area = area_of_triangle(ab, ac, bc);
 
-		double density = 100; // trees per square kilometre
+		Point midpoint(
+				(sector->pa.x + sector->pb.x + sector->pc.x)/3,
+				(sector->pa.y + sector->pb.y + sector->pc.y)/3,
+				(sector->pa.z + sector->pb.z + sector->pc.z)/3
+			);
+		midpoint = _terrain.mapToTerrain(midpoint);
+
+		Compiler::Vector<3> xyz;
+		xyz.x = midpoint.x;
+		xyz.y = midpoint.y;
+		xyz.z = midpoint.z;
+		double density = _treeDensityFunc(&xyz);
 		int treecount = (int)(area * density);
 
 		srand(sector->id);
 		for (int i = 0; i < treecount; i++)
 		{
+
+			double u, v;
+			do
+			{
+				u = randf();
+				v = randf();
+			}
+			while ((u+v) > 1);
+
 			double b0 = randf();
 			double b1 = (1-b0) * randf();
 			double b2 = 1 - b0 - b1;

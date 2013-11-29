@@ -1,3 +1,10 @@
+/* TerrainMaker
+ * © 2013 David Given
+ *
+ * This software is licensed under the Simplified BSD license. See COPYING
+ * for the full text.
+ */
+
 double radToDeg(double value) { return value * (180.0f / M_PI); }
 double degToRad(double value) { return value * (M_PI / 180.0f); }
 

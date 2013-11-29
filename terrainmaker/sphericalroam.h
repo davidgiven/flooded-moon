@@ -1,3 +1,10 @@
+/* TerrainMaker
+ * © 2013 David Given
+ *
+ * This software is licensed under the Simplified BSD license. See COPYING
+ * for the full text.
+ */
+
 /* This is a variant on the classic ROAM topography rendering algorithm.
  * It's largely stolen from Sean O'Neil's implementation, now mostly forgotten.
  *

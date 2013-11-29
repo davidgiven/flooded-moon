@@ -1,3 +1,10 @@
+/* TerrainMaker
+ * © 2013 David Given
+ *
+ * This software is licensed under the Simplified BSD license. See COPYING
+ * for the full text.
+ */
+
 struct Vector
 {
 	static Vector X;
@@ -458,6 +465,7 @@ public:
 	{
 		t = o.t;
 		_itset = false;
+		return *this;
 	}
 
 private:

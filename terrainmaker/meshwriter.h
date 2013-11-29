@@ -1,3 +1,10 @@
+/* TerrainMaker
+ * © 2013 David Given
+ *
+ * This software is licensed under the Simplified BSD license. See COPYING
+ * for the full text.
+ */
+
 class MeshWriter
 {
 public:
