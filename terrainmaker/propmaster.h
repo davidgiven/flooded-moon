@@ -38,18 +38,14 @@ public:
 		icosahedron();
 	}
 
-	void writeTo(const char* filename)
+	void writeTo(Writer& writer)
 	{
-		MeshWriter writer;
-
 		for (Sectors::const_iterator i = _sectors.begin(),
 				e = _sectors.end(); i != e; i++)
 		{
 			Sector* sector = *i;
 			emitSector(writer, sector);
 		}
-
-		writer.writeTo(filename);
 	}
 
 private:
@@ -161,7 +157,7 @@ private:
 		facet(v7, v2, vb, 19);
 	}
 
-	void emitTree(MeshWriter& writer, const Point& p, double width, double height)
+	void emitTree(Writer& writer, const Point& p, double width, double height)
 	{
 		Vector up = p.toVector().normalise();
 		Vector tocamera = (p - _camera).normalise();
@@ -174,7 +170,7 @@ private:
 		writer.addFace(right, top, left);
 	}
 
-	void emitSector(MeshWriter& writer, Sector* sector)
+	void emitSector(Writer& writer, Sector* sector)
 	{
 		/* Calculate the area of the sector. */
 

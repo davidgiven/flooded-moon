@@ -52,7 +52,8 @@ Compiler::StandardSymbolTable calculonSymbols;
 #include "matrix.h"
 #include "spheremap.h"
 #include "terrain.h"
-#include "meshwriter.h"
+#include "writer.h"
+#include "plywriter.h"
 #include "camerawriter.h"
 #include "sphericalroam.h"
 #include "propmaster.h"
@@ -128,8 +129,17 @@ int main(int argc, const char* argv[])
 				<< (terrain.terrain(camera) - RADIUS - SEALEVEL)
 				<< "\n";
 
-		SphericalRoam(view, terrain, FOV / SHMIXELS).writeTo("/tmp/moon.ply");
-		Propmaster(view, terrain, 13, 60).writeTo("/tmp/props.ply");
+		{
+			PlyWriter writer;
+			SphericalRoam(view, terrain, FOV / SHMIXELS).writeTo(writer);
+			writer.writeTo("/tmp/moon.ply");
+		}
+
+		{
+			PlyWriter writer;
+			Propmaster(view, terrain, 13, 60).writeTo(writer);
+			writer.writeTo("/tmp/props.ply");
+		}
 	}
 	catch (const char* e)
 	{

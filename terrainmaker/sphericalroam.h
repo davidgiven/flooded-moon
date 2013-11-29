@@ -160,18 +160,14 @@ public:
 		std::cerr << "\n";
 	}
 
-	void writeTo(const char* filename)
+	void writeTo(Writer& writer)
 	{
-		MeshWriter writer;
-
 		for (std::set<Facet*>::const_iterator i = _completedFacets.begin(),
 				e = _completedFacets.end(); i != e; i++)
 		{
 			Facet* f = *i;
 			writer.addFace(f->pa, f->pb, f->pc);
 		}
-
-		writer.writeTo(filename);
 	}
 
 	/* Discard a facet (remove it from both lists) */
