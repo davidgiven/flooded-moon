@@ -387,6 +387,7 @@
         omega 3
         texture_map
         {
+			[(sealevel-0.100)*km pigment { color White }]
             [(sealevel+0.002)*km Rock_Texture]
             [(sealevel+0.003)*km Scrubland_Texture]
             [(sealevel+1.000)*km Scrubland_Texture]
@@ -407,6 +408,7 @@
         omega 3
         texture_map
         {
+			[(sealevel-0.100)*km pigment { color White }]
             [(sealevel+5.000)*km Rock_Texture]
             [(sealevel+10.000)*km pigment { colour White }]
         }
@@ -610,7 +612,7 @@
 
 #local Base_Rayleigh_Power = 6.7;
 #local Rayleigh_Factor = 1 / Atmospheric_Scale;
-#local Rayleigh_Scale = 1;
+#local Rayleigh_Scale = 0.5;
 #local Rayleigh_Power = Base_Rayleigh_Power * Rayleigh_Factor;
 
 #local Rayleigh_Density =
@@ -801,7 +803,7 @@
 	union
 	{
 		object { Moon_Object texture { Moon_Texture }}
-		object { Vegetation_Object pigment { colour Green }}
+//		object { Vegetation_Object pigment { colour Green }}
 		object { Sea_Object }
 		object { Sky_Object }
 //		object { Clouds_Object }
