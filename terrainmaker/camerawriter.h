@@ -21,7 +21,30 @@ private:
 	}
 
 public:
-	void write(const char* outfilename, const char* tmplfilename,
+	void writePov(const char* outfilename, Transform& view, double altitude)
+	{
+		Point camera = view.untransform(Point::ORIGIN);
+		std::cerr << "camera at (" << camera.x << ", " << camera.y
+				<< ", " << camera.z << ")\n";
+
+		Point target = view.untransform(Point(0, 1, 0));
+		std::cerr << "looking at (" << target.x << ", " << target.y
+				<< ", " << target.z << ")\n";
+
+		Vector up = (view.untransform(Point(0, 0, -1)) - camera).normalise();
+		std::cerr << "up (" << up.x << ", " << up.y
+				<< ", " << up.z << ")\n";
+
+		std::ofstream outputf(outfilename, std::ios::out);
+		outputf << "location <"
+			    << camera.x << ", " << camera.y << ", " << camera.z << ">\n"
+		        << "look_at <"
+		        << target.x << ", " << target.y << ", " << target.z << ">\n"
+		        << "sky <"
+		        << up.x << ", " << up.y << ", " << up.z << ">\n";
+	}
+
+	void writeMitsuba(const char* outfilename, const char* tmplfilename,
 			Transform& view, double altitude)
 	{
 		std::ifstream templatef(tmplfilename);

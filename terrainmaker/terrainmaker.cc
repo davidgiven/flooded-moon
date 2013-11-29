@@ -30,14 +30,17 @@ const double RADIUS = 1737.400;
 const double MAXHEIGHT = 22; // maximum height of any object on the surface
 const double SEALEVEL = -2;
 const double ATMOSPHERE = 20;
-const double SHMIXELS = 100; //150;
 const double FOV = 50;
 
-double latitude = 20.75;
-double longitude = -2.2;//-2.8;
-double altitude = SEALEVEL + .3;
-double azimuth = 0;
-double bearing = 230;
+double latitude;
+double longitude;
+double altitude;
+double azimuth;
+double bearing;
+std::string cameraf;
+std::string topof;
+std::string propsf;
+double shmixels;
 
 using std::min;
 using std::max;
@@ -53,7 +56,7 @@ Compiler::StandardSymbolTable calculonSymbols;
 #include "spheremap.h"
 #include "terrain.h"
 #include "writer.h"
-#include "plywriter.h"
+#include "povwriter.h"
 #include "camerawriter.h"
 #include "sphericalroam.h"
 #include "propmaster.h"
@@ -72,16 +75,24 @@ int main(int argc, const char* argv[])
     options.add_options()
 		("help,h",
 				"produce help message")
-		("lat", po::value<double>()->default_value(20.75),
+		("lat", po::value<double>()->default_value(20),
 				"latitude")
-		("lon", po::value<double>()->default_value(-2.2),
+		("lon", po::value<double>()->default_value(-3.5),
 				"longitude")
-		("altitude", po::value<double>()->default_value(2.9),
+		("altitude", po::value<double>()->default_value(5),
 				"altitude (above sea level)")
-		("azimuth", po::value<double>()->default_value(0),
+		("azimuth", po::value<double>()->default_value(-10),
 				"azimuth (0 looks straight ahead; negative looks down)")
-		("bearing", po::value<double>()->default_value(230),
+		("bearing", po::value<double>()->default_value(40),
 				"bearing")
+		("shmixels", po::value<double>()->default_value(100),
+				"terrain quality")
+		("camera", po::value<std::string>()->default_value("/tmp/camera.inc"),
+				"file to write camera information to")
+		("topo", po::value<std::string>()->default_value("/tmp/moon.inc"),
+				"file to write topographic information to")
+		("props", po::value<std::string>()->default_value(""),
+				"file to write prop information to")
 	;
 
     po::variables_map vm;
@@ -97,9 +108,13 @@ int main(int argc, const char* argv[])
 
     latitude = vm["lat"].as<double>();
     longitude = vm["lon"].as<double>();
-    altitude = vm["altitude"].as<double>();
-    azimuth = vm["azimuth"].as<double>() + SEALEVEL;
+    altitude = vm["altitude"].as<double>() + SEALEVEL;
+    azimuth = vm["azimuth"].as<double>();
     bearing = vm["bearing"].as<double>();
+	shmixels = vm["shmixels"].as<double>();
+	cameraf = vm["camera"].as<std::string>();
+	topof = vm["topo"].as<std::string>();
+	propsf = vm["props"].as<std::string>();
 
     calculonSymbols.add("LATITUDE", latitude);
     calculonSymbols.add("LONGITUDE", longitude);
@@ -121,24 +136,40 @@ int main(int argc, const char* argv[])
 		view = view.rotate(Vector::Y, -bearing);
 		view = view.rotate(Vector::X, 90 + azimuth);
 
-		Point camera = view.untransform(Point::ORIGIN);
-		CameraWriter().write("mitsuba/camera.xml", "mitsuba/camera.tmpl.xml",
-				view, altitude);
-
-		std::cerr << "height of terrain at camera is "
-				<< (terrain.terrain(camera) - RADIUS - SEALEVEL)
-				<< "\n";
-
+		if (!cameraf.empty())
 		{
-			PlyWriter writer;
-			SphericalRoam(view, terrain, FOV / SHMIXELS).writeTo(writer);
-			writer.writeTo("/tmp/moon.ply");
+			std::cerr << "writing camera information to: "
+			          << cameraf
+					  << "\n";
+
+			Point camera = view.untransform(Point::ORIGIN);
+			CameraWriter().writePov(cameraf.c_str(), view, altitude);
+
+			std::cerr << "height of terrain at camera is "
+					<< (terrain.terrain(camera) - RADIUS - SEALEVEL)
+					<< "\n";
 		}
 
+		if (!topof.empty())
 		{
-			PlyWriter writer;
+			std::cerr << "writing topographic information to: "
+			          << cameraf
+					  << "\n";
+
+			PovWriter writer;
+			SphericalRoam(view, terrain, FOV / shmixels).writeTo(writer);
+			writer.writeTo(topof.c_str());
+		}
+
+		if (!propsf.empty())
+		{
+			std::cerr << "writing props information to: "
+			          << cameraf
+					  << "\n";
+
+			PovWriter writer;
 			Propmaster(view, terrain, 13, 60).writeTo(writer);
-			writer.writeTo("/tmp/props.ply");
+			writer.writeTo(propsf.c_str());
 		}
 	}
 	catch (const char* e)
