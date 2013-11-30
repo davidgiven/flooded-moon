@@ -159,7 +159,10 @@ int main(int argc, const char* argv[])
 					  << "\n";
 
 			Point camera = view.untransform(Point::ORIGIN);
-			CameraWriter().writePov(cameraf.c_str(), view, altitude);
+			if (boost::algorithm::ends_with(cameraf, ".xml"))
+				CameraWriter().writeMitsuba(cameraf.c_str(), "mitsuba/camera.tmpl.xml", view, altitude);
+			else
+				CameraWriter().writePov(cameraf.c_str(), view, altitude);
 
 			std::cerr << "height of terrain at camera is "
 					<< (terrain.terrain(camera) - RADIUS - SEALEVEL)
