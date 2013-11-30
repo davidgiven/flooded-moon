@@ -23,7 +23,9 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <memory>
 #include <boost/program_options.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <libnoise/noise.h>
 
 const double RADIUS = 1737.400;
@@ -44,6 +46,7 @@ double shmixels;
 
 using std::min;
 using std::max;
+using std::auto_ptr;
 
 namespace po = boost::program_options;
 
@@ -57,6 +60,7 @@ Compiler::StandardSymbolTable calculonSymbols;
 #include "terrain.h"
 #include "writer.h"
 #include "povwriter.h"
+#include "plywriter.h"
 #include "camerawriter.h"
 #include "sphericalroam.h"
 #include "propmaster.h"
@@ -67,6 +71,18 @@ static Point mapToTerrain(const Terrain& terrain, const Point& p)
 
 	double f = terrain.terrain(p) / p.length();
 	return Point(p.x*f, p.y*f, p.z*f);
+}
+
+static Writer* create_writer(const std::string& filename)
+{
+	if (boost::algorithm::ends_with(filename, ".inc"))
+		return new PovWriter(filename);
+	if (boost::algorithm::ends_with(filename, ".ply"))
+		return new PlyWriter(filename);
+
+	std::cout << "terrainmaker: couldn't figure out the type of '"
+	          << filename << "'\n";
+	exit(1);
 }
 
 int main(int argc, const char* argv[])
@@ -156,9 +172,9 @@ int main(int argc, const char* argv[])
 			          << cameraf
 					  << "\n";
 
-			PovWriter writer;
-			SphericalRoam(view, terrain, FOV / shmixels).writeTo(writer);
-			writer.writeTo(topof.c_str());
+			auto_ptr<Writer> writer(create_writer(topof));
+			SphericalRoam(view, terrain, FOV / shmixels).writeTo(*writer);
+			writer->writeToFile();
 		}
 
 		if (!propsf.empty())
@@ -167,9 +183,9 @@ int main(int argc, const char* argv[])
 			          << cameraf
 					  << "\n";
 
-			PovWriter writer;
-			Propmaster(view, terrain, 13, 60).writeTo(writer);
-			writer.writeTo(propsf.c_str());
+			auto_ptr<Writer> writer(create_writer(propsf));
+			Propmaster(view, terrain, 13, 60).writeTo(*writer);
+			writer->writeToFile();
 		}
 	}
 	catch (const char* e)

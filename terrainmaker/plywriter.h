@@ -8,7 +8,8 @@
 class PlyWriter : public Writer
 {
 public:
-	PlyWriter()
+	PlyWriter(const std::string& filename):
+		Writer(filename)
 	{
 	}
 
@@ -17,7 +18,6 @@ public:
 		std::ofstream of;
 		of.open(filename, std::ios::out);
 		of.precision(10);
-		of << std::scientific;
 
 		of << "ply\n"
 			 "format ascii 1.0\n"

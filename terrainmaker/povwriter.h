@@ -8,7 +8,8 @@
 class PovWriter : public Writer
 {
 public:
-	PovWriter()
+	PovWriter(const std::string& filename):
+		Writer(filename)
 	{
 	}
 
@@ -29,6 +30,16 @@ public:
 		}
 		of << "\n}\n";
 
+		of << "normal_vectors {\n"
+		   << _pointArray.size();
+
+		for (int i=0; i<_pointArray.size(); i++)
+		{
+			Vector v = _pointArray[i].toVector().normalise();
+			of << ",\n<" << v.x << ", " << v.y << ", " << v.z << ">";
+		}
+		of << "\n}\n";
+
 		of << "face_indices {\n"
 		   << _faces.size();
 
@@ -38,7 +49,8 @@ public:
 			of << ",\n<" << t.a << ", " << t.b << ", " << t.c << ">";
 		}
 		of << "\n"
-		   << "}\n"
 		   << "}\n";
+
+		of << "}\n";
 	}
 };
