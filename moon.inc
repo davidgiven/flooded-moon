@@ -132,7 +132,7 @@
 		}
 
         max_gradient 1.5
-		accuracy 0.0001
+		accuracy 0.0000001
 	}
 
 
@@ -288,18 +288,35 @@
                 point_at <0, 0, 0>, 0.8, 1.0
             }
             normal_map {
-              [0.0 granite 0.8]
-              [0.5 granite -0.8]
-              [1.0 granite 0.1]
+              [0.0 granite 0.0]
+//              [0.5 granite -0.8]
+              [1.0 granite 0.5]
             }
-            scale .4
+            scale .2
             //scale .5*y
 
-            warp {turbulence .2}
+//            warp {turbulence .2}
             rotate 30*x
         }
     }
         
+#local Light_Scrubland_Pigment =
+    pigment
+    {
+        cells
+        turbulence .5 lambda 8
+        pigment_map
+        {
+            [0.0 P_Vegetation3]
+            [0.3 P_Vegetation2]
+            [0.6 P_Vegetation1]
+        }
+        scale 0.1
+        //scale <1,.1,1>*.25
+        warp {turbulence .2}
+        rotate 30*x
+    }
+
 #local Scrubland_Pigment =
     pigment
     {
@@ -308,74 +325,73 @@
         pigment_map
         {
             [0.0 P_Vegetation1]
-            [0.5 P_Vegetation2]
-            [1.0 P_Vegetation3]
+            [0.3 P_Vegetation2]
+            [0.6 P_Vegetation3]
         }
-        scale 0.25
+        scale 0.1
         //scale <1,.1,1>*.25
         warp {turbulence .2}
         rotate 30*x
     }
 
+#local Light_Scrubland_Texture =
+    texture
+    {
+        pigment { Light_Scrubland_Pigment }
+    }
+        
 #local Scrubland_Texture =
     texture
     {
         pigment { Scrubland_Pigment }
-        normal
-        {
-            slope
-            {
-                point_at <0, 0, 0>, 0.8, 1.0
-            }
-            normal_map {
-              [0.0 granite 0.8]
-              [0.5 granite -0.8]
-              [1.0 granite 0.1]
-            }
-            scale .4
-            //scale .5*y
-
-            warp {turbulence .2}
-            rotate 30*x
-        }
     }
         
+#local SandLow_Texture =
+	texture
+	{
+		pigment { color SandLow_Colour }
+	}
+
+#local Fields_Texture =
+	texture
+	{
+		pigment
+		{
+			pigment_pattern
+			{
+				crackle
+				solid
+			} 
+			pigment_map
+			{
+				[0. P_Desert]
+				[0.21 P_Vegetation2]
+				[1 P_Vegetation1]
+			}
+		}
+	}
+
 #declare Flat_Surface =
     texture
     {
-        pigment {
-            function { Distance_Function(x, y, z) }
-        
-            turbulence 0
-            lambda 3
-            omega 3
-            pigment_map
-            {
-               
-                [(sealevel-0.100)*km color White]
-                [(sealevel+0.000)*km color SandLow_Colour]
-                [(sealevel+0.005)*km color SandHigh_Colour]
-                [(sealevel+0.005)*km ShorefrontLow]
-                [(sealevel+0.010)*km ShorefrontHigh]
-                [(sealevel+0.010)*km
-                    pigment_pattern
-                    {
-                        crackle
-                        solid
-                    } 
-                    pigment_map
-                    {
-                        [0. P_Desert]
-                        [0.21 P_Vegetation2]
-                        [1 P_Vegetation1]
-                    }
-                ]
-                [(sealevel+1.000)*km P_Vegetation3]
-                [(sealevel+2.000)*km P_Vegetation3]
-                [(sealevel+10.000)*km color White]
-            }
-        }
-    }
+		function { Distance_Function(x, y, z) }
+	
+		turbulence 0
+		lambda 3
+		omega 3
+		texture_map
+		{
+			[(sealevel-0.010)*km Rock_Texture]
+			[(sealevel+0.000)*km SandLow_Texture]
+			[(sealevel+0.005)*km pigment { SandHigh_Colour }]
+			[(sealevel+0.006)*km ShorefrontLow]
+			[(sealevel+0.008)*km ShorefrontHigh]
+			[(sealevel+0.010)*km Fields_Texture]
+			[(sealevel+1.000)*km P_Vegetation3]
+			[(sealevel+2.000)*km P_Vegetation3]
+			[(sealevel+10.000)*km pigment { color White }]
+		}
+	}
     
 #declare Shallow_Surface =
     texture
@@ -387,11 +403,11 @@
         omega 3
         texture_map
         {
-			[(sealevel-0.100)*km pigment { color White }]
+//			[(sealevel-0.100)*km pigment { color White }]
             [(sealevel+0.002)*km Rock_Texture]
-            [(sealevel+0.003)*km Scrubland_Texture]
+            [(sealevel+0.003)*km Light_Scrubland_Texture]
             [(sealevel+1.000)*km Scrubland_Texture]
-            [(sealevel+1.000)*km Rock_Texture]
+            [(sealevel+1.500)*km Rock_Texture]
             [(sealevel+4.000)*km Rock_Texture]
             [(sealevel+5.000)*km Rock_Texture]
             [(sealevel+10.000)*km pigment { colour White }]
@@ -408,12 +424,16 @@
         omega 3
         texture_map
         {
-			[(sealevel-0.100)*km pigment { color White }]
+//			[(sealevel-0.100)*km pigment { color White }]
             [(sealevel+5.000)*km Rock_Texture]
             [(sealevel+10.000)*km pigment { colour White }]
         }
     }
     
+#declare Red_Texture = texture { pigment { Red } }
+#declare Green_Texture = texture { pigment { Green } }
+#declare Blue_Texture = texture { pigment { Blue } }
+
 #declare Moon_Texture =
     texture
     {
@@ -431,10 +451,14 @@
         */
         texture_map
         {
-            [0.0 Flat_Surface ]
+		/*
+			[0.2 Green_Texture ]
+			[0.3 Blue_Texture ]
+			[0.5 Red_Texture ]
+		*/
             [0.2 Flat_Surface ]
-            [0.4 Shallow_Surface ]
-            [0.6 Steep_Surface ]
+            [0.3 Shallow_Surface ]
+            [0.5 Steep_Surface ]
         }
     }
     
@@ -568,7 +592,6 @@
         //} 
         
         finish {
-            ambient 0
             specular 0.8
             roughness 0.03
             diffuse 0.3

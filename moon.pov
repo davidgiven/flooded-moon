@@ -1,3 +1,4 @@
+#version 3.7;
 #include "consts.inc"
 #include "colors.inc"
 #include "stones.inc"
@@ -8,18 +9,18 @@
 #declare Lunar_Sphere           = 1750.000; // enclosing diameter of model
 #declare Nominal_Terrain_Radius = 1737.400; // 0 level for sea
 #declare Sea_Level              = -7.65;
-#declare Atmospheric_Depth      = 100;
+#declare Atmospheric_Depth      = 200;
 #declare Atmospheric_Scale      = 30;
 
 #declare Cloud_Base             = 5;
 #declare Cloud_Height           = 10;
 
-#declare Time_Of_Day            = 4;
-#declare Altitude               = 5;
-#declare Latitude               = 20;
-#declare Longitude              = -3.5;
-#declare Pitch                  = -10;
-#declare Bearing                = 40;
+#declare Time_Of_Day            = 6;
+#declare Altitude               = 3;
+#declare Latitude               = 20.7;
+#declare Longitude              = -1.0;
+#declare Pitch                  = -15;
+#declare Bearing                = 30;
 #declare Displacement           = 0;
 #declare Field_Of_View          = 50;
 
@@ -27,6 +28,7 @@
 
 global_settings
 {
+	assumed_gamma 1.0
 }
 
 #default
@@ -35,12 +37,13 @@ global_settings
 	{
 		finish
 		{
-			ambient 0.00
+			ambient 0.05
 		}
 	}
 }
 
 #include "moon.inc"
+#include "earth.inc"
 #include "animationpath.inc"
 
 camera
@@ -72,14 +75,33 @@ camera
     */
     
     Place_On_Surface(Longitude, Latitude, Bearing, Pitch, Altitude)
+	translate Displacement * <-1, 1, 1>
 }
 
-background
+sky_sphere
 {
-    rgb <0, 0, 0>
+	pigment
+	{
+		image_map
+		{
+			png "nightsky/phot-32a-09-fullres.png"
+			map_type 1
+			interpolate 4
+			once
+		}
+		rotate 90*x
+	}
+	emission 0.2
 }
 
 object { Moon }
+
+object
+{
+	Earth
+	translate <0, -384000, 0>
+	rotate x*5.14
+}
 
 //box
 //{
@@ -90,24 +112,10 @@ object { Moon }
 
 light_source
 {
-	<0, 0, 0>
-	colour rgb <1, 1, 1>
-	looks_like
-	{
-		sphere
-		{
-			<0, 0, 0>, 1000
-			pigment
-			{
-				colour rgb <1.0, 1.0, 1.0>
-			}
-			finish
-			{
-				ambient 1
-			}
-		}
-	}
+	<-149600000, 0, 0>, <1, 1, 1>
+	parallel
+	point_at <0, 0, 0>
 
-	translate <-100000, 0, 0>
+
 	rotate z*(Time_Of_Day*360/24)
 }
