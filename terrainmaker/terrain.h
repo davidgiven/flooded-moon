@@ -5,43 +5,32 @@
  * for the full text.
  */
 
-class Terrain
+class Terrain : public Map
 {
 public:
-	Terrain(const char* topography, const char* geoid):
-		_terrain(topography),
+	Terrain(const Map& terrain, const Map& geoid):
+		_terrain(terrain),
 		_geoid(geoid)
 	{
 	}
 
 private:
-	SphereMap _terrain;
-	SphereMap _geoid;
+	const Map& _terrain;
+	const Map& _geoid;
 	noise::module::Perlin _noise;
 
-public:
-	// The geoid data has range 1081.1 and offset 525.3. SphereMap reads it out of
-	// the file as unit-scaled values, so we actually get the elevation with:
-	//
-	//   elevation = (sample * 1081.1) - 525.3
-	//
-	// The units are in metres.
-	//
-	// Note, however, that the geoid imagemap is from -180 to +179 longitude on
-	// the X axis, while the topography map is from 0 to +359 longitude.
+	// Returns the radius of the current geoid, in metres from core.
 
 	double geoid(double lon, double lat) const
 	{
-		double d = _geoid.lookup(lon - M_PI, lat);
-		return (d * 1081.1) - 525.3;
+		return _geoid.at(lon, lat);
 	}
 
-	// Returns the altitude of a location on the moon, in metres.
+	// Returns the radius of a location, in metres from core.
 
-	double altitude(double lon, double lat) const
+	double terrain(double lon, double lat) const
 	{
-		double d = _terrain.lookup(lon, lat);
-		return (d - 0.5) * 22000.0;
+		return _terrain.at(lon, lat);
 	}
 
 	// Procedurally perturbs the terrain.
@@ -51,6 +40,11 @@ public:
 		double n = _noise.GetValue(p.x/1, p.y/1, p.z/1)*50;
 		return n;
 	}
+
+public:
+	/* Returns the radius of the current perturbed location,
+	 * specified as a point on a sphere (radius irrelevant), in
+	 * metres from core. */
 
 	double terrain(const Point& v) const
 	{
@@ -64,14 +58,29 @@ public:
 		//lat -= M_PI_2;
 		lon = M_PI_2 - lon;
 
-		//return sin(lon*20)*50 + RADIUS;
-		double m = altitude(lon, lat) - geoid(lon, lat);
-//		m = 0;
-		double alt = m/1000.0 + RADIUS;
-		Point nv(vv.x*alt/r, vv.y*alt/r, vv.z*alt/r);
+		return at(radToDeg(lon), radToDeg(lat));
+	}
 
-		alt += perturb(m, nv) / 1000.0;
-		return alt;
+	bool contains(double lon, double lat) const
+	{
+		return _terrain.contains(lon, lat);
+	}
+
+	/* Returns the altitude of the current perturbed location, in metres
+	 * from core. */
+
+	double at(double lon, double lat) const
+	{
+		if (!contains(lon, lat))
+			return at(0, 0);
+
+		double m = terrain(lon, lat);
+//		m = 0;
+//		double alt = m/1000.0 + RADIUS;
+//		Point nv(vv.x*alt/r, vv.y*alt/r, vv.z*alt/r);
+
+//		alt += perturb(m, nv) / 1000.0;
+		return m;
 	}
 
 	Point mapToTerrain(const Point& p) const

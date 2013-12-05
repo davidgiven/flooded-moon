@@ -5,6 +5,15 @@
  * for the full text.
  */
 
+class Map
+{
+public:
+	virtual ~Map() {}
+
+	virtual bool contains(double lon, double lat) const = 0;
+	virtual double at(double lon, double lat) const = 0;
+};
+	
 class SphereMap
 {
 public:

@@ -17,7 +17,7 @@ public:
 	{
 		std::ofstream of;
 		of.open(filename, std::ios::out);
-		of.precision(10);
+		of.precision(20);
 
 		of << "mesh2 {\n"
 		   << "vertex_vectors {\n"
@@ -30,6 +30,7 @@ public:
 		}
 		of << "\n}\n";
 
+		#if 0
 		of << "normal_vectors {\n"
 		   << _pointArray.size();
 
@@ -39,6 +40,7 @@ public:
 			of << ",\n<" << v.x << ", " << v.y << ", " << v.z << ">";
 		}
 		of << "\n}\n";
+		#endif
 
 		of << "face_indices {\n"
 		   << _faces.size();
