@@ -19,58 +19,116 @@
         }
     }
     
-#declare Topography_Table =
-	function {
-        pigment {
-            image_map {
-                png "KaguyaTopographyDataLowRes.png"
-                //png "KaguyaTopographyData.png"
-                map_type 1 // spherical
-                interpolate 3 // bicubic
-            }
-		    rotate x*90
-            rotate z*-90
-        }
-    }
+#if (1)
+	// LROC
+	#declare Topography_Table =
+		function {
+			pigment {
+				image_map {
+					png "LROCTopographyData.png"
+					//png "KaguyaTopographyDataLowRes.png"
+					//png "KaguyaTopographyData.png"
+					map_type 1 // spherical
+					interpolate 3 // bicubic
+				}
+				rotate x*90
+				rotate z*-90
+			}
+		}
 
-// returns altitude in kilometres
-#declare Topography_Altitude =
-	function(x, y, z)
-	{
-		(Topography_Table(x, y, z).grey - 0.5) * 22
-			+ 1737.400
-	}
+	// returns altitude from core in kilometres
+	#declare Topography_Altitude =
+		function(x, y, z)
+		{
+			(Topography_Table(x, y, z).grey - 0.5) * 19.43647388 + 1738.441198
+		}
 
-#declare Geoid_Pigment =
-    pigment {
-        image_map {
-            png "GeoidData.png"
-            map_type 1 // spherical
-            interpolate 2 // bilinear
-        }
-        rotate y*180
-        rotate x*90
-        rotate z*-90
-    }
+	#declare Geoid_Pigment =
+		pigment {
+			image_map {
+				png "GeoidData.png"
+				map_type 1 // spherical
+				interpolate 2 // bilinear
+			}
+			rotate y*180
+			rotate x*90
+			rotate z*-90
+		}
 
-#declare Geoid_Table = function { pigment { Geoid_Pigment } }
+	#declare Geoid_Table = function { pigment { Geoid_Pigment } }
 
-// The geoid data has range 1081.1 and offset 525.3. Povray reads it out of
-// the file as unit-scaled values, so we actually get the elevation with:
-//
-//   elevation = (sample * 1081.1) - 525.3
-//
-// The units are in metres.
-//
-// Note, however, that the geoid imagemap is from -180 to +179 longitude on
-// the X axis, while the topography map is from 0 to +359 longitude. 
+	// The geoid data has range 1081.1 and offset 525.3. Povray reads it out of
+	// the file as unit-scaled values, so we actually get the elevation with:
+	//
+	//   elevation = (sample * 1081.1) - 525.3
+	//
+	// The units are in metres.
+	//
+	// Note, however, that the geoid imagemap is from -180 to +179 longitude on
+	// the X axis, while the topography map is from 0 to +359 longitude. 
 
-// returns delta in kilometres
-#declare Geoid_Altitude =
-	function(x, y, z)
-	{
-		(Geoid_Table(x, y, z).gray * 1.0811) - 0.5253
-	}
+	// returns delta in kilometres
+	#declare Geoid_Altitude =
+		function(x, y, z)
+		{
+			(Geoid_Table(x, y, z).gray * 1.0811) - 0.5253
+		}
+#else
+	// Kaguya
+	#declare Topography_Table =
+		function {
+			pigment {
+				image_map {
+					png "KaguyaTopographyDataLowRes.png"
+					//png "KaguyaTopographyData.png"
+					map_type 1 // spherical
+					interpolate 3 // bicubic
+				}
+				rotate x*90
+				rotate z*-90
+			}
+		}
+
+	// returns altitude from core in kilometres
+	#declare Topography_Altitude =
+		function(x, y, z)
+		{
+			(Topography_Table(x, y, z).grey - 0.5) * 22
+				+ 1737.400
+		}
+
+	#declare Geoid_Pigment =
+		pigment {
+			image_map {
+				png "GeoidData.png"
+				map_type 1 // spherical
+				interpolate 2 // bilinear
+			}
+			rotate y*180
+			rotate x*90
+			rotate z*-90
+		}
+
+	#declare Geoid_Table = function { pigment { Geoid_Pigment } }
+
+	// The geoid data has range 1081.1 and offset 525.3. Povray reads it out of
+	// the file as unit-scaled values, so we actually get the elevation with:
+	//
+	//   elevation = (sample * 1081.1) - 525.3
+	//
+	// The units are in metres.
+	//
+	// Note, however, that the geoid imagemap is from -180 to +179 longitude on
+	// the X axis, while the topography map is from 0 to +359 longitude. 
+
+	// returns delta in kilometres
+	#declare Geoid_Altitude =
+		function(x, y, z)
+		{
+			(Geoid_Table(x, y, z).gray * 1.0811) - 0.5253
+		}
+
+#end
 
 #local Steep_Noise =
     function {
@@ -132,16 +190,9 @@
 		}
 
         max_gradient 1.5
-		accuracy 0.0000001
+		accuracy 0.0001
 	}
 
-
-#local Geoid_Texture =
-    texture
-    {
-        Geoid_Pigment
-    }
-    
 
 #local Distance_Function =
     function(x, y, z)
@@ -674,7 +725,6 @@
 		method 3
 		//samples 31
 		//jitter 0.1
-		intervals 3
 		samples 3
 		scattering
 		{

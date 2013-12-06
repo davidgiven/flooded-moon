@@ -41,7 +41,13 @@ public:
 		        << "#declare CameraLookAt = <"
 		        << target.x << ", " << target.y << ", " << target.z << ">;\n"
 		        << "#declare CameraSky = <"
-		        << up.x << ", " << up.y << ", " << up.z << ">;\n";
+		        << up.x << ", " << up.y << ", " << up.z << ">;\n"
+				<< "#declare CameraAltitude = " << altitude << ";\n"
+				<< "#declare CameraLongitude = " << longitude << ";\n"
+				<< "#declare CameraLatitude = " << latitude << ";\n"
+				<< "#declare CameraBearing = " << bearing << ";\n"
+				<< "#declare CameraAzimuth = " << azimuth << ";\n"
+			;
 	}
 
 	void writeMitsuba(const char* outfilename, const char* tmplfilename,

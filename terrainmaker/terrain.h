@@ -19,18 +19,19 @@ private:
 	const Map& _geoid;
 	noise::module::Perlin _noise;
 
-	// Returns the radius of the current geoid, in metres from core.
+	// Returns the radius of the current geoid, in kilometres from core.
 
 	double geoid(double lon, double lat) const
 	{
-		return _geoid.at(lon, lat);
+		return radius;
+		return _geoid.at(lon, lat) / 1000.0;
 	}
 
-	// Returns the radius of a location, in metres from core.
+	// Returns the radius of a location, in kilometres from core.
 
 	double terrain(double lon, double lat) const
 	{
-		return _terrain.at(lon, lat);
+		return _terrain.at(lon, lat) / 1000.0;
 	}
 
 	// Procedurally perturbs the terrain.
@@ -44,7 +45,7 @@ private:
 public:
 	/* Returns the radius of the current perturbed location,
 	 * specified as a point on a sphere (radius irrelevant), in
-	 * metres from core. */
+	 * kilometres from core. */
 
 	double terrain(const Point& v) const
 	{
@@ -52,29 +53,34 @@ public:
 		Point vv = t.transform(v);
 
 		double r = vv.length();
-		double lat = acos(vv.y / r);
-		double lon = atan2(vv.z, vv.x);
+		double lat = radToDeg(acos(vv.y / r)) - 90.0;
+		double lon = radToDeg(atan2(vv.z, vv.x));
 
-		//lat -= M_PI_2;
-		lon = M_PI_2 - lon;
+		lat = -lat;
+		lon = 90.0 - lon;
 
-		return at(radToDeg(lon), radToDeg(lat));
+		return at(lon, lat);
 	}
 
 	bool contains(double lon, double lat) const
 	{
-		return _terrain.contains(lon, lat);
+		return _terrain.contains(lon, lat) && _geoid.contains(lon, lat);
 	}
 
-	/* Returns the altitude of the current perturbed location, in metres
-	 * from core. */
+	/* Returns the altitude of the current perturbed location, in
+	 * kilometres from core. */
 
 	double at(double lon, double lat) const
 	{
-		if (!contains(lon, lat))
-			return at(0, 0);
+		lat = std::max(-90.0, lat);
+		lat = std::min(90.0, lat);
 
-		double m = terrain(lon, lat);
+		if (!contains(lon, lat))
+			return radius;
+
+		double t = terrain(lon, lat);
+//		double g = geoid(lon, lat);
+		double m = t;
 //		m = 0;
 //		double alt = m/1000.0 + RADIUS;
 //		Point nv(vv.x*alt/r, vv.y*alt/r, vv.z*alt/r);

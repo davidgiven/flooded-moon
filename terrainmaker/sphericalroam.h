@@ -69,7 +69,7 @@ public:
 
 		/* Calculate the maximum sight distance. */
 
-		double r = RADIUS + SEALEVEL;
+		double r = radius + sealevel;
 		double cameradistance = view.transform(Point::ORIGIN).length();
 		std::cerr << "distance to core is " << cameradistance << "km\n";
 		double tallest = MAXHEIGHT + r;
@@ -77,7 +77,7 @@ public:
 		double maxsight = horizon + sqrt(tallest*tallest - r*r);
 		double maxsightsquared = maxsight*maxsight;
 		std::cerr << "distance to horizon is " << horizon <<
-				"; maximum sight distance is " << maxsight << "\n";
+				"km; maximum sight distance is " << maxsight << "km\n";
 
 		int i = 0;
 		while (!_pendingFacets.empty())
@@ -157,7 +157,7 @@ public:
 			}
 		}
 
-		std::cerr << "\n";
+		std::cerr << "\rfound " << _completedFacets.size() << " facets\n";
 	}
 
 	void writeTo(Writer& writer)

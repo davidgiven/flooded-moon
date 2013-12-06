@@ -28,8 +28,27 @@ public:
 		_records.push_back(r);
 	}
 
+	void add(const std::string& filename)
+	{
+		try
+		{
+			PDS* pds = PDS::LoadFromSpec(filename);
+			add(pds);
+		}
+		catch (std::exception& e)
+		{
+			std::string s = "error opening '";
+			s += filename;
+			s += "': ";
+			s += e.what();
+			fatalError(s);
+		}
+	}
+
 	bool contains(double x, double y) const
 	{
+		x = wrapf(0, 360.0, x);
+
 		for (Record* r : _records)
 		{
 			if ((x >= r->minLon) && (x < r->maxLon) &&
@@ -43,10 +62,7 @@ public:
 
 	double at(double x, double y) const
 	{
-		while (x < 0)
-			x = x + 360.0;
-		while (x > 360.0)
-			x = x - 360.0;
+		x = wrapf(0, 360.0, x);
 
 		for (Record* r : _records)
 		{

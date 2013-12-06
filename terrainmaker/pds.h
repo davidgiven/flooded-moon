@@ -111,16 +111,23 @@ public:
 		double dx = (x - _minLon) / (_maxLon - _minLon);
 		double dy = (y - _minLat) / (_maxLat - _minLat);
 
-		double px = dx * _width;
-		double py = dy * _height;
+		double px = dx * (double)(_width-1);
+		double py = (1-dy) * (double)(_height-1);
 
-		unsigned ix = (int)px;
-		assert(ix < _width);
-		unsigned iy = (_height-1) - (int)py;
-		assert(iy < _height);
+		double tl = getsample(floor(px), floor(py));
+		double tr = getsample(ceil(px), floor(py));
+		double bl = getsample(floor(px), ceil(py));
+		double br = getsample(ceil(px), ceil(py));
 
-		double sample = _data[iy*_width + ix];
-		return (sample*_scalingFactor) + _offset;
+		px = px - floor(px);
+		py = py - floor(py);
+
+		double v = ((1-px) * (1-py) * tl) +
+				(px * (1-py) * tr) +
+				((1-px) * py * bl) +
+				(px * py * br);
+
+		return (v*_scalingFactor) + _offset;
 	}
 
 	void bounds(double& minLon, double& minLat, double& maxLon, double& maxLat) const
@@ -129,6 +136,14 @@ public:
 		minLon = _minLon;
 		maxLat = _maxLat;
 		maxLon = _maxLon;
+	}
+
+private:
+	double getsample(unsigned x, unsigned y) const
+	{
+		assert(x < _width);
+		assert(y < _height);
+		return _data[y*_width + x];
 	}
 
 private:
