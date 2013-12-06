@@ -5,7 +5,7 @@
  * for the full text.
  */
 
-class PDSSet : public Map
+class PDSSet : public LatLongMap
 {
 private:
 	struct Record
@@ -74,6 +74,8 @@ public:
 		}
 		return 0;
 	}
+
+	using Map::at;
 
 private:
 	std::deque<Record*> _records;

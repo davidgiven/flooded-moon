@@ -31,14 +31,14 @@ public:
 		_terrain(terrain),
 		_error(degToRad(error))
 	{
-		Point p0 = _terrain.mapToTerrain(Point(-1, 1, 1));
-		Point p1 = _terrain.mapToTerrain(Point(1, 1, 1));
-		Point p2 = _terrain.mapToTerrain(Point(1, -1, 1));
-		Point p3 = _terrain.mapToTerrain(Point(-1, -1, 1));
-		Point p4 = _terrain.mapToTerrain(Point(-1, 1, -1));
-		Point p5 = _terrain.mapToTerrain(Point(1, 1, -1));
-		Point p6 = _terrain.mapToTerrain(Point(1, -1, -1));
-		Point p7 = _terrain.mapToTerrain(Point(-1, -1, -1));
+		Point p0 = _terrain.mapToSphere(Point(-1, 1, 1));
+		Point p1 = _terrain.mapToSphere(Point(1, 1, 1));
+		Point p2 = _terrain.mapToSphere(Point(1, -1, 1));
+		Point p3 = _terrain.mapToSphere(Point(-1, -1, 1));
+		Point p4 = _terrain.mapToSphere(Point(-1, 1, -1));
+		Point p5 = _terrain.mapToSphere(Point(1, 1, -1));
+		Point p6 = _terrain.mapToSphere(Point(1, -1, -1));
+		Point p7 = _terrain.mapToSphere(Point(-1, -1, -1));
 
 		Facet* f0 = addFacet(p1, p0, p3);
 		Facet* f1 = addFacet(p3, p2, p1);
@@ -313,7 +313,7 @@ private:
 		const Point& getRealMidh(const Terrain& terrain)
 		{
 			if (!_realmidh.isValid())
-				_realmidh = terrain.mapToTerrain(_midh);
+				_realmidh = terrain.mapToSphere(_midh);
 			return _realmidh;
 		}
 

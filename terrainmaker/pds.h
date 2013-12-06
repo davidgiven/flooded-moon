@@ -7,7 +7,7 @@
 
 const std::map<std::string, std::string> emptyMap;
 
-class PDS : public Map
+class PDS : public LatLongMap
 {
 public:
 	static PDS* LoadFromSpec(const std::string& spec)

@@ -1,0 +1,38 @@
+/* Calculates the height and kind of perturbed terrain given:
+ *
+ * XYX:vector*3  location on sphere
+ * LONGITUDE, LATITUDE, BEARING, AZIMUTH camera position
+ * RADIUS        normalised radius of planet
+ * SEALEVEL      sealevel delta from geoid
+ * SEA(XYZ)      returns sealevel at this point
+ * TERRAIN(XYZ)  returns real terrain height
+ * GEOID(XYZ)    returns geoid height
+ * PERLIN(XYZ)   some perlin noise
+ * MULTIFRACTAL(XYZ, freq, laq, oct) multifractal noise
+ *
+ * Returns:
+ * 
+ * [height, type] where:
+ *
+ * height        height of perturbed terrain above core
+ * type          terrain type (values TBD)
+ *
+ * All distances are kilometres.
+ */
+
+let max(x: real, y: real): real =
+	if (x < y) then y else x;
+
+let stockheight = TERRAIN(XYZ);
+let water = SEA(XYZ);
+
+/* Don't bother rendering anything below this level. */
+let lowtide = water - 0.0;
+
+let perturbedheight = stockheight +
+	MULTIFRACTAL(XYZ, 1, 2, 6)*0.01;
+
+let clippedheight = max(lowtide, perturbedheight);
+
+[clippedheight, 0]
+

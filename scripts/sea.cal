@@ -1,0 +1,18 @@
+/* Calculates the height and kind of the water given:
+ *
+ * XYX:vector*3  location on sphere
+ * LONGITUDE, LATITUDE, BEARING, AZIMUTH camera position
+ * RADIUS        normalised radius of planet
+ * SEALEVEL      relative sealevel
+ * TERRAIN(XYZ)  returns real terrain height
+ * GEOID(XYZ)    returns geoid height
+ *
+ * Returns:
+ * 
+ * height        height of perturbed terrain above core
+ *
+ * All distances are kilometres.
+ */
+
+GEOID(XYZ) + SEALEVEL
+

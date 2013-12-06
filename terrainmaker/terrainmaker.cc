@@ -52,6 +52,8 @@ std::string cameraf;
 std::string topof;
 std::string propsf;
 std::string heightmapf;
+std::string seafuncf = "scripts/sea.cal";
+std::string terrainfuncf = "scripts/terrain.cal";
 double shmixels = 100.0;
 
 using std::min;
@@ -60,32 +62,34 @@ using std::auto_ptr;
 
 namespace po = boost::program_options;
 
-#include "calculon.h"
-typedef Calculon::Instance<Calculon::RealIsDouble> Compiler;
-Compiler::StandardSymbolTable calculonSymbols;
-
 #include "utils.h"
 #include "matrix.h"
 
 Transform world;
 
-#include "spheremap.h"
+#include "map.h"
+#include "pdslabel.h"
+#include "pds.h"
+#include "pdsset.h"
+
+PDSSet terrainpds;
+PDSSet geoidpds;
+
+#include "functions.h"
 #include "terrain.h"
+#include "sea.h"
 #include "writer.h"
 #include "povwriter.h"
 #include "plywriter.h"
 #include "camerawriter.h"
 #include "sphericalroam.h"
 #include "propmaster.h"
-#include "pdslabel.h"
-#include "pds.h"
-#include "pdsset.h"
 
 static Point mapToTerrain(const Terrain& terrain, const Point& p)
 {
 	/* p is at the surface of our nominal sphere. */
 
-	double f = terrain.terrain(p) / p.length();
+	double f = terrain.at(p) / p.length();
 	return Point(p.x*f, p.y*f, p.z*f);
 }
 
@@ -200,6 +204,10 @@ int main(int argc, const char* argv[])
 				"add a geoid PDS file (repeatable)")
 		("terrain", po::value<std::vector<std::string>>()->composing(),
 				"add a terrain PDS file (repeatable)")
+		("seafunc", po::value(&seafuncf),
+				"filename of Calculon script for calculating sea")
+		("terrainfunc", po::value(&terrainfuncf),
+				"filename of Calculon script for calculating terrain")
 		("camera", po::value<std::string>(&cameraf),
 				"write camera info to specified file")
 		("topo", po::value<std::string>(&topof),
@@ -239,38 +247,48 @@ int main(int argc, const char* argv[])
 		po::notify(vm);
 	}
 
-	altitude += sealevel;
-
-    calculonSymbols.add("LATITUDE", latitude);
-    calculonSymbols.add("LONGITUDE", longitude);
-    calculonSymbols.add("ALTITUDE", altitude);
-    calculonSymbols.add("AZIMUTH", azimuth);
-    calculonSymbols.add("BEARING", bearing);
-    calculonSymbols.add("SEALEVEL", sealevel + radius);
+	initCalculon();
 
 	try
 	{
-		PDSSet terrainpds;
 		if (vm.count("terrain") > 0)
 		{
 			for (auto s : vm["terrain"].as<std::vector<std::string>>())
 				terrainpds.add(s);
 		}
 
-		PDSSet geoidpds;
 		if (vm.count("geoid") > 0)
 		{
 			for (auto s : vm["geoid"].as<std::vector<std::string>>())
 				geoidpds.add(s);
 		}
 
-		Terrain terrain(terrainpds, geoidpds);
+		Terrain terrain;
+		Sea sea;
+
+		/* Set up the camera position. */
 
 		world = world.lookAt(Point::ORIGIN, Vector::Y, Vector::Z);
 		world = world.rotate(Vector::Y, -longitude);
 		world = world.rotate(Vector::X, -latitude);
 		world = world.rotate(Vector::X, -90);
-		world = world.translate(Vector(0, radius+altitude, 0));
+		world = world.translate(Vector(0, radius, 0));
+		
+		/* world is now relative to a point on a normalised sphere. Find out
+		 * what sealevel is at this point and adjust the camera so it's
+		 * relative to that. */
+
+		{
+			Point camera = world.untransform(Point::ORIGIN);
+			double s = sea.at(camera);
+
+			std::cerr << "sealevel at camera is " << s << "km\n";
+
+			world = world.translate(Vector(0, s-radius+altitude, 0));
+		}
+
+		/* Adjust for pointing direction. */
+
 		world = world.rotate(Vector::Y, -bearing);
 		world = world.rotate(Vector::X, 90 + azimuth);
 
@@ -288,8 +306,11 @@ int main(int argc, const char* argv[])
 			else
 				CameraWriter().writePov(cameraf.c_str());
 
+			double sea_at_camera = sea.at(camera);
+			double height_of_camera = camera.length();
+
 			std::cerr << "height of terrain at camera is "
-					<< (terrain.terrain(camera) - radius - sealevel)
+					<< (height_of_camera - sea_at_camera)
 					<< "\n";
 		}
 

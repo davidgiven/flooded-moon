@@ -183,7 +183,7 @@ private:
 				(sector->pa.y + sector->pb.y + sector->pc.y)/3,
 				(sector->pa.z + sector->pb.z + sector->pc.z)/3
 			);
-		midpoint = _terrain.mapToTerrain(midpoint);
+		midpoint = _terrain.mapToSphere(midpoint);
 
 		Compiler::Vector<3> xyz;
 		xyz.x = midpoint.x;
@@ -214,10 +214,10 @@ private:
 					sector->pa.z*b0 + sector->pb.z*b1 + sector->pc.z*b2
 				);
 
-			double altitude = _terrain.terrain(p);
+			double altitude = _terrain.at(p);
 			if (altitude > (radius+sealevel+0.02))
 			{
-				p = _terrain.mapToTerrain(p, altitude);
+				p = _terrain.mapToSphere(p, altitude);
 				double height = 0.03 + randf()*0.03;
 				emitTree(writer, p, 0.01, height);
 			}
