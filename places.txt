@@ -11,3 +11,70 @@ Coordinates of interesting photos I have taken:
 #declare Displacement           = 0;
 #declare Field_Of_View          = 50;
 
+*** Mountainscape
+
+#declare Time_Of_Day            = 10;
+#declare Altitude               = 0.02;
+#declare Latitude               = 20;
+#declare Longitude              = -3.232;
+#declare Pitch                  = 2;
+#declare Bearing                = 70;
+#declare Displacement           = 0;
+#declare Field_Of_View          = 50;
+
+*** High altitude mountainscape
+
+#declare Time_Of_Day            = 10;
+#declare Altitude               = 0.5;
+#declare Latitude               = 20;
+#declare Longitude              = -3.232;
+#declare Pitch                  = -10;
+#declare Bearing                = 70;
+#declare Displacement           = 0;
+#declare Field_Of_View          = 70;
+
+*** Looking towards Mons Bradley
+
+#declare Time_Of_Day            = 10;
+#declare Altitude               = 3;
+#declare Latitude               = 20.7;
+#declare Longitude              = -1.0;
+#declare Pitch                  = -15;
+#declare Bearing                = 30;
+#declare Displacement           = 0;
+#declare Field_Of_View          = 50;
+
+*** Mysterious artifact
+
+#declare Time_Of_Day            = 6;
+#declare Altitude               = 3.3; //6;
+#declare Latitude               = 20.4;
+#declare Longitude              = -1.135;
+#declare Pitch                  = -30; //-17;
+#declare Bearing                = 0;
+#declare Displacement           = <0, 0, -0.6>;
+#declare Field_Of_View          = 90;
+
+*** Kiess Island
+
+#declare Time_Of_Day            = -1;
+#declare Altitude               = 0.3;
+#declare Latitude               = -7.80;
+#declare Longitude              = 86.34;
+#declare Pitch                  = -10;
+#declare Bearing                = -95;
+#declare Displacement           = 0;
+#declare Field_Of_View          = 50;
+
+*** Closeup on the Earth
+
+#declare Time_Of_Day            = 14;
+#declare Altitude               = 0.3;
+#declare Latitude               = -7.80;
+#declare Longitude              = 86.34;
+#declare Pitch                  = 4;
+#declare Bearing                = -95;
+#declare Displacement           = 0;
+#declare Field_Of_View          = 5;
+
+

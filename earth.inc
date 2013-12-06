@@ -80,7 +80,8 @@
 
 		normal
 		{
-			wrinkles 0.1 scale 0.01
+			wrinkles 0.1
+			scale 0.01
 		}
 		finish
 		{
@@ -105,6 +106,17 @@
 				once
 			}
 			rotate x*-90
+		}
+	}
+
+#local Clouds =
+	texture
+	{
+		pigment { White }
+
+		finish
+		{
+			diffuse 1.0
 		}
 	}
 
@@ -137,7 +149,9 @@
 		/* Clouds */
 		sphere
 		{
-			<0, 0, 0>, Radius+3
+			<0, 0, 0>, Radius+10
+			hollow
+
 			texture
 			{
 				pigment_pattern
@@ -154,7 +168,7 @@
 				texture_map
 				{
 					[0.0 pigment { rgbf <1, 1, 1, 1> }]
-					[1.0 pigment { rgbf <1, 1, 1, 0> }]
+					[1.0 Clouds]
 				}
 			}
 		}
