@@ -66,6 +66,9 @@ Compiler::StandardSymbolTable calculonSymbols;
 
 #include "utils.h"
 #include "matrix.h"
+
+Transform world;
+
 #include "spheremap.h"
 #include "terrain.h"
 #include "writer.h"
@@ -263,14 +266,13 @@ int main(int argc, const char* argv[])
 
 		Terrain terrain(terrainpds, geoidpds);
 
-		Transform view;
-		view = view.lookAt(Point::ORIGIN, Vector::Y, Vector::Z);
-		view = view.rotate(Vector::Y, -longitude);
-		view = view.rotate(Vector::X, -latitude);
-		view = view.rotate(Vector::X, -90);
-		view = view.translate(Vector(0, radius+altitude, 0));
-		view = view.rotate(Vector::Y, -bearing);
-		view = view.rotate(Vector::X, 90 + azimuth);
+		world = world.lookAt(Point::ORIGIN, Vector::Y, Vector::Z);
+		world = world.rotate(Vector::Y, -longitude);
+		world = world.rotate(Vector::X, -latitude);
+		world = world.rotate(Vector::X, -90);
+		world = world.translate(Vector(0, radius+altitude, 0));
+		world = world.rotate(Vector::Y, -bearing);
+		world = world.rotate(Vector::X, 90 + azimuth);
 
 		if (!cameraf.empty())
 		{
@@ -278,13 +280,13 @@ int main(int argc, const char* argv[])
 			          << cameraf
 					  << "\n";
 
-			Point camera = view.untransform(Point::ORIGIN);
+			Point camera = world.untransform(Point::ORIGIN);
 			if (boost::algorithm::ends_with(cameraf, ".xml"))
-				CameraWriter().writeMitsuba(cameraf.c_str(), "mitsuba/camera.tmpl.xml", view, altitude);
+				CameraWriter().writeMitsuba(cameraf.c_str(), "mitsuba/camera.tmpl.xml");
 			else if (boost::algorithm::ends_with(cameraf, ".py"))
-				CameraWriter().writeBlender(cameraf.c_str(), view);
+				CameraWriter().writeBlender(cameraf.c_str());
 			else
-				CameraWriter().writePov(cameraf.c_str(), view, altitude);
+				CameraWriter().writePov(cameraf.c_str());
 
 			std::cerr << "height of terrain at camera is "
 					<< (terrain.terrain(camera) - radius - sealevel)
@@ -298,7 +300,7 @@ int main(int argc, const char* argv[])
 					  << "\n";
 
 			auto_ptr<Writer> writer(create_writer(topof));
-			SphericalRoam(view, terrain, FOV / shmixels).writeTo(*writer);
+			SphericalRoam(terrain, FOV / shmixels).writeTo(*writer);
 			writer->writeToFile();
 		}
 
@@ -309,7 +311,7 @@ int main(int argc, const char* argv[])
 					  << "\n";
 
 			auto_ptr<Writer> writer(create_writer(propsf));
-			Propmaster(view, terrain, 13, 60).writeTo(*writer);
+			Propmaster(terrain, 13, 60).writeTo(*writer);
 			writer->writeToFile();
 		}
 

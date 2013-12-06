@@ -22,14 +22,13 @@ class Propmaster
 	Compiler::Program<TreeDensityFunc> _treeDensityFunc;
 
 public:
-	Propmaster(Transform& view, const Terrain& terrain, int maxrecursion,
+	Propmaster(const Terrain& terrain, int maxrecursion,
 			double maxdistance):
 		_treeDensityFuncStream("treedensity.cal"),
 		_treeDensityFunc(calculonSymbols, _treeDensityFuncStream,
 				"(XYZ: vector*3): real"),
-		_view(view),
 		_terrain(terrain),
-		_camera(_view.untransform(Point::ORIGIN)),
+		_camera(world.untransform(Point::ORIGIN)),
 		_maxRecursion(maxrecursion),
 		_maxDistance(maxdistance)
 	{
@@ -226,7 +225,6 @@ private:
 	}
 
 private:
-	Transform& _view;
 	const Terrain& _terrain;
 	Point _camera;
 	int _maxRecursion;

@@ -27,8 +27,7 @@ private:
 	class Facet;
 
 public:
-	SphericalRoam(const Transform& view, const Terrain& terrain, double error):
-		_view(view),
+	SphericalRoam(const Terrain& terrain, double error):
 		_terrain(terrain),
 		_error(degToRad(error))
 	{
@@ -70,7 +69,7 @@ public:
 		/* Calculate the maximum sight distance. */
 
 		double r = radius + sealevel;
-		double cameradistance = view.transform(Point::ORIGIN).length();
+		double cameradistance = world.transform(Point::ORIGIN).length();
 		std::cerr << "distance to core is " << cameradistance << "km\n";
 		double tallest = MAXHEIGHT + r;
 		double horizon = sqrt(cameradistance*cameradistance - r*r);
@@ -90,9 +89,9 @@ public:
 			 * big facets.)
 			 */
 
-			Point va = view.transform(facet->pa);
-			Point vb = view.transform(facet->pb);
-			Point vc = view.transform(facet->pc);
+			Point va = world.transform(facet->pa);
+			Point vb = world.transform(facet->pb);
+			Point vc = world.transform(facet->pc);
 
 			double distancesquared = va.lengthSquared();
 			double sizesquared = (facet->pa - facet->pb).lengthSquared();
@@ -253,7 +252,6 @@ public:
 	}
 
 private:
-	const Transform& _view;
 	const Terrain& _terrain;
 	double _error;
 
@@ -319,14 +317,14 @@ private:
 			return _realmidh;
 		}
 
-		double getError(const Transform& view, const Terrain& terrain)
+		double getError(const Terrain& terrain)
 		{
 			if (isnan(_error))
 			{
 				const Point& realmid = getRealMidh(terrain);
 
-				Vector vfake = view.transform(_midh).toVector().normalise();
-				Vector vreal = view.transform(realmid).toVector().normalise();
+				Vector vfake = world.transform(_midh).toVector().normalise();
+				Vector vreal = world.transform(realmid).toVector().normalise();
 
 				double d = vfake.dot(vreal);
 				if (d < 1)

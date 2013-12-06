@@ -23,9 +23,12 @@ public:
 		   << "vertex_vectors {\n"
 		   << _pointArray.size();
 
+		Point camera = world.untransform(Point::ORIGIN);
+
 		for (int i=0; i<_pointArray.size(); i++)
 		{
-			const Point& v = _pointArray[i];
+			const Point v = _pointArray[i] - camera;
+			
 			of << ",\n<" << v.x << ", " << v.y << ", " << v.z << ">";
 		}
 		of << "\n}\n";
@@ -54,5 +57,8 @@ public:
 		   << "}\n";
 
 		of << "}\n";
+
+		of << "translate <"
+		   << camera.x << ", " << camera.y << ", " << camera.z << ">\n";
 	}
 };

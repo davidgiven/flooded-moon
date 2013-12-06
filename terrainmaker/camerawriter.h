@@ -21,17 +21,17 @@ private:
 	}
 
 public:
-	void writePov(const char* outfilename, Transform& view, double altitude)
+	void writePov(const char* outfilename)
 	{
-		Point camera = view.untransform(Point::ORIGIN);
+		Point camera = world.untransform(Point::ORIGIN);
 		std::cerr << "camera at (" << camera.x << ", " << camera.y
 				<< ", " << camera.z << ")\n";
 
-		Point target = view.untransform(Point(0, 1, 0));
+		Point target = world.untransform(Point(0, 1, 0));
 		std::cerr << "looking at (" << target.x << ", " << target.y
 				<< ", " << target.z << ")\n";
 
-		Vector up = (view.untransform(Point(0, 0, -1)) - camera).normalise();
+		Vector up = (world.untransform(Point(0, 0, -1)) - camera).normalise();
 		std::cerr << "up (" << up.x << ", " << up.y
 				<< ", " << up.z << ")\n";
 
@@ -50,23 +50,22 @@ public:
 			;
 	}
 
-	void writeMitsuba(const char* outfilename, const char* tmplfilename,
-			Transform& view, double altitude)
+	void writeMitsuba(const char* outfilename, const char* tmplfilename)
 	{
 		std::ifstream templatef(tmplfilename);
 		std::stringstream templatebuffer;
 		templatebuffer << templatef.rdbuf();
 		std::string templates = templatebuffer.str();
 
-		Point camera = view.untransform(Point::ORIGIN);
+		Point camera = world.untransform(Point::ORIGIN);
 		std::cerr << "camera at (" << camera.x << ", " << camera.y
 				<< ", " << camera.z << ")\n";
 
-		Point target = view.untransform(Point(0, 1, 0));
+		Point target = world.untransform(Point(0, 1, 0));
 		std::cerr << "looking at (" << target.x << ", " << target.y
 				<< ", " << target.z << ")\n";
 
-		Vector up = (view.untransform(Point(0, 0, 1)) - camera).normalise();
+		Vector up = (world.untransform(Point(0, 0, 1)) - camera).normalise();
 		std::cerr << "up (" << up.x << ", " << up.y
 				<< ", " << up.z << ")\n";
 
@@ -89,17 +88,17 @@ public:
 		outputf << templates;
 	}
 
-	void writeBlender(const char* outfilename, Transform& view)
+	void writeBlender(const char* outfilename)
 	{
-		Point camera = view.untransform(Point::ORIGIN);
+		Point camera = world.untransform(Point::ORIGIN);
 		std::cerr << "camera at (" << camera.x << ", " << camera.y
 				<< ", " << camera.z << ")\n";
 
-		Point target = view.untransform(Point(0, -1, 0));
+		Point target = world.untransform(Point(0, -1, 0));
 		std::cerr << "looking at (" << target.x << ", " << target.y
 				<< ", " << target.z << ")\n";
 
-		Vector up = (view.untransform(Point(0, 0, -1)) - camera).normalise();
+		Vector up = (world.untransform(Point(0, 0, -1)) - camera).normalise();
 		std::cerr << "up (" << up.x << ", " << up.y
 				<< ", " << up.z << ")\n";
 
