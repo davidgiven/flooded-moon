@@ -56,7 +56,8 @@ public:
 		of << "\n"
 		   << "}\n";
 
-		of << "}\n";
+		of << "inside_vector CameraSky\n"
+		   << "}\n";
 
 		of << "translate <"
 		   << camera.x << ", " << camera.y << ", " << camera.z << ">\n";

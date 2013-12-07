@@ -7,9 +7,9 @@
 #include "transforms.inc"
 
 #declare km                     = 1000;
-#declare Lunar_Sphere           = 1750.000 * km; // enclosing diameter of terrain
-#declare Nominal_Terrain_Radius = 1737.400 * km; // 0 level for sea
-#declare Sea_Level              = -1.9 * km;
+#declare Lunar_Sphere           = 1750.000 * km; // enclosing diameter of terrain object
+#declare Nominal_Terrain_Radius = 1737.400 * km;
+#declare Atmosphere_Base        = -2 * km;
 #declare Atmospheric_Depth      = 100 * km;
 #declare Atmospheric_Scale      = 30 * km;
 #declare Time_Of_Day            = 7;
@@ -60,17 +60,6 @@ background
 		}
 	}
 
-#declare Sea_Object =
-	object
-	{
-		#include "/tmp/sea.inc"
-		scale km
-		pigment
-		{
-			colour rgb <0, 0, 1>
-		}
-	}
-
 // =======================================================================
 //                                  SEA   
 // =======================================================================
@@ -88,19 +77,20 @@ background
 
         normal {
             wrinkles 0.2
-            scale 0.01
-        }        
+            scale 0.01*km
+        }      
         //normal {
         //    bozo 0.8
         //    scale 0.002 * km
         //} 
         
-        finish {
-            ambient 0
+        finish
+		{
             specular 0.8
             roughness 0.03
             diffuse 0.3
-            reflection {
+            reflection
+			{
                 0, 1.0
                 falloff 2
                 fresnel on
@@ -109,11 +99,11 @@ background
         }
     }
     
-/*
 #declare Sea_Object =
-	sphere
+	object
 	{
-		<0, 0, 0>, Nominal_Terrain_Radius + Sea_Level
+		#include "/tmp/sea.inc"
+		scale km
 
 	    texture {
 	        Sea_Texture
@@ -126,7 +116,6 @@ background
             fade_color Sea_Colour
         }
 	}
-*/
 
 // =======================================================================
 //                              ATMOSPHERE
@@ -134,7 +123,7 @@ background
 
 // Note! Media units are all in kilometres!
 
-#local Bottom_Of_Atmosphere = Nominal_Terrain_Radius;
+#local Bottom_Of_Atmosphere = Nominal_Terrain_Radius + Atmosphere_Base;
 #local Top_Of_Atmosphere = Bottom_Of_Atmosphere
 	+ Atmospheric_Depth;
 
@@ -222,27 +211,35 @@ background
 //                                  SUN   
 // =======================================================================
 
+#local Sun_Closeness = 30;
+#local Sun_Brightness = 10;
 light_source
 {
 	<0, 0, 0>
-	colour rgb <1, 1, 1>
+	color White
+
 	looks_like
 	{
 		sphere
 		{
-			<0, 0, 0>, 1000*km
-			pigment
+			<0, 0, 0>, 695500*km/Sun_Closeness
+
+			texture
 			{
-				colour rgb <1.0, 1.0, 1.0>
-			}
-			finish
-			{
-				ambient 1
+				pigment
+				{
+					White
+				}
+				finish
+				{
+					emission Sun_Brightness
+					ambient 1
+				}
 			}
 		}
 	}
 
-	translate <-100000*km, 0, 0>
+	translate <-149600000*km/Sun_Closeness, 0, 0>
 	rotate z*(Time_Of_Day*360/24)
 }
 
@@ -269,5 +266,5 @@ sky_sphere
 
 object { Terrain_Object }
 object { Sea_Object }
-//object { Sky_Object }
+object { Sky_Object }
 

@@ -31,7 +31,7 @@ let water = SEA(XYZ);
 let lowtide = water - 0.5;
 
 let perturbedheight = stockheight +
-	MULTIFRACTAL(XYZ, 1, 2, 6)*0.01;
+	MULTIFRACTAL(XYZ, 1, 2, 6)*0.05;
 
 let clippedheight = max(lowtide, perturbedheight);
 
