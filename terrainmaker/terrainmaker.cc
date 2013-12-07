@@ -50,9 +50,10 @@ double radius;
 double sealevel;
 std::string cameraf;
 std::string topof;
+std::string seatopof;
 std::string propsf;
 std::string heightmapf;
-std::string seafuncf = "scripts/sea.cal";
+std::string seafuncf = "scripts/waterlevel.cal";
 std::string terrainfuncf = "scripts/terrain.cal";
 double shmixels = 100.0;
 
@@ -211,7 +212,9 @@ int main(int argc, const char* argv[])
 		("camera", po::value<std::string>(&cameraf),
 				"write camera info to specified file")
 		("topo", po::value<std::string>(&topof),
-				"generate topography and write to specified file")
+				"generate land topography and write to specified file")
+		("seatopo", po::value<std::string>(&seatopof),
+				"generate ocean topography and write to specified file")
 		("props", po::value<std::string>(&propsf),
 				"generate props and write to specified file")
 		("heightmap", po::value<std::string>(&heightmapf),
@@ -316,12 +319,23 @@ int main(int argc, const char* argv[])
 
 		if (!topof.empty())
 		{
-			std::cerr << "writing topographic information to: "
+			std::cerr << "writing land topographic information to: "
 			          << topof
 					  << "\n";
 
 			auto_ptr<Writer> writer(create_writer(topof));
 			SphericalRoam(terrain, FOV / shmixels).writeTo(*writer);
+			writer->writeToFile();
+		}
+
+		if (!seatopof.empty())
+		{
+			std::cerr << "writing ocean topographic information to: "
+			          << topof
+					  << "\n";
+
+			auto_ptr<Writer> writer(create_writer(seatopof));
+			SphericalRoam(sea, FOV / shmixels).writeTo(*writer);
 			writer->writeToFile();
 		}
 

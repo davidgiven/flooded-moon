@@ -27,7 +27,7 @@ private:
 	class Facet;
 
 public:
-	SphericalRoam(const Terrain& terrain, double error):
+	SphericalRoam(const XYZMap& terrain, double error):
 		_terrain(terrain),
 		_error(degToRad(error))
 	{
@@ -252,7 +252,7 @@ public:
 	}
 
 private:
-	const Terrain& _terrain;
+	const XYZMap& _terrain;
 	double _error;
 
 	/* Each facet is arranged like this:
@@ -310,7 +310,7 @@ private:
 			return (fh == f) && (f->fh == this);
 		}
 
-		const Point& getRealMidh(const Terrain& terrain)
+		const Point& getRealMidh(const XYZMap& terrain)
 		{
 			if (!_realmidh.isValid())
 				_realmidh = terrain.mapToSphere(_midh);

@@ -26,8 +26,9 @@ let max(x: real, y: real): real =
 let stockheight = TERRAIN(XYZ);
 let water = SEA(XYZ);
 
-/* Don't bother rendering anything below this level. */
-let lowtide = water - 0.0;
+/* Don't bother rendering anything below this level --- the ocean floor
+ * underwater is flat. */
+let lowtide = water - 0.5;
 
 let perturbedheight = stockheight +
 	MULTIFRACTAL(XYZ, 1, 2, 6)*0.01;

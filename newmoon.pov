@@ -6,6 +6,14 @@
 #include "functions.inc"
 #include "transforms.inc"
 
+#declare km                     = 1000;
+#declare Lunar_Sphere           = 1750.000 * km; // enclosing diameter of terrain
+#declare Nominal_Terrain_Radius = 1737.400 * km; // 0 level for sea
+#declare Sea_Level              = -1.9 * km;
+#declare Atmospheric_Depth      = 100 * km;
+#declare Atmospheric_Scale      = 30 * km;
+#declare Time_Of_Day            = 7;
+
 global_settings
 {
 	assumed_gamma 1.0
@@ -22,11 +30,18 @@ global_settings
 	}
 }
 
+#include "/tmp/camera.inc"
+
 camera
 {
     angle 50
-	right -x
-	#include "/tmp/camera.inc"
+	up z
+	right -x*image_width/image_height
+	scale km
+
+	location CameraLocation
+	sky CameraSky
+	look_at CameraLookAt
 }
 
 background
@@ -34,25 +49,178 @@ background
     rgb <0, 0, 0>
 }
 
-object
-{
-	#include "/tmp/moon.inc"
-
-	pigment
+#declare Terrain_Object =
+	object
 	{
-		colour rgb <1, 1, 1>
+		#include "/tmp/moon.inc"
+		scale km
+		pigment
+		{
+			colour rgb <1, 1, 1>
+		}
 	}
-}
 
-sphere
-{
-	<0, 0, 0>, 1500
-
-	pigment
+#declare Sea_Object =
+	object
 	{
-		colour rgb <1, 1, 1>
+		#include "/tmp/sea.inc"
+		scale km
+		pigment
+		{
+			colour rgb <0, 0, 1>
+		}
 	}
-}
+
+// =======================================================================
+//                                  SEA   
+// =======================================================================
+
+//#local Sea_Colour = rgb <57/256, 63/256, 86/256>;
+#local Sea_Colour = rgbt <0, 0.2, 0.4, 0>;
+
+#local Sea_Texture =
+    texture
+    {
+        pigment {
+            colour rgbt 1
+            quick_colour rgbt <0, 0, 1, 0>
+        }
+
+        normal {
+            wrinkles 0.2
+            scale 0.01
+        }        
+        //normal {
+        //    bozo 0.8
+        //    scale 0.002 * km
+        //} 
+        
+        finish {
+            ambient 0
+            specular 0.8
+            roughness 0.03
+            diffuse 0.3
+            reflection {
+                0, 1.0
+                falloff 2
+                fresnel on
+            }
+            conserve_energy
+        }
+    }
+    
+/*
+#declare Sea_Object =
+	sphere
+	{
+		<0, 0, 0>, Nominal_Terrain_Radius + Sea_Level
+
+	    texture {
+	        Sea_Texture
+	    }
+	
+        interior {
+            ior 1.34
+            fade_distance 0.01*km
+            fade_power 2
+            fade_color Sea_Colour
+        }
+	}
+*/
+
+// =======================================================================
+//                              ATMOSPHERE
+// =======================================================================
+
+// Note! Media units are all in kilometres!
+
+#local Bottom_Of_Atmosphere = Nominal_Terrain_Radius;
+#local Top_Of_Atmosphere = Bottom_Of_Atmosphere
+	+ Atmospheric_Depth;
+
+#local Base_Rayleigh_Power = 6.7;
+#local Rayleigh_Factor = 1 / Atmospheric_Scale;
+#local Rayleigh_Scale = 0.5;
+#local Rayleigh_Power = Base_Rayleigh_Power * Rayleigh_Factor;
+
+#local Rayleigh_Density =
+	density
+	{
+        #local height_from_centre =
+	        function(x, y, z) {
+	            sqrt(x*x + y*y + z*z)
+	        }
+	        
+	    #local height_from_surface =
+	        function(x, y, z) {
+	            height_from_centre(x, y, z) - Bottom_Of_Atmosphere
+	        }
+	   
+	    #local gravity_factor =
+	        function(x, y, z) {
+	            (1/3) * Bottom_Of_Atmosphere / height_from_centre(x, y, z)
+	        }
+	        
+		function
+		{
+			Rayleigh_Scale * exp(-Rayleigh_Power * height_from_surface(x, y, z)
+				// disable the gravity factor for now
+			    // * gravity_factor(x, y, z)
+            )
+            //* (Atmospheric_Scale / Atmospheric_Depth)
+		}
+	}
+
+#local Rayleigh_Colour = rgb <0.2061, 0.3933, 1.0>;
+
+#local Rayleigh_Media =
+	media
+	{
+		method 3
+		//samples 31
+		//jitter 0.1
+		intervals 3
+		samples 3
+		scattering
+		{
+			RAYLEIGH_SCATTERING
+			color 2.3 * Rayleigh_Colour / Atmospheric_Scale
+			extinction 1
+		}
+		density
+		{
+			Rayleigh_Density
+		}
+	}
+
+#local Sky_Object =
+	difference {
+		sphere {
+			<0, 0, 0>, Top_Of_Atmosphere
+		}
+		sphere {
+			<0, 0, 0>, Bottom_Of_Atmosphere
+		}
+		
+		pigment
+		{
+			rgbt 1
+		}
+
+		hollow
+		
+		interior
+		{
+			media
+			{
+				Rayleigh_Media
+			}
+		}
+	}
+
+// =======================================================================
+//                                  SUN   
+// =======================================================================
 
 light_source
 {
@@ -62,7 +230,7 @@ light_source
 	{
 		sphere
 		{
-			<0, 0, 0>, 1000
+			<0, 0, 0>, 1000*km
 			pigment
 			{
 				colour rgb <1.0, 1.0, 1.0>
@@ -74,7 +242,32 @@ light_source
 		}
 	}
 
-	translate <-100000, 0, 0>
-	rotate z*(6*360/24)
+	translate <-100000*km, 0, 0>
+	rotate z*(Time_Of_Day*360/24)
 }
+
+// ==========================================================================
+//                                   SKY
+// ==========================================================================
+
+sky_sphere
+{
+	pigment
+	{
+		image_map
+		{
+			png "nightsky/phot-32a-09-fullres.png"
+			map_type 1
+			interpolate 4
+			once
+		}
+		rotate 90*x
+	}
+	emission 0.2
+}
+
+
+object { Terrain_Object }
+object { Sea_Object }
+//object { Sky_Object }
 
