@@ -107,6 +107,11 @@
 			}
 			rotate x*-90
 		}
+
+		finish
+		{
+			diffuse 1.0
+		}
 	}
 
 #local Clouds =

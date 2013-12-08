@@ -49,8 +49,8 @@ public:
 
 		for (int i=0; i<_pointArray.size(); i++)
 		{
-			double t = _pointArray[i].texture;
-			of << ",\n<" << t << ", 0>";
+			const PointData& pd = _pointArray[i];
+			of << ",\n<" << pd.u << ", " << pd.v << ">";
 		}
 		of << "\n}\n";
 

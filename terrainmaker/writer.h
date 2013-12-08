@@ -38,7 +38,7 @@ public:
 		PointData& pd = _pointArray[index];
 		pd.point = point;
 		pd.index = index;
-		pd.texture = 0;
+		pd.u = pd.v = 0.0;
 
 		return index;
 	}
@@ -58,11 +58,11 @@ public:
 		writeTo(_filename.c_str());
 	}
 
-	void applyTextureData(XYZMap& map)
+	void applyTextureData(Texture& texture)
 	{
 		for (PointData& pd : _pointArray)
 		{
-			pd.texture = map.at(pd.point);
+			texture.at(pd.point, pd.u, pd.v);
 		}
 		_hasTextures = true;
 	}
@@ -115,7 +115,7 @@ protected:
 	{
 		Point point;
 		int index;
-		double texture;
+		double u, v;
 		Vector normal;
 	};
 

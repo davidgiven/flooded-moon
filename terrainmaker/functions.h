@@ -12,7 +12,9 @@ Compiler::StandardSymbolTable calculonSymbols;
 typedef double MapFunc(Compiler::Vector<3>* xyz);
 Compiler::Program<MapFunc>* seaFunc;
 Compiler::Program<MapFunc>* terrainFunc;
-Compiler::Program<MapFunc>* textureFunc;
+
+typedef void UVFunc(Compiler::Vector<2>* result, Compiler::Vector<3>* xyz);
+Compiler::Program<UVFunc>* textureFunc;
 
 extern "C" double lookup_sea(Compiler::Vector<3>* xyz)
 {
@@ -74,11 +76,11 @@ extern "C" double lookup_slope(Compiler::Vector<3>* xyz)
 
 	Vector vp = base.cross(location).normalise();
 
-	/* Use this to construct a point which is five metres away
+	/* Use this to construct a point which is a certain distance away
 	 * from the original point (in a random direction).
 	 * (Remember that location is in kilometres. */
 
-	Point p1 = Point(vp*0.005) + location;
+	Point p1 = Point(vp*0.100) + location;
 
 	/* Create two more points based on this, equally spaced around
 	 * the rotation vector. */
@@ -140,8 +142,9 @@ void initCalculon(void)
 
 	{
 		std::ifstream f(texturefuncf);
-		textureFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
-			"(XYZ: vector*3): real");
+		textureFunc = new Compiler::Program<UVFunc>(calculonSymbols, f,
+			"(XYZ: vector*3): vector*2");
+		textureFunc->dump();
 	}
 }
 

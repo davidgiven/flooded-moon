@@ -12,7 +12,7 @@
 #declare Atmosphere_Base        = -2 * km;
 #declare Atmospheric_Depth      = 100 * km;
 #declare Atmospheric_Scale      = 30 * km;
-#declare Time_Of_Day            = 5.5 + 12;
+#declare Time_Of_Day            = 9; //5.5 + 12;
 
 global_settings
 {
@@ -49,40 +49,13 @@ background
     rgb <0, 0, 0>
 }
 
-#declare Terrain_Mesh =
-	object
-	{
-		mesh2
-		{
-			#include "/tmp/moon.inc"
-		}
+// =======================================================================
+//                                 MOON   
+// =======================================================================
 
-		scale km
-	}
+#include "newmoon.inc"
 
-#declare Terrain_Object =
-	object
-	{
-		mesh2
-		{
-			#include "/tmp/moon.inc"
-		}
-		scale km
-
-		uv_mapping texture
-		{
-			function { x }
-
-			texture_map
-			{
-				[0.0 pigment { Red }]
-				[0.2 pigment { Green }]
-				[0.4 pigment { Blue }]
-				[0.6 pigment { Yellow }]
-				[0.8 pigment { White }]
-			}
-		}
-	}
+object { Moon_Object }
 
 // =======================================================================
 //                                  SEA   
@@ -316,8 +289,4 @@ sky_sphere
 	emission 0.2
 }
 
-
-object { Terrain_Object }
-object { Sea_Object }
-//object { Sky_Object }
 
