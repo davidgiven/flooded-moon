@@ -4,6 +4,18 @@
 #declare Atmospheric_Depth      = 100 * km;
 #declare Atmospheric_Scale      = 30 * km;
 
+#local map =
+	function(x, lo, hi)
+	{
+		(x-lo) / (hi-lo)
+	}
+
+#local unmap =
+	function(x, lo, hi)
+	{
+		x*(hi-lo) + lo
+	}
+
 // =======================================================================
 //                                TERRAIN 
 // =======================================================================
@@ -232,29 +244,20 @@
 #local Flat_Surface =
     texture
     {
-		uv_mapping function { x }
+		uv_mapping function { map(x, -20, 20) }
 	
 		texture_map
 		{
-			[-0.020 Rock_Texture]
-			[ 0.002 SandLow_Texture]
-			[ 0.005 SandHigh_Texture]
-			[ 0.006 ShorefrontLow_Texture]
-			[ 0.008 ShorefrontHigh_Texture]
-			[ 0.010 Fields_Texture]
-			[ 2.000 ScrubLow_Texture]
-			[ 3.000 ScrubHigh_Texture]
-			[ 4.000 Rock_Texture]
-			[10.000 Snow_Texture]
-			/*
-			[ 0.005 SandHigh_Texture ]
-			[ 0.006 ShorefrontLow]
-			[ 0.008 ShorefrontHigh]
-			[ 0.010 Fields_Texture]
-			[ 1.000 P_Vegetation3]
-			[ 2.000 P_Vegetation3]
-			[ 10.000)*km pigment { color White }]
-			*/
+			[map(-0.020, -20, 20) Rock_Texture]
+			[map( 0.002, -20, 20) SandLow_Texture]
+			[map( 0.005, -20, 20) SandHigh_Texture]
+			[map( 0.006, -20, 20) ShorefrontLow_Texture]
+			[map( 0.008, -20, 20) ShorefrontHigh_Texture]
+			[map( 0.010, -20, 20) Fields_Texture]
+			[map( 2.000, -20, 20) ScrubLow_Texture]
+			[map( 3.000, -20, 20) ScrubHigh_Texture]
+			[map( 4.000, -20, 20) Rock_Texture]
+			[map(10.000, -20, 20) Snow_Texture]
 		}
 	}
     
@@ -263,18 +266,19 @@
 #local Flattish_Surface =
     texture
     {
-		uv_mapping function { x }
+		uv_mapping function { map(x, -20, 20) }
 	
 		texture_map
 		{
-			[-0.020 Rock_Texture]
-			[ 0.002 SandLow_Texture]
-			[ 0.004 ShorefrontLow_Texture]
-			[ 0.008 ShorefrontHigh_Texture]
-			[ 0.015 ScrubLow_Texture]
-			[ 2.000 ScrubHigh_Texture]
-			[ 3.000 Rock_Texture]
-			[10.000 Snow_Texture]
+			[map(-0.020, -20, 20) Rock_Texture]
+			[map(-0.002, -20, 20) SandLow_Texture]
+			[map( 0.002, -20, 20) SandHigh_Texture]
+			[map( 0.004, -20, 20) ShorefrontLow_Texture]
+			[map( 0.008, -20, 20) ShorefrontHigh_Texture]
+			[map( 0.015, -20, 20) ScrubLow_Texture]
+			[map( 2.000, -20, 20) ScrubHigh_Texture]
+			[map( 3.000, -20, 20) Rock_Texture]
+			[map(10.000, -20, 20) Snow_Texture]
 		}
 	}
     
@@ -283,16 +287,16 @@
 #local Steepish_Surface =
     texture
     {
-		uv_mapping function { x }
+		uv_mapping function { map(x, -20, 20) }
 	
 		texture_map
 		{
-			[-0.020 Rock_Texture]
-			[ 0.020 Rock_Texture]
-			[ 0.030 Rock_Texture]
-			[ 1.500 ScrubHigh_Texture]
-			[ 3.000 Rock_Texture]
-			[10.000 Snow_Texture]
+			[map(-0.020, -20, 20) Rock_Texture]
+			[map( 0.020, -20, 20) Rock_Texture]
+			[map( 0.030, -20, 20) ScrubLow_Texture]
+			[map( 1.500, -20, 20) ScrubHigh_Texture]
+			[map( 3.000, -20, 20) Rock_Texture]
+			[map(10.000, -20, 20) Snow_Texture]
 		}
 	}
     
@@ -479,6 +483,24 @@
 	}
 
 // ==========================================================================
+//                                  TREES 
+// ==========================================================================
+
+#local Trees_Object =
+	object
+	{
+		mesh2
+		{
+			#include "/tmp/props.inc"
+		}
+
+		texture
+		{
+			pigment { White }
+		}
+	}
+
+// ==========================================================================
 //                                 OVERALL
 // ==========================================================================
 
@@ -486,6 +508,7 @@
 	union
 	{
 		object { Terrain_Object }
+		object { Trees_Object }
 		object { Sea_Object }
 		object { Sky_Object }
 	}

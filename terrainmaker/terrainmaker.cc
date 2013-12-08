@@ -57,6 +57,7 @@ std::string heightmapf;
 std::string seafuncf = "scripts/waterlevel.cal";
 std::string terrainfuncf = "scripts/terrain.cal";
 std::string texturefuncf = "scripts/texture.cal";
+std::string propsfuncf = "scripts/props.cal";
 double shmixels = 100.0;
 
 using std::min;
@@ -214,6 +215,8 @@ int main(int argc, const char* argv[])
 				"filename of Calculon script for calculating terrain")
 		("texturefunc", po::value(&texturefuncf),
 				"filename of Calculon script for calculating texture")
+		("propsfunc", po::value(&propsfuncf),
+				"filename of Calculon script for calculating prop density")
 		("camera", po::value<std::string>(&cameraf),
 				"write camera info to specified file")
 		("topo", po::value<std::string>(&topof),
@@ -356,7 +359,7 @@ int main(int argc, const char* argv[])
 		if (!propsf.empty())
 		{
 			std::cerr << "writing props information to: "
-			          << cameraf
+			          << propsf
 					  << "\n";
 
 			auto_ptr<Writer> writer(create_writer(propsf));

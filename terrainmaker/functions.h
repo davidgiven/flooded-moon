@@ -16,6 +16,8 @@ Compiler::Program<MapFunc>* terrainFunc;
 typedef void UVFunc(Compiler::Vector<2>* result, Compiler::Vector<3>* xyz);
 Compiler::Program<UVFunc>* textureFunc;
 
+Compiler::Program<MapFunc>* propsFunc;
+
 extern "C" double lookup_sea(Compiler::Vector<3>* xyz)
 {
 	return (*seaFunc)(xyz);
@@ -137,14 +139,19 @@ void initCalculon(void)
 		std::ifstream f(terrainfuncf);
 		terrainFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
 			"(XYZ: vector*3): real");
-		terrainFunc->dump();
 	}
 
 	{
 		std::ifstream f(texturefuncf);
 		textureFunc = new Compiler::Program<UVFunc>(calculonSymbols, f,
 			"(XYZ: vector*3): vector*2");
-		textureFunc->dump();
+	}
+
+	{
+		std::ifstream f(propsfuncf);
+		propsFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
+			"(XYZ: vector*3): real");
+		propsFunc->dump();
 	}
 }
 

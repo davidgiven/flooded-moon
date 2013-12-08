@@ -12,7 +12,7 @@
 #declare Atmosphere_Base        = -2 * km;
 #declare Atmospheric_Depth      = 100 * km;
 #declare Atmospheric_Scale      = 30 * km;
-#declare Time_Of_Day            = 9; //5.5 + 12;
+#declare Time_Of_Day            = 7; //5.5 + 12;
 
 global_settings
 {

@@ -17,23 +17,14 @@ class Propmaster
 		Point pc;
 	};
 
-	std::ifstream _treeDensityFuncStream;
-	typedef double TreeDensityFunc(Compiler::Vector<3>* xyz);
-	Compiler::Program<TreeDensityFunc> _treeDensityFunc;
-
 public:
 	Propmaster(const Terrain& terrain, int maxrecursion,
 			double maxdistance):
-		_treeDensityFuncStream("treedensity.cal"),
-		_treeDensityFunc(calculonSymbols, _treeDensityFuncStream,
-				"(XYZ: vector*3): real"),
 		_terrain(terrain),
 		_camera(world.untransform(Point::ORIGIN)),
 		_maxRecursion(maxrecursion),
 		_maxDistance(maxdistance)
 	{
-		_treeDensityFunc.dump();
-
 		icosahedron();
 	}
 
@@ -189,7 +180,7 @@ private:
 		xyz.x = midpoint.x;
 		xyz.y = midpoint.y;
 		xyz.z = midpoint.z;
-		double density = _treeDensityFunc(&xyz);
+		double density = (*propsFunc)(&xyz);
 		int treecount = (int)(area * density);
 
 		srand(sector->id);
@@ -215,12 +206,9 @@ private:
 				);
 
 			double altitude = _terrain.at(p);
-			if (altitude > (radius+sealevel+0.02))
-			{
-				p = _terrain.mapToSphere(p, altitude);
-				double height = 0.03 + randf()*0.03;
-				emitTree(writer, p, 0.01, height);
-			}
+			p = _terrain.mapToSphere(p, altitude);
+			double height = 0.03 + randf()*0.03;
+			emitTree(writer, p, 0.01, height);
 		}
 	}
 

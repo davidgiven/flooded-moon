@@ -30,7 +30,7 @@ let height = stockheight - water;
 
 /* Don't bother rendering anything below this level --- the ocean floor
  * underwater is flat. */
-let lowtide = water - 0.5;
+let lowtide = water - 5;
 
 let easecurve(x) =
 	(x*x) / (x*x + (1-x)*(1-x));
@@ -62,17 +62,20 @@ let blend2(x, lo1, hi1, hi2, lo2) =
 let pand(x, y) = x * y;
 let por(x, y) = x + y - pand(x, y);
 
-let craggy =
-	MULTIFRACTAL(XYZ*2, 1, 2, 6)*0.02 *
-		por(
-			blend0lo(slope, 0.1, 0.3),
-			blend0hi(height, -0.040, 0.000)
-		)
+let smallcrags =
+	PERLIN(XYZ*10)*0.01 *
+	blend0lo(slope, 0.00, 0.3);
+
+let largecrags =
+	MULTIFRACTAL(XYZ*2, 1, 2, 6)*0.03 *
+		blend0lo(slope, 0.00, 0.2) *
+		blend0hi(height, -0.100, 0.010)
 	;
 	
 let perturbedheight = stockheight
-	+ PERLIN(XYZ*10)*0.005
-	+ craggy;
+	//+ PERLIN(XYZ*10)*0.005
+	+ smallcrags + largecrags
+	;
 
 max(lowtide, perturbedheight)
 
