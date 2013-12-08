@@ -19,15 +19,14 @@ public:
 		of.open(filename, std::ios::out);
 		of.precision(20);
 
-		of << "mesh2 {\n"
-		   << "vertex_vectors {\n"
+		of << "vertex_vectors {\n"
 		   << _pointArray.size();
 
 		Point camera = world.untransform(Point::ORIGIN);
 
 		for (int i=0; i<_pointArray.size(); i++)
 		{
-			const Point v = _pointArray[i] - camera;
+			const Point v = _pointArray[i].point - camera;
 			
 			of << ",\n<" << v.x << ", " << v.y << ", " << v.z << ">";
 		}
@@ -39,11 +38,21 @@ public:
 
 		for (int i=0; i<_pointArray.size(); i++)
 		{
-			Vector v = _pointArray[i].toVector().normalise();
+			const Vector& v = _pointArray[i].normal;
 			of << ",\n<" << v.x << ", " << v.y << ", " << v.z << ">";
 		}
 		of << "\n}\n";
 		#endif
+
+		of << "uv_vectors {\n"
+		   << _pointArray.size();
+
+		for (int i=0; i<_pointArray.size(); i++)
+		{
+			double t = _pointArray[i].texture;
+			of << ",\n<" << t << ", 0>";
+		}
+		of << "\n}\n";
 
 		of << "face_indices {\n"
 		   << _faces.size();
@@ -56,8 +65,7 @@ public:
 		of << "\n"
 		   << "}\n";
 
-		of << "inside_vector CameraSky\n"
-		   << "}\n";
+		of << "inside_vector CameraSky\n";
 
 		of << "translate <"
 		   << camera.x << ", " << camera.y << ", " << camera.z << ">\n";

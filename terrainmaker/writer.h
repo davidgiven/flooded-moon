@@ -9,6 +9,7 @@ class Writer
 {
 public:
 	Writer(const std::string& filename):
+		_hasTextures(false),
 		_filename(filename)
 	{
 	}
@@ -31,8 +32,14 @@ public:
 			return i->second;
 
 		int index = _pointArray.size();
+		_pointArray.resize(index+1);
 		_pointMap[point] = index;
-		_pointArray.push_back(point);
+
+		PointData& pd = _pointArray[index];
+		pd.point = point;
+		pd.index = index;
+		pd.texture = 0;
+
 		return index;
 	}
 
@@ -51,17 +58,72 @@ public:
 		writeTo(_filename.c_str());
 	}
 
+	void applyTextureData(XYZMap& map)
+	{
+		for (PointData& pd : _pointArray)
+		{
+			pd.texture = map.at(pd.point);
+		}
+		_hasTextures = true;
+	}
+
+	void calculateNormals()
+	{
+		typedef std::unordered_multimap<int, int> Polymap;
+		Polymap polymap;
+
+		for (int i=0; i<_faces.size(); i++)
+		{
+			Triangle& t = _faces[i];
+			polymap.insert(Polymap::value_type(t.a, i));
+			polymap.insert(Polymap::value_type(t.b, i));
+			polymap.insert(Polymap::value_type(t.c, i));
+
+			Vector edge1 = (_pointArray[t.b].point - _pointArray[t.a].point).normalise();
+			Vector edge2 = (_pointArray[t.c].point - _pointArray[t.a].point).normalise();
+			t.normal = edge1.cross(edge2).normalise();
+		}
+
+		for (int i=0; i<_pointArray.size(); i++)
+		{
+			Vector n(0.0, 0.0, 0.0);
+
+			auto its = polymap.equal_range(i);
+			int trianglecount = 0;
+			for (auto it = its.first; it != its.second; it++)
+			{
+				int triangleindex = it->second;
+				n = n + _faces[triangleindex].normal;
+				trianglecount++;
+			}
+
+			n = n / trianglecount;
+			_pointArray[i].normal = n;
+		}
+	}
+
 	virtual void writeTo(const char* filename) = 0;
 
 protected:
 	struct Triangle
 	{
 		int a, b, c;
+		Vector normal;
 	};
 
+	struct PointData
+	{
+		Point point;
+		int index;
+		double texture;
+		Vector normal;
+	};
+
+	bool _hasTextures;
 	std::string _filename;
 	typedef std::map<Point, int> PointMap;
 	PointMap _pointMap;
-	std::vector<Point> _pointArray;
+
+	std::vector<PointData> _pointArray;
 	std::vector<Triangle> _faces;
 };

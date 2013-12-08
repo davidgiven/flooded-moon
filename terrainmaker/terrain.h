@@ -12,17 +12,6 @@ public:
 	{
 	}
 
-private:
-	noise::module::Perlin _noise;
-
-	// Procedurally perturbs the terrain.
-
-	double perturb(double altitude, const Point& p) const
-	{
-		double n = _noise.GetValue(p.x/1, p.y/1, p.z/1)*50;
-		return n;
-	}
-
 public:
 	bool contains(double lon, double lat) const
 	{
@@ -34,14 +23,12 @@ public:
 
 	double at(const Point& p) const
 	{
-		Compiler::Vector<2> result;
 		Compiler::Vector<3> v;
 		v.x = p.x;
 		v.y = p.y;
 		v.z = p.z;
 
-		(*terrainFunc)(&result, &v);
-		return result.m[0];
+		return (*terrainFunc)(&v);
 	}
 
 	using Map::at;

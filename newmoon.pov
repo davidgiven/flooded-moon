@@ -6,13 +6,13 @@
 #include "functions.inc"
 #include "transforms.inc"
 
-#declare km                     = 1000;
+#declare km                     = 1;
 #declare Lunar_Sphere           = 1750.000 * km; // enclosing diameter of terrain object
 #declare Nominal_Terrain_Radius = 1737.400 * km;
 #declare Atmosphere_Base        = -2 * km;
 #declare Atmospheric_Depth      = 100 * km;
 #declare Atmospheric_Scale      = 30 * km;
-#declare Time_Of_Day            = 7;
+#declare Time_Of_Day            = 5.5 + 12;
 
 global_settings
 {
@@ -49,14 +49,38 @@ background
     rgb <0, 0, 0>
 }
 
+#declare Terrain_Mesh =
+	object
+	{
+		mesh2
+		{
+			#include "/tmp/moon.inc"
+		}
+
+		scale km
+	}
+
 #declare Terrain_Object =
 	object
 	{
-		#include "/tmp/moon.inc"
-		scale km
-		pigment
+		mesh2
 		{
-			colour rgb <1, 1, 1>
+			#include "/tmp/moon.inc"
+		}
+		scale km
+
+		uv_mapping texture
+		{
+			function { x }
+
+			texture_map
+			{
+				[0.0 pigment { Red }]
+				[0.2 pigment { Green }]
+				[0.4 pigment { Blue }]
+				[0.6 pigment { Yellow }]
+				[0.8 pigment { White }]
+			}
 		}
 	}
 
@@ -102,7 +126,11 @@ background
 #declare Sea_Object =
 	object
 	{
-		#include "/tmp/sea.inc"
+		mesh2
+		{
+			#include "/tmp/sea.inc"
+		}
+
 		scale km
 
 	    texture {
@@ -116,6 +144,32 @@ background
             fade_color Sea_Colour
         }
 	}
+
+// ==========================================================================
+//                                  EARTH
+// ==========================================================================
+
+#include "earth.inc"
+
+object
+{
+	Earth
+	scale km
+
+	translate <0, -384000*km, 0>
+	rotate x*5.14
+}
+
+light_source
+{
+	<0, -300000*km, 0>
+	color <0.8, 0.8, 1.0>*0.2
+	spotlight
+	point_at <0, 0, 0>
+
+	rotate x*5.14
+}
+
 
 // =======================================================================
 //                              ATMOSPHERE
@@ -168,8 +222,7 @@ background
 		method 3
 		//samples 31
 		//jitter 0.1
-		intervals 3
-		samples 3
+		samples 31
 		scattering
 		{
 			RAYLEIGH_SCATTERING
@@ -266,5 +319,5 @@ sky_sphere
 
 object { Terrain_Object }
 object { Sea_Object }
-object { Sky_Object }
+//object { Sky_Object }
 

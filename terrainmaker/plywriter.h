@@ -33,7 +33,7 @@ public:
 
 		for (int i=0; i<_pointArray.size(); i++)
 		{
-			const Point& v = _pointArray[i];
+			const Point& v = _pointArray[i].point;
 			of << v.x << " " << v.y << " " << v.z << "\n";
 		}
 

@@ -25,6 +25,7 @@
 #include <fstream>
 #include <sstream>
 #include <memory>
+#include <unordered_map>
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
@@ -55,6 +56,7 @@ std::string propsf;
 std::string heightmapf;
 std::string seafuncf = "scripts/waterlevel.cal";
 std::string terrainfuncf = "scripts/terrain.cal";
+std::string texturefuncf = "scripts/texture.cal";
 double shmixels = 100.0;
 
 using std::min;
@@ -79,6 +81,7 @@ PDSSet geoidpds;
 #include "functions.h"
 #include "terrain.h"
 #include "sea.h"
+#include "texture.h"
 #include "writer.h"
 #include "povwriter.h"
 #include "plywriter.h"
@@ -209,6 +212,8 @@ int main(int argc, const char* argv[])
 				"filename of Calculon script for calculating sea")
 		("terrainfunc", po::value(&terrainfuncf),
 				"filename of Calculon script for calculating terrain")
+		("texturefunc", po::value(&texturefuncf),
+				"filename of Calculon script for calculating texture")
 		("camera", po::value<std::string>(&cameraf),
 				"write camera info to specified file")
 		("topo", po::value<std::string>(&topof),
@@ -268,6 +273,7 @@ int main(int argc, const char* argv[])
 
 		Terrain terrain;
 		Sea sea;
+		Texture texture;
 
 		/* Set up the camera position. */
 
@@ -325,6 +331,11 @@ int main(int argc, const char* argv[])
 
 			auto_ptr<Writer> writer(create_writer(topof));
 			SphericalRoam(terrain, FOV / shmixels).writeTo(*writer);
+			std::cerr << "calculating textures\n";
+			writer->applyTextureData(texture);
+			std::cerr << "calculating normals\n";
+			writer->calculateNormals();
+			std::cerr << "writing to file\n";
 			writer->writeToFile();
 		}
 
@@ -335,7 +346,10 @@ int main(int argc, const char* argv[])
 					  << "\n";
 
 			auto_ptr<Writer> writer(create_writer(seatopof));
-			SphericalRoam(sea, FOV / shmixels).writeTo(*writer);
+			SphericalRoam(sea, FOV / (shmixels/10)).writeTo(*writer);
+			std::cerr << "calculating normals\n";
+			writer->calculateNormals();
+			std::cerr << "writing to file\n";
 			writer->writeToFile();
 		}
 
