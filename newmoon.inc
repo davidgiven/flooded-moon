@@ -7,7 +7,7 @@
 #local map =
 	function(x, lo, hi)
 	{
-		(x-lo) / (hi-lo)
+	  (clip(x, lo, hi)-lo) / (hi-lo)
 	}
 
 #local unmap =
@@ -434,6 +434,64 @@
 				diffuse 0.3
 				roughness 0.01
 				metallic 0.0
+			}
+		}
+		texture
+		{
+			#local Seashore =
+				function
+				{
+					pattern
+					{
+						object
+						{
+							object
+							{
+								Terrain_Object
+								scale (Nominal_Terrain_Radius+0.010) / Nominal_Terrain_Radius
+							}
+						}
+					}
+				}
+
+			#local Waves_Pigment =
+				pigment
+				{
+					crackle
+					scale 0.05*km
+
+					pigment_map
+					{
+						[0.00 rgbt <1, 1, 1, 0>]
+						[0.07 rgbt <1, 1, 1, 0>] 
+						[0.10 rgbt <1, 1, 1, 1>]
+					}
+				}
+
+			pigment
+			{
+				function
+				{
+					Seashore(x, y, z)
+				}
+
+				pigment_map
+				{
+					[0 rgbt <1, 1, 1, 1>]
+					[1 Waves_Pigment]
+				}
+
+				warp
+				{
+					turbulence 0.001
+					omega 1
+					lambda 4
+				}
+			}
+
+			finish
+			{
+				diffuse 1
 			}
 		}
 	}
