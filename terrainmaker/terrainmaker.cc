@@ -336,8 +336,8 @@ int main(int argc, const char* argv[])
 			SphericalRoam(terrain, FOV / shmixels).writeTo(*writer);
 			std::cerr << "calculating textures\n";
 			writer->applyTextureData(texture);
-			std::cerr << "calculating normals\n";
-			writer->calculateNormals();
+//			std::cerr << "calculating normals\n";
+//			writer->calculateNormals();
 			std::cerr << "writing to file\n";
 			writer->writeToFile();
 		}
@@ -349,7 +349,7 @@ int main(int argc, const char* argv[])
 					  << "\n";
 
 			auto_ptr<Writer> writer(create_writer(seatopof));
-			SphericalRoam(sea, FOV / (shmixels/10)).writeTo(*writer);
+			SphericalRoam(sea, FOV / shmixels).writeTo(*writer);
 			std::cerr << "calculating normals\n";
 			writer->calculateNormals();
 			std::cerr << "writing to file\n";
@@ -362,9 +362,8 @@ int main(int argc, const char* argv[])
 			          << propsf
 					  << "\n";
 
-			auto_ptr<Writer> writer(create_writer(propsf));
-			Propmaster(terrain, 13, 60).writeTo(*writer);
-			writer->writeToFile();
+			std::ofstream of(propsf);
+			Propmaster(terrain, 13, 60).writeTo(of);
 		}
 
 		if (!heightmapf.empty())

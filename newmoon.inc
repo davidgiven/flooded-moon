@@ -90,8 +90,8 @@
 #declare Blue_Texture = texture { pigment { Blue } }
 
 #local Rock_Texture =
-    texture
-    {
+	texture
+	{
 		pigment
 		{
 			cells
@@ -102,30 +102,45 @@
 				[0.5 rgb <.8, .8, .8>]
 				[1.0 rgb <.4, .4, .4>]
 			}
-			scale 0.30
+			scale 0.100
 			//scale <1,.1,1>*.25
+			scale CameraSky
 			warp {turbulence .2}
-			rotate 30*x
 		}
 
-        normal
-        {
-            slope
-            {
-                point_at CameraSky, 0.8, 1.0
-            }
-            normal_map {
-              [0.0 granite 0.0]
+		normal
+		{
+			slope
+			{
+				point_at CameraSky, 0.8, 1.0
+			}
+			normal_map {
+			  [0.0 granite 0.0]
 //              [0.5 granite -0.8]
-              [1.0 granite 0.5]
-            }
-            scale .2
-            //scale .5*y
+			  [1.0 granite 0.5]
+			}
+			scale 0.080
+			//scale .5*y
 
 //            warp {turbulence .2}
-            rotate 30*x
-        }
-    }
+		}
+	}
+	texture
+	{
+		pigment
+		{
+			slope
+			{
+				point_at CameraSky, 0, 1.0
+			}
+			color_map
+			{
+				[0.0 rgbt <1, 1, 1, 1>]
+				[0.3 rgbt <0, 0, 0, 0>]
+			}
+			scale 1
+		}
+	}
         
 #local Snow_Texture =
 	texture
@@ -227,7 +242,7 @@
 				crackle
 				solid
 			} 
-			scale 0.01*km
+			scale 0.1*km
 
 			pigment_map
 			{
@@ -244,7 +259,15 @@
 #local Flat_Surface =
     texture
     {
-		uv_mapping function { map(x, -20, 20) }
+		pigment_pattern
+		{
+			uv_mapping function { map(x, -20, 20) }
+			pigment_map
+			{
+				[0 rgb <0, 0, 0>]
+				[1 rgb <1, 1, 1>]
+			}
+		}
 	
 		texture_map
 		{
@@ -266,7 +289,15 @@
 #local Flattish_Surface =
     texture
     {
-		uv_mapping function { map(x, -20, 20) }
+		pigment_pattern
+		{
+			uv_mapping function { map(x, -20, 20) }
+			pigment_map
+			{
+				[0 rgb <0, 0, 0>]
+				[1 rgb <1, 1, 1>]
+			}
+		}
 	
 		texture_map
 		{
@@ -287,7 +318,15 @@
 #local Steepish_Surface =
     texture
     {
-		uv_mapping function { map(x, -20, 20) }
+		pigment_pattern
+		{
+			uv_mapping function { map(x, -20, 20) }
+			pigment_map
+			{
+				[0 rgb <0, 0, 0>]
+				[1 rgb <1, 1, 1>]
+			}
+		}
 	
 		texture_map
 		{
@@ -319,7 +358,15 @@
 			 * v is the slope (0 = horizontal, 1 = steep).
 			 */
 			 
-			uv_mapping function { y }
+			pigment_pattern
+			{
+				uv_mapping function { y }
+				pigment_map
+				{
+					[0 rgb <0, 0, 0>]
+					[1 rgb <1, 1, 1>]
+				}
+			}
 			turbulence 0.1
 
 			texture_map
@@ -336,41 +383,61 @@
 //                                  SEA   
 // =======================================================================
 
-//#local Sea_Colour = rgb <57/256, 63/256, 86/256>;
-#local Sea_Colour = rgbt <0, 0.2, 0.4, 0>;
+#local WaterColour = <0.60, 0.85, 0.85>;
+#local WaterClarity = 0.4;
+#local WaterFrequency = 1300;
+#local WaterReflection = 0.3;
 
-#local Sea_Texture =
-    texture
-    {
-        pigment {
-            colour rgbt 1
-            quick_colour rgbt <0, 0, 1, 0>
-        }
-
-        normal {
-            wrinkles 0.2
-            scale 0.01*km
-        }      
-        //normal {
-        //    bozo 0.8
-        //    scale 0.002 * km
-        //} 
-        
-        finish
+#local Sea_Material =
+	material
+	{
+		texture
 		{
-            specular 0.8
-            roughness 0.03
-            diffuse 0.3
-            reflection
+			pigment
 			{
-                0, 1.0
-                falloff 2
-                fresnel on
-            }
-            conserve_energy
-        }
-    }
-    
+				color rgb WaterColour transmit WaterClarity
+			}
+
+			normal
+			{
+				waves 0.10
+				scale 0.002*km
+				translate <0, Nominal_Terrain_Radius*2, 0>
+			}
+			finish
+			{
+				brilliance 0.9
+				specular 0.4
+				reflection WaterReflection
+				diffuse 0.3
+				roughness 0.01
+				metallic 0.0
+			}
+		}
+		texture
+		{
+			pigment
+			{
+				color rgbt 1
+			}
+
+			normal
+			{
+				bozo 0.5
+				scale 0.001*km
+			}
+			finish
+			{
+				brilliance 0.9
+				specular 0.4
+				reflection WaterReflection
+				diffuse 0.3
+				roughness 0.01
+				metallic 0.0
+			}
+		}
+	}
+
 #local Sea_Object =
 	object
 	{
@@ -378,19 +445,12 @@
 		{
 			#include "/tmp/sea.inc"
 		}
-
 		scale km
 
-	    texture {
-	        Sea_Texture
+	    material {
+	        Sea_Material
 	    }
 	
-        interior {
-            ior 1.34
-            fade_distance 0.01*km
-            fade_power 2
-            fade_color Sea_Colour
-        }
 	}
 
 // =======================================================================
@@ -486,18 +546,61 @@
 //                                  TREES 
 // ==========================================================================
 
-#local Trees_Object =
-	object
-	{
-		mesh2
+#if (0)
+#include "black_tupelo.inc"
+
+#local Tree_Object =
+	union { 
+		object
 		{
-			#include "/tmp/props.inc"
+			black_tupelo_13_stems
+			pigment
+			{
+				color rgb <0.5, 0.4, 0>
+			}
+		}
+		object
+		{
+			black_tupelo_13_leaves
+			texture
+			{
+				pigment
+				{
+					color rgb <17, 69, 17>/255
+				} 
+				finish
+				{
+				}
+			}
 		}
 
-		texture
-		{
-			pigment { White }
-		}
+		scale 1/black_tupelo_13_height
+	}
+#else
+
+#include "tomtree/maple-mesh.inc"
+//#include "tomtree/TOMTREE.inc"
+#local Tree_Object =
+	object {
+		TREE
+	}
+#end
+
+#macro Tree(pos, upv, w, h, r)
+	object
+	{
+		Tree_Object
+		rotate r*y
+		scale h
+		Reorient_Trans(y, upv)
+		translate pos
+	}
+#end
+
+#local Trees_Object =
+	union
+	{
+		#include "/tmp/props.inc"
 	}
 
 // ==========================================================================

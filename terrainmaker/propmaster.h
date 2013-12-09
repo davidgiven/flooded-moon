@@ -28,13 +28,13 @@ public:
 		icosahedron();
 	}
 
-	void writeTo(Writer& writer)
+	void writeTo(std::ofstream& of)
 	{
 		for (Sectors::const_iterator i = _sectors.begin(),
 				e = _sectors.end(); i != e; i++)
 		{
 			Sector* sector = *i;
-			emitSector(writer, sector);
+			emitSector(of, sector);
 		}
 	}
 
@@ -147,20 +147,17 @@ private:
 		facet(v7, v2, vb, 19);
 	}
 
-	void emitTree(Writer& writer, const Point& p, double width, double height)
+	void emitTree(std::ofstream& of, const Point& p, double width, double height,
+			double rotation)
 	{
 		Vector up = p.toVector().normalise();
-		Vector tocamera = (p - _camera).normalise();
-		Vector sideways = up.cross(tocamera);
 
-		Point top = p + up*height;
-		Point left = p + sideways*width;
-		Point right = p - sideways*width;
-
-		writer.addFace(right, top, left);
+		of << "Tree(<" << p.x << ", " << p.y << ", " << p.z << ">, "
+			<< "<" << up.x << ", " << up.y << ", " << up.z << ">, "
+			<< width << ", " << height << ", " << rotation << ")\n";
 	}
 
-	void emitSector(Writer& writer, Sector* sector)
+	void emitSector(std::ofstream& of, Sector* sector)
 	{
 		/* Calculate the area of the sector. */
 
@@ -208,7 +205,8 @@ private:
 			double altitude = _terrain.at(p);
 			p = _terrain.mapToSphere(p, altitude);
 			double height = 0.03 + randf()*0.03;
-			emitTree(writer, p, 0.01, height);
+			double rotation = randf()*360.0;
+			emitTree(of, p, 0.01, height, rotation);
 		}
 	}
 

@@ -50,7 +50,9 @@ public:
 		for (int i=0; i<_pointArray.size(); i++)
 		{
 			const PointData& pd = _pointArray[i];
-			of << ",\n<" << pd.u << ", " << pd.v << ">";
+			double u = isnan(pd.u) ? 0.0 : pd.u;
+			double v = isnan(pd.v) ? 0.0 : pd.v;
+			of << ",\n<" << u << ", " << v << ">";
 		}
 		of << "\n}\n";
 
