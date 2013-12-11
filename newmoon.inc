@@ -20,6 +20,29 @@
 //                                TERRAIN 
 // =======================================================================
 
+#local Fields_Texture =
+	texture
+	{
+		pigment
+		{
+			bozo
+			color_map
+			{
+				[0 color <0.60, 0.75, 0.30>]
+				[1 color <0.20, 0.50, 0.10>]
+			}
+			scale 0.010*km
+		}
+
+		normal
+		{
+			bumps 0.25
+			scale 0.100*km
+		}
+	}
+
+/* Other */
+
 #local P_Desert = 
     pigment
 	{
@@ -89,40 +112,91 @@
 #declare Green_Texture = texture { pigment { Green } }
 #declare Blue_Texture = texture { pigment { Blue } }
 
-#local Rock_Texture =
+#local LowRock_Texture =
 	texture
 	{
 		pigment
 		{
-			cells
-			turbulence .5 lambda 8
+			bozo
+			turbulence 0.04
+			omega 0.75
 			color_map
 			{
-				[0.0 rgb <.6, .6, .6>]
-				[0.5 rgb <.8, .8, .8>]
+				[0.0 rgb <.7, .6, .3>]
+				[0.6 rgb <.8, .6, .4>]
 				[1.0 rgb <.4, .4, .4>]
 			}
-			scale 0.100
+			scale 0.100*km
 			//scale <1,.1,1>*.25
-			scale CameraSky
+			scale CameraSky*2
+			warp {turbulence .2}
+		}
+
+/*
+		normal
+		{
+			bumps 0.2
+			turbulence 0.1
+			omega 1
+			scale 0.2*km
+		}
+	*/
+	}
+	texture
+	{
+		pigment
+		{
+			slope
+			{
+				point_at CameraSky, 0, 1.0
+			}
+			color_map
+			{
+				[0.0 rgbt <1, 1, 1, 1>]
+				[0.3 rgbt <0.5, 0.5, 0.5, 0>]
+			}
+			scale 1
+		}
+	}
+	texture
+	{
+		pigment
+		{
+			crackle
+			color_map
+			{
+				[0    rgbt 0.3]
+				[0.3  rgbt 1]
+			}
+			scale 0.010*km
+		}
+	}
+
+#local HighRock_Texture =
+	texture
+	{
+		pigment
+		{
+			bozo
+			turbulence 0.04
+			omega 0.75
+			color_map
+			{
+				[0.0 rgb <.7, .6, .5>]
+				[0.6 rgb <.8, .6, .6>]
+				[1.0 rgb <.6, .6, .8>]
+			}
+			scale 0.200*km
+			scale CameraSky*2
 			warp {turbulence .2}
 		}
 
 		normal
 		{
-			slope
-			{
-				point_at CameraSky, 0.8, 1.0
-			}
-			normal_map {
-			  [0.0 granite 0.0]
-//              [0.5 granite -0.8]
-			  [1.0 granite 0.5]
-			}
-			scale 0.080
-			//scale .5*y
-
-//            warp {turbulence .2}
+			bumps 0.2
+			turbulence 0.1
+			omega 1
+			scale 0.2*km
 		}
 	}
 	texture
@@ -139,6 +213,26 @@
 				[0.3 rgbt <0, 0, 0, 0>]
 			}
 			scale 1
+		}
+	}
+
+#local Rock_Texture =
+    texture
+    {
+		pigment_pattern
+		{
+			uv_mapping function { map(x, -20, 20) }
+			pigment_map
+			{
+				[0 rgb <0, 0, 0>]
+				[1 rgb <1, 1, 1>]
+			}
+		}
+	
+		texture_map
+		{
+			[map( 0.000, -20, 20) LowRock_Texture]
+			[map( 5.000, -20, 20) HighRock_Texture]
 		}
 	}
         
@@ -197,18 +291,20 @@
 	{
 		pigment
 		{
-			cells
-			turbulence .5 lambda 8
+			bozo
 			pigment_map
 			{
 				[0.0 P_Vegetation1]
 				[0.3 P_Vegetation2]
 				[0.6 P_Vegetation3]
 			}
-			scale 0.1
+			scale 0.1*km
 			//scale <1,.1,1>*.25
-			warp {turbulence .2}
-			rotate 30*x
+			warp
+			{
+				turbulence .5
+				lambda 8
+			}
 		}
 	}
     
@@ -231,28 +327,6 @@
 			rotate 30*x
 		}
 	}
-
-#local Fields_Texture =
-	texture
-	{
-		pigment
-		{
-			pigment_pattern
-			{
-				crackle
-				solid
-			} 
-			scale 0.1*km
-
-			pigment_map
-			{
-				[0 P_Desert]
-				[0.21 P_Vegetation2]
-				[1 P_Vegetation1]
-			}
-		}
-	}
-
 
 /* Really flat. Sandy shore, fields, barren rockland. */
 
@@ -367,7 +441,7 @@
 					[1 rgb <1, 1, 1>]
 				}
 			}
-			turbulence 0.1
+			turbulence 0.2
 
 			texture_map
 			{
@@ -492,6 +566,7 @@
 			finish
 			{
 				diffuse 1
+				ambient 0.05
 			}
 		}
 	}
@@ -562,7 +637,7 @@
 		method 3
 		//samples 31
 		//jitter 0.1
-		samples 31
+		samples 60
 		scattering
 		{
 			RAYLEIGH_SCATTERING

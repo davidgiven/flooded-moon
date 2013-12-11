@@ -5,6 +5,7 @@
 #include "textures.inc"
 #include "functions.inc"
 #include "transforms.inc"
+#include "rad_def.inc"
 
 #declare km                     = 1;
 #declare Lunar_Sphere           = 1750.000 * km; // enclosing diameter of terrain object
@@ -12,11 +13,19 @@
 #declare Atmosphere_Base        = -2 * km;
 #declare Atmospheric_Depth      = 100 * km;
 #declare Atmospheric_Scale      = 30 * km;
-#declare Time_Of_Day            = 8; //5.5 + 12;
+#declare Time_Of_Day            = 3.75 + 12;
+#declare Field_Of_View          = 50;
 
 global_settings
 {
 	assumed_gamma 1.0
+
+	/*
+	radiosity
+	{
+		Rad_Settings(Radiosity_Normal, off, on)
+	}
+	*/
 }
 
 #default
@@ -34,7 +43,7 @@ global_settings
 
 camera
 {
-    angle 50
+    angle Field_Of_View
 	up z
 	right -x*image_width/image_height
 	scale km

@@ -46,8 +46,7 @@
 		method 3
 		//samples 31
 		//jitter 0.1
-		intervals 3
-		samples 3
+		samples 31
 		scattering
 		{
 			RAYLEIGH_SCATTERING

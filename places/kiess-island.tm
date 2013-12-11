@@ -1,6 +1,6 @@
-altitude=0.3
+altitude=0.050
 latitude=-7.80
-longitude=86.34
-azimuth=-10
-bearing=-95
+longitude=86.32
+azimuth=7
+bearing=-110
 
