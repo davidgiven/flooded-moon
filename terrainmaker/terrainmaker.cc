@@ -53,6 +53,7 @@ std::string cameraf;
 std::string topof;
 std::string seatopof;
 std::string propsf;
+double maxpropdistance = 20.0;
 std::string heightmapf;
 std::string seafuncf = "scripts/waterlevel.cal";
 std::string terrainfuncf = "scripts/terrain.cal";
@@ -217,6 +218,8 @@ int main(int argc, const char* argv[])
 				"filename of Calculon script for calculating texture")
 		("propsfunc", po::value(&propsfuncf),
 				"filename of Calculon script for calculating prop density")
+		("propdistance", po::value(&maxpropdistance),
+				"maximum distance from the camera to render props")
 		("camera", po::value<std::string>(&cameraf),
 				"write camera info to specified file")
 		("topo", po::value<std::string>(&topof),
@@ -290,14 +293,12 @@ int main(int argc, const char* argv[])
 		 * what sealevel is at this point and adjust the camera so it's
 		 * relative to that. */
 
-		{
-			Point camera = world.untransform(Point::ORIGIN);
-			double s = sea.at(camera);
+		Point camera = world.untransform(Point::ORIGIN);
+		double sealevel = sea.at(camera);
 
-			std::cerr << "sealevel at camera is " << s << "km\n";
+		std::cerr << "sealevel at camera is " << sealevel << "km\n";
 
-			world = world.translate(Vector(0, s-radius+altitude, 0));
-		}
+		world = world.translate(Vector(0, sealevel-radius+altitude, 0));
 
 		/* Adjust for pointing direction. */
 
@@ -333,11 +334,11 @@ int main(int argc, const char* argv[])
 					  << "\n";
 
 			auto_ptr<Writer> writer(create_writer(topof));
-			SphericalRoam(terrain, FOV / shmixels).writeTo(*writer);
+			SphericalRoam(terrain, sealevel, FOV / shmixels).writeTo(*writer);
 			std::cerr << "calculating textures\n";
 			writer->applyTextureData(texture);
-//			std::cerr << "calculating normals\n";
-//			writer->calculateNormals();
+			std::cerr << "calculating normals\n";
+			writer->calculateNormals();
 			std::cerr << "writing to file\n";
 			writer->writeToFile();
 		}
@@ -349,7 +350,7 @@ int main(int argc, const char* argv[])
 					  << "\n";
 
 			auto_ptr<Writer> writer(create_writer(seatopof));
-			SphericalRoam(sea, FOV / shmixels).writeTo(*writer);
+			SphericalRoam(sea, sealevel, FOV / shmixels).writeTo(*writer);
 			std::cerr << "calculating normals\n";
 			writer->calculateNormals();
 			std::cerr << "writing to file\n";
@@ -363,7 +364,7 @@ int main(int argc, const char* argv[])
 					  << "\n";
 
 			std::ofstream of(propsf);
-			Propmaster(terrain, 13, 60).writeTo(of);
+			Propmaster(terrain, 13, maxpropdistance).writeTo(of);
 		}
 
 		if (!heightmapf.empty())

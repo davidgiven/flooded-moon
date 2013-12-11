@@ -45,6 +45,13 @@ public:
 
 	void addFace(const Point& va, const Point& vb, const Point& vc)
 	{
+		assert(va.isValid());
+		assert(vb.isValid());
+		assert(vc.isValid());
+		assert(va != vb);
+		assert(vb != vc);
+		assert(va != vc);
+
 		int pa = addPoint(va);
 		int pb = addPoint(vb);
 		int pc = addPoint(vc);
@@ -97,8 +104,15 @@ public:
 				trianglecount++;
 			}
 
-			n = n / trianglecount;
-			_pointArray[i].normal = n;
+			if (trianglecount > 0)
+			{
+				n = n / trianglecount;
+				_pointArray[i].normal = n;
+			}
+			else
+				_pointArray[i].normal = Vector(0, 0, 0);
+
+			assert(_pointArray[i].normal.isValid());
 		}
 	}
 

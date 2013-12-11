@@ -27,8 +27,9 @@ private:
 	class Facet;
 
 public:
-	SphericalRoam(const XYZMap& terrain, double error):
+	SphericalRoam(const XYZMap& terrain, double sealevel, double error):
 		_terrain(terrain),
+		_sealevel(sealevel),
 		_error(degToRad(error))
 	{
 		Point p0 = _terrain.mapToSphere(Point(-1, 1, 1));
@@ -68,12 +69,14 @@ public:
 
 		/* Calculate the maximum sight distance. */
 
-		double r = radius + sealevel;
-		double cameradistance = world.transform(Point::ORIGIN).length();
-		std::cerr << "distance to core is " << cameradistance << "km\n";
-		double tallest = MAXHEIGHT + r;
-		double horizon = sqrt(cameradistance*cameradistance - r*r);
-		double maxsight = horizon + sqrt(tallest*tallest - r*r);
+		Point camera = world.transform(Point::ORIGIN);
+		Vector camerav = camera.toVector();
+		double cameradistance = camera.length();
+		std::cerr << "distance to core is " << cameradistance << "km\n"
+		          << "sealevel here is " << _sealevel << "km\n";
+		double tallest = MAXHEIGHT + sealevel;
+		double horizon = sqrt(cameradistance*cameradistance - _sealevel*_sealevel);
+		double maxsight = horizon + sqrt(tallest*tallest - _sealevel*_sealevel);
 		double maxsightsquared = maxsight*maxsight;
 		std::cerr << "distance to horizon is " << horizon <<
 				"km; maximum sight distance is " << maxsight << "km\n";
@@ -81,6 +84,7 @@ public:
 		int i = 0;
 		while (!_pendingFacets.empty())
 		{
+			double maxerror = 0.0;
 			std::set<Facet*>::iterator iterator = _pendingFacets.begin();
 			Facet* facet = *iterator;
 			_pendingFacets.erase(iterator);
@@ -92,49 +96,57 @@ public:
 			Point va = world.transform(facet->pa);
 			Point vb = world.transform(facet->pb);
 			Point vc = world.transform(facet->pc);
+			Vector vab = facet->pa - facet->pb;
+			Vector vac = facet->pa - facet->pc;
+			Vector vbc = facet->pb - facet->pc;
 
 			double distancesquared = va.lengthSquared();
-			double sizesquared = (facet->pa - facet->pb).lengthSquared();
+			double sizesquared = vab.lengthSquared();
+			bool dosplit = false;
+
+			/* Always consider facets which are very large. */
+
 			if ((sizesquared > maxsightsquared) ||
 					(distancesquared < maxsightsquared))
 			{
-				/* Calculate the apparent size of the facet. */
+				/* Calculate the apparent size of the facet. Don't split
+				 * facets that are smaller than a certain absolute size
+				 * to avoid degenerate cases. */
 
-				Vector ca = va.toVector().normalise();
-				Vector cb = vb.toVector().normalise();
-				Vector cc = vc.toVector().normalise();
-
-				double dab = ca.dot(cb);
-				double dac = ca.dot(cc);
-				double dbc = cb.dot(cc);
-
-				double a = min(acos(dab), min(acos(dac), acos(dbc)));
-				if (a > _error)
+				double area = vab.cross(vac).length() / 2.0;
+				if (area > 0.000001)
 				{
-					/* Split this facet. */
-					split(facet);
+					Vector ca = va.toVector().normalise();
+					Vector cb = vb.toVector().normalise();
+					Vector cc = vc.toVector().normalise();
+					double dab = acos(ca.dot(cb));
+					double dac = acos(ca.dot(cc));
+					double dbc = acos(cb.dot(cc));
+
+					double mx = min(dab, dac, dbc);
+
+					if (mx > _error)
+						dosplit = true;
 				}
-				else
-				{
-					/* Otherwise, don't bother with it. */
-					_completedFacets.insert(facet);
-				}
+			}
+
+			if (dosplit)
+			{
+				/* Consumes and destroys facet. */
+				split(facet);
 			}
 			else
-			{
-				/* Over maxsight facets just get dropped on the floor,
-				 * neither completed nor pending.
-				 */
-			}
+				_completedFacets.insert(facet);
 
 			i++;
 			if (!(i & 0xffff))
 			{
-				int s = _completedFacets.size();
-				std::cerr << "\r" << s << "  ";
+				int cs = _completedFacets.size();
+				int ss = _pendingFacets.size();
+				std::cerr << "\r" << ss << "/" << cs << "   ";
 
 #if 0
-				if (s > 1e6)
+				if (cs > 1e6)
 				{
 					std::cerr << "\nToo much detail, bailing out\n";
 
@@ -230,6 +242,10 @@ public:
 		 */
 
 		const Point& m = f->getRealMidh(_terrain);
+		assert(m != f->pa);
+		assert(m != f->pb);
+		assert(m != f->pc);
+
 		Facet* f0 = addFacet(f->pc, m, f->pb);
 		Facet* f1 = addFacet(f->pb, m, f->pa);
 		Facet* f2 = addFacet(n->pc, m, n->pb);
@@ -253,6 +269,7 @@ public:
 
 private:
 	const XYZMap& _terrain;
+	double _sealevel;
 	double _error;
 
 	/* Each facet is arranged like this:
@@ -277,17 +294,19 @@ private:
 	private:
 		Point _midh;
 		Point _realmidh;
-		double _error;
 
 	public:
 		Facet(const Point& pa, const Point& pb, const Point& pc):
 				pa(pa), pb(pb), pc(pc),
 				fa(NULL), fo(NULL), fh(NULL),
-
-				_midh((pa.x+pc.x)/2, (pa.y+pc.y)/2, (pa.z+pc.z)/2),
-				_error(NAN)
+				_midh((pa.x+pc.x)/2, (pa.y+pc.y)/2, (pa.z+pc.z)/2)
 		{
-
+			assert(_midh != pa);
+			assert(_midh != pb);
+			assert(_midh != pc);
+			assert(pa.isValid());
+			assert(pb.isValid());
+			assert(pc.isValid());
 		}
 
 		void setEdges(Facet* a, Facet* o, Facet* h)
@@ -313,28 +332,14 @@ private:
 		const Point& getRealMidh(const XYZMap& terrain)
 		{
 			if (!_realmidh.isValid())
-				_realmidh = terrain.mapToSphere(_midh);
-			return _realmidh;
-		}
-
-		double getError(const Terrain& terrain)
-		{
-			if (isnan(_error))
 			{
-				const Point& realmid = getRealMidh(terrain);
-
-				Vector vfake = world.transform(_midh).toVector().normalise();
-				Vector vreal = world.transform(realmid).toVector().normalise();
-
-				double d = vfake.dot(vreal);
-				if (d < 1)
-					_error = acos(d);
-				else
-					_error = 0;
-				assert(!isnan(_error));
+				_realmidh = terrain.mapToSphere(_midh);
+				/* Occasionally _realmidh will coincide with a facet
+				 * vertex, which causes bad stuff. Cope. */
+				if ((_realmidh == pa) || (_realmidh == pb) || (_realmidh == pc))
+					_realmidh = _midh;
 			}
-
-			return _error;
+			return _realmidh;
 		}
 	};
 

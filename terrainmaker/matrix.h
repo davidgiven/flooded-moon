@@ -49,6 +49,16 @@ struct Vector
 		return !isnan(x);
 	}
 
+	bool operator == (const Vector& o) const
+	{
+		return (x == o.x) && (y == o.y) && (z == o.z);
+	}
+
+	bool operator != (const Vector& o) const
+	{
+		return (x != o.x) || (y != o.y) || (z != o.z);
+	}
+
 	Vector operator + (const Vector& o) const
 	{
 		return Vector(x + o.x, y + o.y, z + o.z);
@@ -149,6 +159,11 @@ struct Point
 	bool operator == (const Point& o) const
 	{
 		return (x == o.x) && (y == o.y) && (z == o.z);
+	}
+
+	bool operator != (const Point& o) const
+	{
+		return (x != o.x) || (y != o.y) || (z != o.z);
 	}
 
 	Vector toVector() const

@@ -32,7 +32,7 @@ public:
 		}
 		of << "\n}\n";
 
-		#if 0
+		#if 1
 		of << "normal_vectors {\n"
 		   << _pointArray.size();
 
