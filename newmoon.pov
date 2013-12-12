@@ -13,7 +13,7 @@
 #declare Atmosphere_Base        = -2 * km;
 #declare Atmospheric_Depth      = 100 * km;
 #declare Atmospheric_Scale      = 30 * km;
-#declare Time_Of_Day            = 3.75 + 12;
+#declare Time_Of_Day            = 5.75 + 12;
 #declare Field_Of_View          = 50;
 
 global_settings

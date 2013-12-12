@@ -114,7 +114,7 @@ public:
 				 * to avoid degenerate cases. */
 
 				double area = vab.cross(vac).length() / 2.0;
-				if (area > 0.000001)
+				if (area > (0.000500*0.000500))
 				{
 					Vector ca = va.toVector().normalise();
 					Vector cb = vb.toVector().normalise();
