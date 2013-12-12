@@ -1,0 +1,230 @@
+                                FLOODED MOON
+                                ============
+
+                           © 2010-2013 David Given
+
+What is this?
+-------------
+
+This is an art project to use CGI to visualise the moon, from really close
+up... after it's been terraformed.
+
+It uses real terrain data from various survey spacecraft to produce accurate as
+possible terrain, plus procedural enhancement to make it more... interesting...
+in the smooth areas. Atmosphere, water and vegetation are added and the results
+rendered with Povray. A reasonable attempt is made to keep things physically
+accurate, at least geometry-wise: you only get to see Earthrise from the parts
+of the moon where can actually see Earthrise, for example.
+
+
+Why?
+----
+
+I don't understand the question.
+
+
+What have I got here?
+---------------------
+
+What you're looking at here is a huge pile of largely unorganised source code
+that actually renders the images.
+
+None of this was designed. It all accreted over time, with tweaks added as I
+needed stuff. As a result it's not exactly project ready.
+
+There are two main parts:
+
+TerrainMaker --- this is a C++ program which reads in the spacecraft data plus
+a description of where the camera is, and uses these to construct meshes of the
+terrain and ocean and place vegetation onto the surface.
+
+newmoon.pov --- this is the Povray input file which reads in the information
+produced by TerrainMaker and actually does the render.
+
+
+Getting the spacecraft data
+---------------------------
+
+The repository does *not* contain the spacecraft data, because it's huge. You'll
+need to download this yourself. I've been using the topography and lunar geoid
+datasets from the Lunar Reconnaissance Orbiter spacecraft, because that's the
+highest resolution I can find. These need to be placed in the geoid/ and lroc/
+directories. See the READMEs in there for information about where to get the
+stuff.
+
+
+Using TerrainMaker
+------------------
+
+TerrainMaker is a horrible, undocumented pile of hacks.
+
+To build it, do:
+
+    make -C terrainmaker
+
+You will need the following dependencies:
+
+    the Calculon shader language, available here:
+	    https://cowlark.com/calculon/doc/stable/doc/index.wiki
+
+	the LLVM 3.2 development kit, which is used by Calculon
+
+	the libnoise development kit
+
+	Boost with the program_options and iostreams libraries
+
+The last three should be available with your distribution.
+
+Note to Windows users: you're on your own. Good luck. You may be able to make
+TerrainMaker work with cygwin (if so, please get in touch, I'd be really
+interested to hear about it).
+
+Once built, TerrainMaker is driven by an enormous set of badly organised
+command line arguments. Use -h to get the only available help. It'll read
+arguments out of configuration files, and the preferred way to use it is to
+give it a set of preprepared .tm files.
+
+The scripts/ directiory contains these. The ones you'll care about are:
+
+    data.tm: this tells TerrainMaker about the PDS files it needs to load. If
+	    you want to use TerrainMaker with anything other than the LRO data,
+		change this. It also configures the sealevel and average Lunar
+		radius.
+
+	makeheightmap.tm: tells TerrainMaker to use the PDS files to write out a
+	    2D heightmap in SIMPLE CYLINDRICAL projection. This can be used as
+		a Povray texture wrapped round a sphere. Right now we don't use this
+		for anything; it's there for debug purposes.
+
+	maketopo.tm: the big one. This generates: the topography mesh, the
+	    ocean mesh, the camera description file, and the props description
+		file. This will be placed in /tmp and will be huge. This is the
+		one you'll be using most often.
+
+In addition, there are some more .tm files in the places/ directory. This
+contain camera location information (latitude, longitude, altitude, azimuth,
+bearing). Finding interesting places on the moon to take pictures of is
+actually quite hard, so I'm attempting to build a collection here.
+
+An example TerrainMaker command line is:
+
+    ./terrainmaker/terrainmaker scripts/data.tm scripts/maketopo.tm places/kiess-island.tm --shmixels 100
+
+This tells TerrainMaker to load the dataset, emit meshes, and uses the Kiess
+Island prepackage place. The final option overrides the option set in
+maketopo.tm to change the mesh quality. (You can override any option like this.
+It's handy for moving the camera.)
+
+About shmixels:
+
+When generating a mesh, TerrainMaker tries to ensure that each polygon has a
+small visual size. The size is (field of view / shmixels), so in this example
+you'll get *approximately* 100 polygons horizontally across the final rendered
+image. The higher the number, the more detailed the mesh, but the longer it'll
+take and the bigger the files. 100's a good number for preview images. I
+usually use 400 for final renders. Be warned! The Kiess Island view, at 400
+shmixels, contains about 15 million polygons and produces 2GB of output files.
+
+TerrainMaker uses a HUGE amount of memory. You need to have at least enough to
+load your entire PDS dataset all at once, plus about a GB per million polygons.
+My machine has 16GB and I set the shmixels value too high I run out.
+
+
+Rendering the result
+--------------------
+
+Once you've run TerrainMaker, producing the render is fairly straightforward:
+
+    povray +Inewmoon +A +P +W400 +H300
+
+The .pov file will attempt to pick up the TerrainMaker output files in their
+final location.
+
+There's only one value which needs configuring, which is the time of day:
+at the top of newmoon.pov there's a variable called Time_Of_Day. Changes this
+to a value in pseudo-hours (24 per lunar day). 0 is noon at longitude 0.
+
+
+Tweaking the terrain, or, Calculon FTW!
+---------------------------------------
+
+TerrainMaker uses Calculon scripts to do the procedural generation. These are
+the .cal files the scripts/ directory. Calculon uses LLVM to compile these into
+fast machine code on the fly, so you can change TerrainMaker's behaviour
+without having to recompile it. Calculon is awesome (but I mostly say that
+because I wrote it).
+
+These scripts are:
+
+    waterlevel.cal: returns sealevel for a given XYZ coordinate.
+
+	terrain.cal: returns the terrain height for a given XYZ coordinate. This
+	    is the script that does the procedural terrain deformation: it
+		reads the raw topographic and geoid information and returns a
+		massaged height.
+
+	texture.cal: calculates the (u,v) pair to be passed to Povray for a 
+	    given XYZ coordinate. This was originally going to return a 
+		texture ID but it actually turns out to be simpler to calculate the
+		slope and height-above-sealevel and let Povray figure the textures
+		out itself.
+
+	props.cal: calculates prop density for a prop sector. TerrainMaker's 
+	    prop (tree) placement works by subdividing the sphere into a
+		set of small sectors and placing props randomly within the sector,
+		based on a random seed calculated from the sector ID --- this way
+		we always get the same set of props from run to run. This function
+		controls how many props a sector gets.
+
+These all work off XYZ coordinates which is the location in space of a point
+on the normalised lunar sphere. This avoids problems at the poles.
+
+
+This is taking a really, really long time
+-----------------------------------------
+
+Yeah. Renders are slow.
+
+Tips to speed up test renders:
+
+- reduce the prop density to 0 by editing props.cal.
+
+- reduce the shmixel count. 100 is good for previews.
+
+- disable the sky. The sky is *really* slow. Edit newmoon.inc, go to the
+    bottom, and comment out the object { Sky_Object } line.
+
+- take pictures at noon or midnight. Sky calculations when the sun is
+    oblique are loads slower than when the sun is overhead.
+
+- faster computers. These renders will take all the CPU you've got and beg
+    for more. If you want to use distributed Povray on a huge cloud of
+	machines, that will take a lot of the pain off.
+
+
+Conclusion
+----------
+
+So none of this is really intended for public consumption. Nevertheless, if
+you've read this far, chances are you're going to try something with it.
+
+If you produce any pretty pictures, let me know! I'm always looking for more
+scripts for places/. Likewise, contact me with any comments. Feedback is good.
+
+Also, good luck. You'll need it.
+
+David Given
+dg@cowlark.com
+
+
+Legal nonsense
+--------------
+
+Both TerrainMaker and the Povray files are © 2013 David Given and are licensed
+under the Simplified BSD License --- see the COPYING file for more
+information.
+
+The distribution may also contain data files from other sources. These are not
+mine and will be appropriately credited (if not, let me know because that's a
+bug).
+
