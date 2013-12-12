@@ -1,7 +1,18 @@
-The geoid data comes from:
+This directory needs to contain the not particularly huge lunar geoid
+dataset from the Lunar Reconnaissance Orbiter mission, in PDS format. It's
+not checked in because... because. Feel free to download it yourself!
 
-http://pds-geosciences.wustl.edu/lunar01/lp-l-rss-5-gravity-v1/lp_1001/ascii/
+The dataset can be found on the Lunar Orbital Data Explorer website but
+it's not possible to provide a direct link:
 
-...using the jol090j1 file. It's a 360x180 raster of the geoid elevation in
-standard ASCII 'image' format, suitable for conversion with
-convert_from_image.lua.
+http://ode.rsl.wustl.edu/moon/indexProductSearch.aspx
+
+It's actually easier to do a Google search for the actual filename and
+get someone else's copy. The two files you need are:
+
+	LDGM_4_GLGM-3_L60.IMG 
+	LDGM_4_GLGM-3_L60.LBL 
+
+(You need both. The .LBL contains the file header, the .IMG the actual data.
+Ah, PDS --- bless.)
+

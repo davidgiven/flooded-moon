@@ -1,0 +1,15 @@
+This directory needs to contain the rather huge topography dataset from the
+Lunar Reconnaissance Orbiter camera, in PDS format. It's not checked in because
+it's six gigabytes. Feel free to download it yourself!
+
+http://wms.lroc.asu.edu/lroc/global_product/256_ppd_DEM
+
+The images link to pages where you can get the raw PDS files. Note that we
+don't want to TIFF files.
+
+Right now only EQUIRECTANGULAR projection PDS files are supported, and we can't
+handle the POLAR STEREOGRAPHIC files used for the terrain around the poles. The
+good news is that means you don't need to download the polar (toroidal) images
+--- just the rectangular ones will do. The bad news is that this means the terrain
+abruptly stops at about 60⁰N.
+
