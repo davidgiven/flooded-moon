@@ -225,6 +225,18 @@ under the Simplified BSD License --- see the COPYING file for more
 information.
 
 The distribution may also contain data files from other sources. These are not
-mine and will be appropriately credited (if not, let me know because that's a
-bug).
+mine and come with their own license terms. Some of these terms impose
+restrictions on the output renders. In particular:
 
+- the starfield image (in nightsky/) is CC BY 3.0 licensed and output renders
+  are required to be credited:
+
+    ESO/S. Brunier
+
+- the Earth images (in Earth/) are from NASA and need to be credited:
+
+    NASA
+
+I use:
+
+    Portions: NASA, ESO/S. Brunier

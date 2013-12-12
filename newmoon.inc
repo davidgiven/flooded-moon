@@ -711,7 +711,7 @@
 	}
 #else
 
-#include "tomtree/maple-mesh.inc"
+#include "maple-mesh.inc"
 //#include "tomtree/TOMTREE.inc"
 #local Tree_Object =
 	object {

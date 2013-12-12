@@ -130,28 +130,35 @@ void initCalculon(void)
 	calculonSymbols.add("MULTIFRACTAL", "(vector*3, real, real, real): real", lookup_multifractal);
 
 	{
-		std::ifstream f(seafuncf);
+		std::ifstream f;
+		f.exceptions(std::ifstream::failbit);
+		f.open(seafuncf);
 		seaFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
 			"(XYZ: vector*3): real");
 	}
 
 	{
-		std::ifstream f(terrainfuncf);
+		std::ifstream f;
+		f.exceptions(std::ifstream::failbit);
+		f.open(terrainfuncf);
 		terrainFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
 			"(XYZ: vector*3): real");
 	}
 
 	{
-		std::ifstream f(texturefuncf);
+		std::ifstream f;
+		f.exceptions(std::ifstream::failbit);
+		f.open(texturefuncf);
 		textureFunc = new Compiler::Program<UVFunc>(calculonSymbols, f,
 			"(XYZ: vector*3): vector*2");
 	}
 
 	{
-		std::ifstream f(propsfuncf);
+		std::ifstream f;
+		f.exceptions(std::ifstream::failbit);
+		f.open(propsfuncf);
 		propsFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
 			"(XYZ: vector*3): real");
-		propsFunc->dump();
 	}
 }
 

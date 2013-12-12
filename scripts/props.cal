@@ -1,0 +1,50 @@
+/* Calculates the prop density in a given sector:
+ *
+ * XYX:vector*3  location on sphere of centre of sector
+ * LONGITUDE, LATITUDE, BEARING, AZIMUTH camera position
+ * RADIUS        normalised radius of planet
+ * SEALEVEL      sealevel delta from geoid
+ *
+ * SEA(XYZ)      returns sealevel at this point
+ * TERRAIN(XYZ)  returns real terrain height
+ * GEOID(XYZ)    returns geoid height
+ * SLOPE(XYZ)    returns slope of *real* (unperturbed) terrain
+ *
+ * PERLIN(XYZ)   some perlin noise
+ * MULTIFRACTAL(XYZ, freq, laq, oct) multifractal noise
+ *
+ * Returns:
+ * 
+ * density       the density, in items per square kilometre
+ *
+ * All distances are kilometres.
+ */
+
+let stockheight = TERRAIN(XYZ);
+let sealevel = SEA(XYZ);
+let slope = SLOPE(XYZ);
+let height = stockheight - sealevel;
+
+let easecurve(x) =
+	(x*x) / (x*x + (1-x)*(1-x));
+
+let blend0lo(x, lo, hi) =
+	if (x < lo) then 0
+	else if (x < hi) then
+		easecurve((x-lo) / (hi-lo))
+	else
+		1;
+
+let blend0hi(x, lo, hi) =
+	if (x < lo) then 1
+	else if (x < hi) then
+		1 - easecurve((x-lo) / (hi-lo))
+	else
+		0;
+
+let toolow_p = blend0lo(height, 0.02, 0.05);
+let toohigh_p = blend0hi(height, 2, 3);
+let toosteep_p = blend0hi(slope, 0.05, 0.1);
+
+toolow_p * toohigh_p * toosteep_p * 100
+
