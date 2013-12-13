@@ -47,6 +47,8 @@ public:
 				<< "#declare CameraLatitude = " << latitude << ";\n"
 				<< "#declare CameraBearing = " << bearing << ";\n"
 				<< "#declare CameraAzimuth = " << azimuth << ";\n"
+				<< "#declare CameraFieldOfView = " << fov << ";\n"
+				<< "#declare Time_Of_Day = " << (time_of_day+6.0) << ";\n"
 			;
 	}
 

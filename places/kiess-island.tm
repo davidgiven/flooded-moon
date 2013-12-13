@@ -3,4 +3,5 @@ latitude=-7.80
 longitude=86.32
 azimuth=7
 bearing=-110
+timeofday=17.5
 

@@ -39,7 +39,6 @@
 
 const double MAXHEIGHT = 22; // maximum height of any object on the surface
 const double ATMOSPHERE = 20;
-const double FOV = 50;
 
 unsigned width, height;
 double latitude = 20.0;
@@ -47,6 +46,8 @@ double longitude = -3.5;
 double altitude = 5.0;
 double azimuth = -10.0;
 double bearing = 40.0;
+double fov = 50.0;
+double time_of_day = 0;
 double radius;
 double sealevel;
 std::string cameraf;
@@ -200,6 +201,10 @@ int main(int argc, const char* argv[])
 				"azimuth (0 looks straight ahead; negative looks down)")
 		("bearing", po::value<double>(&bearing),
 				"bearing")
+		("fov", po::value(&fov),
+				"field of view")
+		("timeofday", po::value(&time_of_day),
+				"time of day (virtual hours)")
 		("shmixels", po::value<double>(&shmixels),
 				"terrain quality")
 		("radius", po::value<double>(&radius),
@@ -334,7 +339,7 @@ int main(int argc, const char* argv[])
 					  << "\n";
 
 			auto_ptr<Writer> writer(create_writer(topof));
-			SphericalRoam(terrain, sealevel, FOV / shmixels).writeTo(*writer);
+			SphericalRoam(terrain, sealevel, fov / shmixels).writeTo(*writer);
 			std::cerr << "calculating textures\n";
 			writer->applyTextureData(texture);
 			std::cerr << "calculating normals\n";
@@ -350,7 +355,7 @@ int main(int argc, const char* argv[])
 					  << "\n";
 
 			auto_ptr<Writer> writer(create_writer(seatopof));
-			SphericalRoam(sea, sealevel, FOV / shmixels).writeTo(*writer);
+			SphericalRoam(sea, sealevel, fov / shmixels).writeTo(*writer);
 			std::cerr << "calculating normals\n";
 			writer->calculateNormals();
 			std::cerr << "writing to file\n";

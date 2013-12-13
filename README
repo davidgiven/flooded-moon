@@ -129,6 +129,27 @@ TerrainMaker uses a HUGE amount of memory. You need to have at least enough to
 load your entire PDS dataset all at once, plus about a GB per million polygons.
 My machine has 16GB and I set the shmixels value too high I run out.
 
+About PDS files:
+
+PDS files are NASA's mostly self-describing file format for scientific data.
+They contain an ASCII header that describes the data, plus a huge bitmap
+containing the data itself.
+
+The format's a little fuzzy. The header doesn't need to be in the same file as
+the actual data, and sometimes key fields are missing that makes it hard to
+know how to interpret the data.
+
+When you give a PDS file to TerrainMaker, you supply a string that looks like this:
+
+    filename.lbl:filename.img:KEY1=value:KEY2=value...
+
+The first word indicates the file which contains the label. The second
+indicates the file which contains the data. If the label and the data are in
+the same file, leave the second field blank. Third and subsequent fields are
+additional label keys to take into consideration when parsing the data.
+
+See scripts/data.tm for examples.
+
 
 Rendering the result
 --------------------
@@ -139,10 +160,6 @@ Once you've run TerrainMaker, producing the render is fairly straightforward:
 
 The .pov file will attempt to pick up the TerrainMaker output files in their
 final location.
-
-There's only one value which needs configuring, which is the time of day:
-at the top of newmoon.pov there's a variable called Time_Of_Day. Changes this
-to a value in pseudo-hours (24 per lunar day). 0 is noon at longitude 0.
 
 
 Tweaking the terrain, or, Calculon FTW!

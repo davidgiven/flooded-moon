@@ -61,11 +61,15 @@ public:
 		_height = _label.getUnsigned("LINES");
 
 		const std::string& projection = _label.getString("MAP_PROJECTION_TYPE");
-		if ((projection != "SIMPLE CYLINDRICAL") && (projection != "EQUIRECTANGULAR"))
+		if ((projection == "SIMPLE CYLINDRICAL") || (projection == "EQUIRECTANGULAR"))
+			_projection = EQUIRECTANGULAR;
+		else if (projection == "POLAR STEREOGRAPHIC")
+			_projection = POLAR_STEREOGRAPHIC;
+		else
 			throw std::logic_error("PDS file doesn't have supported map projection");
 
-		if (_label.getFloat("CENTER_LATITUDE") != 0.0)
-			throw std::logic_error("PDS file doesn't have projection centre latitude at 0");
+		_centreLatitude = _label.getFloat("CENTER_LATITUDE");
+		_centreLongitude = _label.getFloat("CENTER_LONGITUDE");
 
 		if (_label.getUnsigned("SAMPLE_BITS") != 16)
 			throw std::logic_error("PDS file isn't 16 bit");
@@ -89,6 +93,14 @@ public:
 		_wScale = (double)_width / (_maxLon - _minLon);
 		_hScale = (double)_height / (_maxLat - _minLat);
 
+		if (_projection == POLAR_STEREOGRAPHIC)
+		{
+			if (_minLat > 0.0)
+				_tdash = tan(M_PI/4 - degToRad(_minLat)/2.0);
+			else
+				_tdash = tan(M_PI/4 + degToRad(_maxLat)/2.0);
+		}
+
 		std::cerr << "read PDS: " << _label.getString("DATA_SET_ID")
 		          << " (" << _width << " x " << _height << ") = ("
 				  << _minLon << "," << _minLat << " - "
@@ -106,13 +118,10 @@ public:
 		return true;
 	}
 
-	double at(double x, double y) const
+	double at(double lon, double lat) const
 	{
-		double dx = (x - _minLon) / (_maxLon - _minLon);
-		double dy = (y - _minLat) / (_maxLat - _minLat);
-
-		double px = dx * (double)(_width-1);
-		double py = (1-dy) * (double)(_height-1);
+		double px, py;
+		findsample(lon, lat, px, py);
 
 		double tl = getsample(floor(px), floor(py));
 		double tr = getsample(ceil(px), floor(py));
@@ -139,6 +148,52 @@ public:
 	}
 
 private:
+	void findsample(double lon, double lat, double& x, double& y) const
+	{
+		switch (_projection)
+		{
+			case EQUIRECTANGULAR:
+			{
+				double dx = (lon - _minLon) / (_maxLon - _minLon);
+				double dy = (lat - _minLat) / (_maxLat - _minLat);
+
+				x = dx * (double)(_width-1);
+				y = (1-dy) * (double)(_height-1);
+
+				assert(x >= 0.0);
+				assert(y >= 0.0);
+				break;
+			}
+
+			case POLAR_STEREOGRAPHIC:
+			{
+				double dlat = degToRad(lat);
+				double dlon = degToRad(180.0 + lon - _centreLongitude);
+				double t = tan(M_PI/4 - fabs(dlat)/2.0);
+				double rho = t / _tdash;
+
+				double e, n;
+				if (_minLat > 0.0)
+				{
+					/* North polar. */
+
+					e = rho * sin(dlon);
+					n = - rho * cos(dlon);
+				}
+				else
+				{
+					/* South polar. */
+					e = rho * sin(dlon);
+					n = rho * cos(dlon);
+				}
+
+				x = (0.5 - e/2.0) * (double)(_width-1);
+				y = (0.5 + n/2.0) * (double)(_height-1);
+				break;
+			}
+		}
+	}
+
 	double getsample(unsigned x, unsigned y) const
 	{
 		assert(x < _width);
@@ -156,8 +211,19 @@ private:
 	double _minLat, _maxLat;
 	double _minLon, _maxLon;
 	double _wScale, _hScale;
+	double _centreLongitude;
+	double _centreLatitude;
 
 	double _scalingFactor;
 	double _offset;
+
+	enum
+	{
+		EQUIRECTANGULAR,
+		POLAR_STEREOGRAPHIC
+	};
+	int _projection;
+
+	double _tdash;
 };
 
