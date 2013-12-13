@@ -55,8 +55,12 @@ class XYZMap : public Map
 public:
 	double at(double lon, double lat) const
 	{
-		assert(false);
-		return 0.0;
+		Transform t;
+		t = t.rotate(Vector::Y, -lat);
+		t = t.rotate(Vector::Z, lon-90);
+		Point p(1.0, 0.0, 0.0);
+		p = t.transform(p);
+		return at(p);
 	}
 
 	using Map::at;
