@@ -1,0 +1,23 @@
+#!/bin/sh
+infile=$1
+outfile=$2
+string=$3
+if [ "$string" = "" ]; then
+	string="DAVID GIVEN  CC-BY-3.0  ESO/S.BRUNIER  NASA"
+fi
+
+convert $infile \
+	-gravity SouthEast -pointsize 8 -font PixelSix10-Regular \
+	-fill black \
+	-draw "text -1,-1 \"$string\"" \
+	-draw "text -1,0 \"$string\"" \
+	-draw "text -1,1 \"$string\"" \
+	-draw "text 0,-1 \"$string\"" \
+	-draw "text 0,1 \"$string\"" \
+	-draw "text 1,-1 \"$string\"" \
+	-draw "text 1,0 \"$string\"" \
+	-draw "text 1,1 \"$string\"" \
+	-fill darkgrey \
+	-draw "text 0,0 \"$string\"" \
+	$outfile
+

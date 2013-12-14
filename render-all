@@ -1,0 +1,17 @@
+#!/bin/sh
+make -C terrainmaker
+
+files="$@"
+if [ "$files" = "" ]; then
+	files=places/*
+fi
+
+echo $files
+for f in $files; do
+	outfile=$(basename ${f%.tm}).png
+	echo -------------------------------------------------
+	echo $f
+	./terrainmaker/terrainmaker scripts/data.tm $f scripts/maketopo.tm --shmixels=400
+	povray +Inewmoon +A +RP5 +O$outfile
+done
+
