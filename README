@@ -161,6 +161,11 @@ Once you've run TerrainMaker, producing the render is fairly straightforward:
 The .pov file will attempt to pick up the TerrainMaker output files in their
 final location.
 
+There's a script called render-all which takes as a parameter one or more
+filenames to a place.tm script. It'll render that scene at the default
+settings. If you don't specify any parameters, it'll render *everything* in
+the places/ directory (which takes ages).
+
 
 Tweaking the terrain, or, Calculon FTW!
 ---------------------------------------
@@ -219,6 +224,30 @@ Tips to speed up test renders:
 	machines, that will take a lot of the pain off.
 
 
+Legal issues
+------------
+
+Output renders depend on some image assets that have licensing which requires
+attribution. It's important you do this. Right now you *must* attribute the
+images with, at least:
+
+    ESO/S.Brunier  NASA
+
+There's a script called 'annotate' which adds an attribution string to the
+corner of an image, using ImageMagick. Use it like this:
+
+    ./annotate infile.png outfile.png "ESO/S.Brunier  NASA"
+
+The script requires the PixelSix10 font; you can get it here:
+
+    http://www.iamcal.com/misc/fonts/
+
+It's not a legal requirement, but I would be pleased if you could also
+attribute images with the FloodedMoon URL:
+
+    https://code.google.com/p/flooded-moon/
+
+
 Conclusion
 ----------
 
@@ -254,6 +283,3 @@ restrictions on the output renders. In particular:
 
     NASA
 
-I use:
-
-    Portions: NASA, ESO/S. Brunier
