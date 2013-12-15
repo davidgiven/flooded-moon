@@ -1,0 +1,9 @@
+#summary Rendering your own images
+
+Good choice! Getting into raytracing is an excellent way to use up vast quantities of excess time and money.
+
+Okay, I'll be blunt: while all the tools are here, they're not in great shape. You'll need to do some hacking to make it all work. You'll also need to download about 6.5GB of topography and geoid data, which for obvious reasons is not included.
+
+You will need a machine with about 16GB of RAM and as many CPU cores as you can possibly manage. I developed it all on Linux, so you'll need to be used to that kind of environment.
+
+Still interested? Check out the source from Mercurial via the Source tab above; meanwhile, you might like to <a href="http://flooded-moon.googlecode.com/hg/README">read the README</a>, which is where what we shall laughably call the documentation is.
