@@ -1,0 +1,11 @@
+#summary Important legal stuff you need to know
+
+All the images here are available under the <a href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0 unported</a> license, commonly known as CC-BY-3.0.
+
+This means you can do what you like with them, but they <i>must</i> be credited properly. If you want to reuse the images on the front page, that just means leaving the credit string in the bottom right corner intact.
+
+The reason for this is that some of the source assets that are used to render these images require this. These assets must be credited.
+
+If you render an image yourself using my tools, then you're at liberty to do what you like with them --- you don't have to release them as CC-BY-3.0 --- but remember that you are still bound by the attribution requirement of the source assets.
+
+Please email me at <a href="mailto:dg@cowlark.com">dg@cowlark.com</a> if you have any queries.
