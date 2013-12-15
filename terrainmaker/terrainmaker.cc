@@ -325,11 +325,14 @@ int main(int argc, const char* argv[])
 				CameraWriter().writePov(cameraf.c_str());
 
 			double sea_at_camera = sea.at(camera);
+			double terrain_at_camera = terrain.at(camera);
 			double height_of_camera = camera.length();
 
 			std::cerr << "height of terrain at camera is "
-					<< (height_of_camera - sea_at_camera)
-					<< "\n";
+					<< (height_of_camera - sea_at_camera) << "km\n"
+					<< "height above ground level is "
+					<< (height_of_camera - terrain_at_camera) << "km\n"
+				;
 		}
 
 		if (!topof.empty())
