@@ -63,23 +63,23 @@ let pand(x, y) = x * y;
 let por(x, y) = x + y - pand(x, y);
 
 let smallcrags =
-	MULTIFRACTAL(XYZ*11, 1, 2, 6)*0.008 *
-	blend0lo(slope, 0.00, 0.3);
+	MULTIFRACTAL(XYZ*3, 1, 2, 6)*0.010;
 
 let largecrags =
-	MULTIFRACTAL(XYZ*1.8, 1, 2, 6)*0.03 *
+	MULTIFRACTAL(XYZ*1.8, 1, 2, 6)*0.300 *
 		blend0lo(slope, 0.00, 0.2) *
 		blend0hi(height, -0.100, 0.010)
 	;
 
 let hugecrags =
-	MULTIFRACTAL(XYZ/2, 1, 2, 6)*0.100 *
-		blend0lo(slope, 0.1, 0.4)
+	MULTIFRACTAL(XYZ/2, 1, 2, 6*slope)*0.200 *
+		blend0lo(slope, 0.00, 1.0)
 	;
 	
 let perturbedheight = stockheight
-	//+ PERLIN(XYZ*10)*0.005
-	+ smallcrags + largecrags + hugecrags
+	+ smallcrags
+//	+ largecrags
+	+ hugecrags
 	;
 
 max(lowtide, perturbedheight)
