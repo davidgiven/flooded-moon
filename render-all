@@ -1,6 +1,15 @@
 #!/bin/sh
 make -C terrainmaker
 
+if [ "$1" = "--preview" ]; then
+	shmixels=100
+	options=""
+	shift
+else
+	shmixels=400
+	options=""
+fi
+
 files="$@"
 if [ "$files" = "" ]; then
 	files=places/*
@@ -11,7 +20,7 @@ for f in $files; do
 	outfile=$(basename ${f%.tm}).png
 	echo -------------------------------------------------
 	echo $f
-	./terrainmaker/terrainmaker scripts/data.tm $f scripts/maketopo.tm --shmixels=400
-	povray +Inewmoon +A +RP5 +O$outfile
+	./terrainmaker/terrainmaker scripts/data.tm $f scripts/maketopo.tm --shmixels=$shmixels
+	povray +Inewmoon +A +RP5 +O$outfile $options
 done
 

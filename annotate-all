@@ -1,0 +1,21 @@
+#!/bin/sh
+
+do_annotate() {
+	o=$4
+	if [ "$o" = "" ]; then
+		o=$1-a
+	fi
+
+	./annotate $1.png $o.jpg "$2" -resize $3
+}
+
+w=../flooded-moon-wiki
+do_annotate farside-from-space "DAVID GIVEN  CC-BY-3.0  NASA" 800x600 $w/lunar-farside-large
+do_annotate farside-from-space "DAVID GIVEN  CC-BY-3.0  NASA" 480x360 $w/lunar-farside-small
+do_annotate epimenides-forest "DAVID GIVEN  CC-BY-3.0  NASA" 640x480 $w/epimenides-forest
+do_annotate nearside-from-space "DAVID GIVEN  CC-BY-3.0  NASA" 800x600 $w/lunar-nearside-large
+do_annotate nearside-from-space "DAVID GIVEN  CC-BY-3.0  NASA" 480x360 $w/lunar-nearside-small
+do_annotate huygens-sound "DAVID GIVEN  CC-BY-3.0  ESO/S.BRUNIER  NASA" 640x480 $w/north-into-huygens-sound
+do_annotate mons-bradley "DAVID GIVN  CC-BY-3.0  NASA" 640x480 $w/mons-bradley
+do_annotate kiess-island "DAVID GIVN  CC-BY-3.0  ESO/S.BRUNIER  NASA" 640x480 $w/kiess-island
+

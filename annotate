@@ -2,11 +2,16 @@
 infile=$1
 outfile=$2
 string=$3
+shift
+shift
+shift
+options="$@"
 if [ "$string" = "" ]; then
 	string="DAVID GIVEN  CC-BY-3.0  ESO/S.BRUNIER  NASA"
 fi
 
 convert $infile \
+	$options \
 	-gravity SouthEast -pointsize 8 -font PixelSix10-Regular \
 	-fill black \
 	-draw "text -1,-1 \"$string\"" \
