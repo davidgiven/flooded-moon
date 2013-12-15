@@ -66,7 +66,7 @@
         wrinkles
         turbulence 0.3
         lambda 3
-		scale km
+		scale 0.3*km
         color_map
 		{
             [0 color rgb <95,120,82>*SC/255]
@@ -82,7 +82,7 @@
         crackle solid
         turbulence 0.3
         lambda 3
-		scale km
+		scale 0.3*km
         color_map
 		{
             [0 color rgb <62,85,40>*0.6*SC/255]
@@ -97,7 +97,7 @@
         crackle solid
         turbulence 0.3
         lambda 3
-        scale km
+        scale 0.3*km
         color_map
 		{
             [0 color rgb <28,44,42>*0.5*SC/255]
@@ -106,12 +106,73 @@
         }
     }
 
+#macro MakeGrass(col)
+	texture
+	{
+		pigment
+		{
+			color rgb col
+		}
+		normal
+		{
+			wrinkles 0.3
+			scale 0.001*km
+		}
+		finish
+		{
+			diffuse 0.6
+			brilliance 1.5
+			roughness 0.5
+		}
+	}
+	texture
+	{
+		pigment
+		{
+			color rgbt 1
+		}
+		normal
+		{
+			bumps 0.3
+			scale 1*km
+			warp
+			{
+				turbulence 0.1
+			}
+		}
+	}
+#end
+
+#local Real_Grass_Texture = MakeGrass(<0.3, 0.4, 0.12>)
+#local Bushes_Texture = MakeGrass(<0.2, 0.3, 0.12>)
+
+#local Grass_Texture =
+	texture
+	{
+		pigment_pattern
+		{
+			uv_mapping function { y }
+			pigment_map
+			{
+				[0 rgb <0, 0, 0>]
+				[1 rgb <1, 1, 1>]
+			}
+		}
+		turbulence 0.2
+
+		texture_map
+		{
+			[0.0 Real_Grass_Texture ]
+			[0.1 Bushes_Texture ]
+		}
+	}
 
 #declare Yellow_Texture = texture { pigment { Yellow } }
 #declare Red_Texture = texture { pigment { Red } }
 #declare Green_Texture = texture { pigment { Green } }
 #declare Blue_Texture = texture { pigment { Blue } }
 
+#if (0)
 #local LowRock_Texture =
 	texture
 	{
@@ -171,34 +232,54 @@
 			scale 0.010*km
 		}
 	}
+#end
 
-#local HighRock_Texture =
+#macro MakeRock(c, s, g, bs)
 	texture
 	{
 		pigment
 		{
-			bozo
-			turbulence 0.04
-			omega 0.75
+			granite
 			color_map
 			{
-				[0.0 rgb <.7, .6, .5>]
-				[0.6 rgb <.8, .6, .6>]
-				[1.0 rgb <.6, .6, .8>]
+				[ 0.02  color c * 1.3 ]
+				[ 0.20  color c * 1.3 ]
+				[ 0.85  color c * 1.0 ]
+				[ 1.00  color c * 0.5 ]
 			}
-			scale 0.200*km
-			scale CameraSky*2
-			warp {turbulence .2}
+			scale 0.05 * s
 		}
-
 		normal
 		{
-			bumps 0.2
-			turbulence 0.1
-			omega 1
-			scale 0.2*km
+			granite
+			bump_size 0.5 * g
+			translate 0
+			scale 0.05 * bs
+			rotate 0
+		}
+		finish
+		{
+			ambient 0
+			diffuse 0.6 
+			brilliance 1.0
+			phong 0.0 
+			phong_size 40
+			specular 0.0 
+			roughness 0.15 
+			metallic 0.0 
+			reflection 0
+			reflection_exponent 1.0 
 		}
 	}
+#end
+
+#local LowRock_Texture =
+	MakeRock(<0.7, 0.6, 0.3>, 2, 2, 0.7)
+
+#local HighRock_Texture =
+	MakeRock(<0.5, 0.5, 0.5>, 2, 2, 1.5)
+
+#if (0)
 	texture
 	{
 		pigment
@@ -215,11 +296,95 @@
 			scale 1
 		}
 	}
+#end
 
-#local Rock_Texture =
+#local Cracked_Rock_Texture =
     texture
     {
+		#local granite1_density = 1.0;
+
+		#local granite_1_pigment =
+			pigment
+			{
+				crackle
+				pigment_map
+				{
+					[0.0 rgb <0.4,0.23,0.15>]
+					[0.035 rgb <0.7,0.6,0.55>]
+					[0.05 rgbt <0.9,0.73,0.65,1.0>]
+					[1.0 rgbt 1 ] //rgb <1,0.83,0.75>]
+				}
+				warp
+				{
+					turbulence 0.2
+				}
+				scale 0.010*km
+			}
+
+		#local granite_1_grain_pigment =
+			pigment
+			{
+				granite
+				color_map
+				{
+					[0.0 rgb granite1_density*0.1*<0.9,0.73,0.65>]
+					[0.0 rgb granite1_density*0.3*<0.9,0.73,0.65>]
+					[0.6 rgb granite1_density*<0.9,0.73,0.65> ]
+					[0.7 rgb granite1_density*<0.9,0.73,0.65> ]
+					[1.0 Black]
+				}
+				scale 0.02*km
+			}
+
+		pigment {granite_1_pigment}
+		pigment {granite_1_grain_pigment}
+		normal
+		{
+			pigment_pattern {granite_1_pigment} 1
+		}
+        scale 0.5
+	}
+
+#local Uncracked_Rock_Texture =
+	texture
+	{
+		#local granite_density = 0.7;
+
+		pigment
+		{
+			wrinkles
+			pigment_map
+			{
+				[0.0 rgb granite_density*0.2*<0.4,0.23,0.15>]
+				[0.05 rgb granite_density*0.4*<0.7,0.7,0.55>]
+				[0.8 rgb granite_density*0.6*<0.9,0.73,0.65>]
+				[1.0 rgb granite_density*0.8*<1,0.83,0.75>]
+			}
+			warp
+			{
+				turbulence 0.5
+			}
+		}
+		scale 0.001*km
+	}
+
+#local Rock_Texture =
+	texture
+	{
 		pigment_pattern
+		{
+			uv_mapping function { y }
+		}
+		texture_map
+		{
+			[0.0 Grass_Texture]
+			[0.05 Bushes_Texture]
+			[0.1 Uncracked_Rock_Texture]
+		}
+	}
+
+/*
+	}0		pigment_pattern
 		{
 			uv_mapping function { map(x, -20, 20) }
 			pigment_map
@@ -235,6 +400,7 @@
 			[map( 5.000, -20, 20) HighRock_Texture]
 		}
 	}
+	*/
         
 #local Snow_Texture =
 	texture
@@ -350,9 +516,8 @@
 			[map( 0.005, -20, 20) SandHigh_Texture]
 			[map( 0.006, -20, 20) ShorefrontLow_Texture]
 			[map( 0.008, -20, 20) ShorefrontHigh_Texture]
-			[map( 0.010, -20, 20) Fields_Texture]
-			[map( 2.000, -20, 20) ScrubLow_Texture]
-			[map( 3.000, -20, 20) ScrubHigh_Texture]
+			[map( 0.010, -20, 20) Grass_Texture]
+			[map( 3.000, -20, 20) Bushes_Texture]
 			[map( 4.000, -20, 20) Rock_Texture]
 			[map(10.000, -20, 20) Snow_Texture]
 		}
@@ -372,6 +537,10 @@
 				[1 rgb <1, 1, 1>]
 			}
 		}
+		warp
+		{
+			turbulence 0.1
+		}
 	
 		texture_map
 		{
@@ -380,8 +549,8 @@
 			[map( 0.002, -20, 20) SandHigh_Texture]
 			[map( 0.004, -20, 20) ShorefrontLow_Texture]
 			[map( 0.008, -20, 20) ShorefrontHigh_Texture]
-			[map( 0.015, -20, 20) ScrubLow_Texture]
-			[map( 2.000, -20, 20) ScrubHigh_Texture]
+			[map( 0.015, -20, 20) Grass_Texture]
+			[map( 2.000, -20, 20) Bushes_Texture]
 			[map( 3.000, -20, 20) Rock_Texture]
 			[map(10.000, -20, 20) Snow_Texture]
 		}
@@ -406,8 +575,8 @@
 		{
 			[map(-0.020, -20, 20) Rock_Texture]
 			[map( 0.020, -20, 20) Rock_Texture]
-			[map( 0.030, -20, 20) ScrubLow_Texture]
-			[map( 1.500, -20, 20) ScrubHigh_Texture]
+			[map( 0.030, -20, 20) Grass_Texture]
+			[map( 1.500, -20, 20) Bushes_Texture]
 			[map( 3.000, -20, 20) Rock_Texture]
 			[map(10.000, -20, 20) Snow_Texture]
 		}

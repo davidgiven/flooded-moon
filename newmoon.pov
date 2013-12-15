@@ -146,7 +146,7 @@ sky_sphere
 			rotate 90*x
 		#end
 	}
-	emission 0.2
+	emission 0.15
 }
 
 
