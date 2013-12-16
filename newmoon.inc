@@ -1,8 +1,8 @@
 #declare Lunar_Sphere           = 1750.000 * km; // enclosing diameter of terrain object
 #declare Nominal_Terrain_Radius = 1737.400 * km;
 #declare Atmosphere_Base        = -2 * km;
-#declare Atmospheric_Depth      = 100 * km;
-#declare Atmospheric_Scale      = 30 * km;
+#declare Atmospheric_Depth      = 200 * km;
+#declare Atmospheric_Scale      = (Atmospheric_Depth * 2);
 
 #local map =
 	function(x, lo, hi)
@@ -773,6 +773,16 @@
 #local Rayleigh_Density =
 	density
 	{
+		#local g = 1.622; // m/s^2 --- note METRES!
+		#local L = 0.0065/6; // K/m --- temperature lapse rate. Adjusted, crudely
+		#local M = 0.0289644; // kg/mol --- molar mass of dry air
+		#local T0 = 293; // kelvin --- STP
+		#local R = 8.3144; // joules / mole kelvin --- gas constant
+		#local gM_RL = (g*M) / (R*L);
+		#local L_T0 = L / T0;
+
+		#local dscale = 1.0; // from atmospheres to whatever Povray uses
+
         #local height_from_centre =
 	        function(x, y, z) {
 	            sqrt(x*x + y*y + z*z)
@@ -783,18 +793,25 @@
 	            height_from_centre(x, y, z) - Bottom_Of_Atmosphere
 	        }
 	   
-	    #local gravity_factor =
-	        function(x, y, z) {
-	            (1/3) * Bottom_Of_Atmosphere / height_from_centre(x, y, z)
-	        }
-	        
+		// Calculates air pressure at a given height, in atmospheres (1 at
+		// ground level). Heights are in metres.
+
+		#local pressure = 
+			function(h)
+			{
+				pow((1 - L_T0*h), gM_RL)
+			}
+
+		#warning concat("Pressure at   0km: ", str(pressure(0), 0, 8))
+		#warning concat("Pressure at   5km: ", str(pressure(5000), 0, 8))
+		#warning concat("Pressure at  10km: ", str(pressure(10000), 0, 8))
+		#warning concat("Pressure at  15km: ", str(pressure(15000), 0, 8))
+		#warning concat("Pressure at  50km: ", str(pressure(50000), 0, 8))
+		#warning concat("Pressure at 100km: ", str(pressure(100000), 0, 8))
+
 		function
 		{
-			Rayleigh_Scale * exp(-Rayleigh_Power * height_from_surface(x, y, z)
-				// disable the gravity factor for now
-			    // * gravity_factor(x, y, z)
-            )
-            //* (Atmospheric_Scale / Atmospheric_Depth)
+			dscale * pressure(height_from_surface(x, y, z)*1000)
 		}
 	}
 

@@ -1,9 +1,9 @@
 #!/bin/sh
-make -C terrainmaker
+make -C terrainmaker -j2
 
 if [ "$1" = "--preview" ]; then
 	shmixels=100
-	options=""
+	options="+W320 +H240 +RP5"
 	shift
 else
 	shmixels=400
@@ -21,6 +21,6 @@ for f in $files; do
 	echo -------------------------------------------------
 	echo $f
 	./terrainmaker/terrainmaker scripts/data.tm $f scripts/maketopo.tm --shmixels=$shmixels
-	povray +Inewmoon +A +RP5 +O$outfile $options
+	povray +Inewmoon +A +O$outfile $options
 done
 
