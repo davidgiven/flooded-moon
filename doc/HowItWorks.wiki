@@ -1,4 +1,4 @@
-<title>A summary of the technology</title>
+<title>a summary of the technology</title>
 
 All these pictures are real --- for certain values of real.
 

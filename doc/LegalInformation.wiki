@@ -1,4 +1,4 @@
-<title>Important legal stuff you need to know</title>
+<title>important legal stuff you need to know</title>
 
 All the images here are available under the <a
 href="http://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution

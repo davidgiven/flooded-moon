@@ -1,3 +1,5 @@
+<title>an art project</title>
+
 This is an art project to use CGI to visualise the moon, from really close
 up... after it's been terraformed.
 

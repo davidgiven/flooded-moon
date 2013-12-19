@@ -1,4 +1,4 @@
-<title>Rendering your own images</title>
+<title>rendering your own images</title>
 
 Good choice! Getting into raytracing is an excellent way to use up vast
 quantities of excess time and money.
