@@ -13,6 +13,23 @@ possibly manage. I developed it all on Linux, so you'll need to be used to that
 kind of environment. (You may be able to get this working on Cygwin, but you
 <i>really will</i> need to be able to build 64 bit binaries.)
 
-Still interested? You can get the source via Mercurial via the Source tab
-above; meanwhile, you might like to <a href="../README">read the README</a>,
-which is where what we shall laughably call the documentation is.
+Still interested? Get it!
+
+<blockquote class='link'>
+<a href='../../../tarball/flooded-moon.tar.gz?uuid=tip'>
+  <img class='link-img' height='22' width='20' alt='[BIN]' src='//cowlark.com/binary.png'>
+</a>
+<a href='../../../tarball/flooded-moon.tar.gz?uuid=tip'>flooded-moon.tar.gz</a>
+<p>Download the most recent version of the source (both the Povray stuff and TerrainMaker).</p>
+</blockquote>
+
+Another way of getting the version under development is by
+checking out the source repository using <a href="http://fossil-scm.org">the
+Fossil DVCS</a>. Use the following commands:
+
+<verbatim>mkdir flooded-moon
+cd flooded-moon
+fossil clone https://cowlark.com/flooded-moon flooded-moon.fossil
+fossil open flooded-moon.fossil
+</verbatim>
+
