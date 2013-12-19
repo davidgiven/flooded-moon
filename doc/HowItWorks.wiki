@@ -1,13 +1,37 @@
-#summary A summary of the technology
+<title>A summary of the technology</title>
 
 All these pictures are real --- for certain values of real.
 
-We start with the topography data from Lunar Reconnaissance Orbiter: all 6GB of it. A bespoke tool, TerrainMaker (open source and provided) reads in the data and computes meshes for the land from the point of view of the camera. TerrainMaker also adds fractal deformation to the topography data, as the topography is fairly low-resolution and otherwise it's really smooth close up.
+We start with the topography data from Lunar Reconnaissance Orbiter: all 6GB of
+it. A bespoke tool, TerrainMaker (open source and provided) reads in the data
+and computes meshes for the land from the point of view of the camera.
+TerrainMaker also adds fractal deformation to the topography data, as the
+topography is fairly low-resolution and otherwise it's really smooth close up.
 
-We also do the same for the ocean. Obviously we want the ocean to be smooth --- but not flat. The Moon's gravitational field has lumps in it, which cause dips and bulges in the water. Luckily, these have been mapped, and we use this data to determine the sealevel.
+We also do the same for the ocean. Obviously we want the ocean to be smooth ---
+but not flat. The Moon's gravitational field has lumps in it, which cause dips
+and bulges in the water. Luckily, these have been mapped, and we use this data
+to determine the sealevel.
 
-TerrainMaker also takes care of placing the trees (and, eventually, other props, I hope). This is more complicated than you might think, as we want to ensure that on each run, the trees end up in the same place, but without having to place every tree on the Moon. We do this by what I suspect might be a novel algorithm: the lunar sphere is split up into facets using a standard subdivision of an icosahedron. During the subdivision process, facets which are too far away from the camera are discarded, so we efficiently compute which facets are nearest the camera. Each facet is given an ID based on position, which is, of course, constant. That ID is then used as a random number seed for placing items.
+TerrainMaker also takes care of placing the trees (and, eventually, other
+props, I hope). This is more complicated than you might think, as we want to
+ensure that on each run, the trees end up in the same place, but without having
+to place every tree on the Moon. We do this by what I suspect might be a novel
+algorithm: the lunar sphere is split up into facets using a standard
+subdivision of an icosahedron. During the subdivision process, facets which are
+too far away from the camera are discarded, so we efficiently compute which
+facets are nearest the camera. Each facet is given an ID based on position,
+which is, of course, constant. That ID is then used as a random number seed for
+placing items.
 
-We now have, for a typical scene, two 6-10 million polygon meshes and about 400000 object placements. These are then handed to the Povray raytracer. Textures and lighting is all procedural: there is one main light source, which is the sun, and all other lighting effects are handled by scattering through the atmosphere. (The Earth also has a small light attached to it to avoid having to use radiosity to produce the earthlight effect, which is painfully slow.)
+We now have, for a typical scene, two 6-10 million polygon meshes and about
+400000 object placements. These are then handed to the Povray raytracer.
+Textures and lighting is all procedural: there is one main light source, which
+is the sun, and all other lighting effects are handled by scattering through
+the atmosphere. (The Earth also has a small light attached to it to avoid
+having to use radiosity to produce the earthlight effect, which is painfully
+slow.)
 
-A typical 800x600 render will take about half an hour. A complex scene with difficult lighting, such as the Kiess Island nighttime shot, will take over an hour.
+A typical 800x600 render will take about half an hour. A complex scene with
+difficult lighting, such as the Kiess Island nighttime shot, will take over an
+hour.
