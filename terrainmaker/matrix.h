@@ -46,7 +46,7 @@ struct Vector
 
 	bool isValid() const
 	{
-		return !isnan(x);
+		return !std::isnan(x);
 	}
 
 	bool operator == (const Vector& o) const
@@ -173,7 +173,7 @@ struct Point
 
 	bool isValid() const
 	{
-		return !isnan(x);
+		return !std::isnan(x);
 	}
 
 	Point operator + (const Vector& o) const

@@ -82,8 +82,6 @@ double shmixels = 100.0;
 using std::min;
 using std::max;
 using std::unique_ptr;
-using std::isnan;
-using std::isinf;
 
 namespace po = boost::program_options;
 
