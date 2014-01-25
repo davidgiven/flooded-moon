@@ -30,12 +30,29 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/iostreams/device/array.hpp>
+
+/* Work around GIL bug where they haven't kept up to date with libpng
+ * API changes. */
+
+#include <png.h>
+#if !defined(png_infopp_NULL)
+	#define png_infopp_NULL (png_infopp)NULL
+#endif
+#if !defined(int_p_NULL)
+	#define int_p_NULL (int*)NULL
+#endif
+
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io/png_dynamic_io.hpp>
 #include <boost/ptr_container/ptr_list.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
-#include <libnoise/noise.h>
+
+#if defined(OSX)
+	#include <noise/noise.h>
+#else
+	#include <libnoise/noise.h>
+#endif
 
 const double MAXHEIGHT = 22; // maximum height of any object on the surface
 const double ATMOSPHERE = 20;
@@ -64,7 +81,9 @@ double shmixels = 100.0;
 
 using std::min;
 using std::max;
-using std::auto_ptr;
+using std::unique_ptr;
+using std::isnan;
+using std::isinf;
 
 namespace po = boost::program_options;
 
@@ -341,7 +360,7 @@ int main(int argc, const char* argv[])
 			          << topof
 					  << "\n";
 
-			auto_ptr<Writer> writer(create_writer(topof));
+			unique_ptr<Writer> writer(create_writer(topof));
 			SphericalRoam(terrain, sealevel, fov / shmixels).writeTo(*writer);
 			std::cerr << "calculating textures\n";
 			writer->applyTextureData(texture);
@@ -357,7 +376,7 @@ int main(int argc, const char* argv[])
 			          << topof
 					  << "\n";
 
-			auto_ptr<Writer> writer(create_writer(seatopof));
+			unique_ptr<Writer> writer(create_writer(seatopof));
 			SphericalRoam(sea, sealevel, fov / shmixels).writeTo(*writer);
 			std::cerr << "calculating normals\n";
 			writer->calculateNormals();

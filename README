@@ -67,7 +67,7 @@ You will need the following dependencies:
     the Calculon shader language, available here:
 	    https://cowlark.com/calculon/doc/stable/doc/index.wiki
 
-	the LLVM 3.2 development kit, which is used by Calculon
+	the LLVM 3.3 development kit, which is used by Calculon
 
 	the libnoise development kit
 
@@ -127,7 +127,7 @@ shmixels, contains about 15 million polygons and produces 2GB of output files.
 
 TerrainMaker uses a HUGE amount of memory. You need to have at least enough to
 load your entire PDS dataset all at once, plus about a GB per million polygons.
-My machine has 16GB and I set the shmixels value too high I run out.
+My machine has 16GB and if I set the shmixels value too high I run out.
 
 About PDS files:
 
