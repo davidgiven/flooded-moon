@@ -12,7 +12,7 @@
  *
  * Returns:
  * 
- * [u, v]        u/v coordinates to pass to Povray
+ * UV            u/v coordinates to pass to Povray
  *
  * All distances are kilometres.
  */
@@ -25,5 +25,6 @@ let water = SEA(XYZ);
 let slope = SLOPE(XYZ);
 let height = stockheight - water;
 
-[height, slope]
+let UV = [height, slope];
+return
 

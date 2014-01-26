@@ -15,7 +15,8 @@ else
 endif
 
 #CXX = g++-4.8
-CXX = clang++
+CXX = g++
+#CXX = clang++
 CALCULON = -I$(HOME)/nonshared/calculon/include
 
 LIBS += \

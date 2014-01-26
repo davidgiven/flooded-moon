@@ -15,7 +15,7 @@
  *
  * Returns:
  * 
- * density       the density, in items per square kilometre
+ * DENSITY       the density, in items per square kilometre
  *
  * All distances are kilometres.
  */
@@ -46,5 +46,6 @@ let toolow_p = blend0lo(height, 0.02, 0.05);
 let toohigh_p = blend0hi(height, 2, 3);
 let toosteep_p = blend0hi(slope, 0.05, 0.1);
 
-toolow_p * toohigh_p * toosteep_p * 100
+let DENSITY = toolow_p * toohigh_p * toosteep_p * 100;
+return
 

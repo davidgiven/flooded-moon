@@ -11,8 +11,11 @@ public:
 	virtual ~Map() {}
 
 	virtual bool contains(double lon, double lat) const = 0;
-	virtual double at(double lon, double lat) const = 0;
-	virtual double at(const Point& v) const = 0;
+	virtual double at(double lon, double lat) const
+	{ assert(false); }
+
+	virtual double at(const Point& v) const
+	{ assert(false); }
 
 	Point mapToSphere(const Point& p) const
 	{

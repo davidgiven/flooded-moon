@@ -131,34 +131,35 @@ void initCalculon(void)
 
 	{
 		std::ifstream f;
-		f.exceptions(std::ifstream::failbit);
+		//f.exceptions(std::ifstream::failbit);
 		f.open(seafuncf);
 		seaFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
-			"(XYZ: vector*3): real");
+			"(XYZ: vector*3): (HEIGHT: real)");
 	}
 
 	{
 		std::ifstream f;
-		f.exceptions(std::ifstream::failbit);
+		//f.exceptions(std::ifstream::failbit);
 		f.open(terrainfuncf);
 		terrainFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
-			"(XYZ: vector*3): real");
+			"(XYZ: vector*3): (HEIGHT: real)");
+		terrainFunc->dump();
 	}
 
 	{
 		std::ifstream f;
-		f.exceptions(std::ifstream::failbit);
+		//f.exceptions(std::ifstream::failbit);
 		f.open(texturefuncf);
 		textureFunc = new Compiler::Program<UVFunc>(calculonSymbols, f,
-			"(XYZ: vector*3): vector*2");
+			"(XYZ: vector*3): (UV: vector*2)");
 	}
 
 	{
 		std::ifstream f;
-		f.exceptions(std::ifstream::failbit);
+		//f.exceptions(std::ifstream::failbit);
 		f.open(propsfuncf);
 		propsFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
-			"(XYZ: vector*3): real");
+			"(XYZ: vector*3): (DENSITY: real)");
 	}
 }
 

@@ -15,7 +15,7 @@
  *
  * Returns:
  * 
- * height        height of perturbed terrain above core
+ * HEIGHT        height of perturbed terrain above core
  *
  * All distances are kilometres.
  */
@@ -82,5 +82,6 @@ let perturbedheight = stockheight
 	+ hugecrags
 	;
 
-max(lowtide, perturbedheight)
+let HEIGHT = max(lowtide, perturbedheight);
+return
 
