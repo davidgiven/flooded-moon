@@ -1,0 +1,20 @@
+project TerrainMaker is
+	type Profile_Type is ("optimised", "debug");
+	profile: Profile_Type := external("profile", "debug");
+
+	for Object_Dir use ".obj/" & profile;
+	for Exec_Dir use ".";
+	for Main use ("terrainmaker.adb");
+
+	package Compiler is
+		case profile is
+			when "debug" =>
+				for Switches("Ada")
+					use ("-g", "-gnat2012");
+			when "optimised" =>
+				for Switches("Ada")
+					use ("-O3", "-gnat2012");
+		end case;
+	end Compiler;
+end TerrainMaker;
+
