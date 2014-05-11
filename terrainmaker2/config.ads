@@ -1,6 +1,10 @@
-package Config is
-	type Number is new float;
+with Interfaces.C;
 
-	function Output_Filename return string;
+package Config is
+	type Number is new Interfaces.C.double;
+
+	package Options is
+		function Output_Filename return string;
+	end;
 end;
 
