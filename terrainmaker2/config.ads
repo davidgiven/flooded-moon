@@ -5,6 +5,8 @@ package Config is
 
 	package Options is
 		function Output_Filename return string;
+		function Width return integer;
+		function Height return integer;
 	end;
 end;
 
