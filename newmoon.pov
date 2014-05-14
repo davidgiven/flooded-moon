@@ -17,6 +17,7 @@
 global_settings
 {
 	assumed_gamma 1.0
+	ambient_light 0.0
 
 	/*
 	radiosity
