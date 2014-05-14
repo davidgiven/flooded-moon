@@ -400,6 +400,10 @@ int main(int argc, const char* argv[])
 			write_image_map(terrain, heightmapf, width, height);
 		}
 	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "Error: " << e.what() << "\n";
+	}
 	catch (const char* e)
 	{
 		std::cerr << "Error: " << e << "\n";

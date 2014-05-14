@@ -177,7 +177,8 @@ private:
 		xyz.x = midpoint.x;
 		xyz.y = midpoint.y;
 		xyz.z = midpoint.z;
-		double density = (*propsFunc)(&xyz);
+		double density;
+		(*propsFunc)(&xyz, &density);
 		int treecount = (int)(area * density);
 
 		srand(sector->id);

@@ -28,7 +28,9 @@ public:
 		v.y = p.y;
 		v.z = p.z;
 
-		return (*terrainFunc)(&v);
+		double h;
+		(*terrainFunc)(&v, &h);
+		return h;
 	}
 
 	using Map::at;

@@ -16,14 +16,11 @@ public:
 
 	void at(const Point& p, double& u, double& v) const
 	{
-		Compiler::Vector<2> result;
 		Compiler::Vector<3> pv;
 		pv.x = p.x;
 		pv.y = p.y;
 		pv.z = p.z;
 
-		(*textureFunc)(&result, &pv);
-		u = result.x;
-		v = result.y;
+		(*textureFunc)(&pv, &u, &v);
 	}
 };

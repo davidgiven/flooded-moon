@@ -9,10 +9,11 @@
  *
  * Returns:
  * 
- * height        height of perturbed terrain above core
+ * HEIGHT        height of perturbed terrain above core
  *
  * All distances are kilometres.
  */
 
-GEOID(XYZ) + SEALEVEL
+let HEIGHT = GEOID(XYZ) + SEALEVEL in
+return
 

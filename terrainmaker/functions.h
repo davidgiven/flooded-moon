@@ -9,18 +9,20 @@
 typedef Calculon::Instance<Calculon::RealIsDouble> Compiler;
 Compiler::StandardSymbolTable calculonSymbols;
 
-typedef double MapFunc(Compiler::Vector<3>* xyz);
+typedef void MapFunc(Compiler::Vector<3>* xyz, double* height);
 Compiler::Program<MapFunc>* seaFunc;
 Compiler::Program<MapFunc>* terrainFunc;
 
-typedef void UVFunc(Compiler::Vector<2>* result, Compiler::Vector<3>* xyz);
+typedef void UVFunc(Compiler::Vector<3>* pv, double* u, double* v);
 Compiler::Program<UVFunc>* textureFunc;
 
 Compiler::Program<MapFunc>* propsFunc;
 
 extern "C" double lookup_sea(Compiler::Vector<3>* xyz)
 {
-	return (*seaFunc)(xyz);
+	double height;
+	(*seaFunc)(xyz, &height);
+	return height;
 }
 
 extern "C" double lookup_terrain(Compiler::Vector<3>* xyz)
@@ -134,7 +136,7 @@ void initCalculon(void)
 		f.exceptions(std::ifstream::failbit);
 		f.open(seafuncf);
 		seaFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
-			"(XYZ: vector*3): real");
+			"(XYZ: vector*3): (HEIGHT: real)");
 	}
 
 	{
@@ -142,7 +144,7 @@ void initCalculon(void)
 		f.exceptions(std::ifstream::failbit);
 		f.open(terrainfuncf);
 		terrainFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
-			"(XYZ: vector*3): real");
+			"(XYZ: vector*3): (HEIGHT: real)");
 	}
 
 	{
@@ -150,7 +152,7 @@ void initCalculon(void)
 		f.exceptions(std::ifstream::failbit);
 		f.open(texturefuncf);
 		textureFunc = new Compiler::Program<UVFunc>(calculonSymbols, f,
-			"(XYZ: vector*3): vector*2");
+			"(XYZ: vector*3): (U: real, V: real)");
 	}
 
 	{
@@ -158,7 +160,7 @@ void initCalculon(void)
 		f.exceptions(std::ifstream::failbit);
 		f.open(propsfuncf);
 		propsFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
-			"(XYZ: vector*3): real");
+			"(XYZ: vector*3): (DENSITY: real)");
 	}
 }
 

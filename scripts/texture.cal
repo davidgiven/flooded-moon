@@ -12,18 +12,21 @@
  *
  * Returns:
  * 
- * [u, v]        u/v coordinates to pass to Povray
+ * U, V          u/v coordinates to pass to Povray
  *
  * All distances are kilometres.
  */
 
 let max(x: real, y: real): real =
-	if (x < y) then y else x;
+	if (x < y) then y else x
+in
 
-let stockheight = TERRAIN(XYZ);
-let water = SEA(XYZ);
-let slope = SLOPE(XYZ);
-let height = stockheight - water;
+let stockheight = TERRAIN(XYZ) in
+let water = SEA(XYZ) in
+let slope = SLOPE(XYZ) in
+let height = stockheight - water in
 
-[height, slope]
+let U = height in
+let V = slope in
+return
 

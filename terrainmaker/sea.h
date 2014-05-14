@@ -28,7 +28,9 @@ public:
 		v.y = p.y;
 		v.z = p.z;
 
-		return (*seaFunc)(&v);
+		double height;
+		(*seaFunc)(&v, &height);
+		return height;
 	}
 
 	using Map::at;

@@ -18,6 +18,9 @@ endif
 CXX = clang++
 CALCULON = -I$(HOME)/nonshared/calculon/include
 
+DEFS += \
+	-Wno-c++11-narrowing
+
 LIBS += \
 	$(CALCULON) \
 	$(LLVM) \
