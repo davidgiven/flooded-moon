@@ -8,5 +8,7 @@ package Config is
 		function Width return integer;
 		function Height return integer;
 	end;
+
+	procedure ParseOptions;
 end;
 

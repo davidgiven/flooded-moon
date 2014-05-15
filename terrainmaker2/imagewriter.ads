@@ -13,6 +13,6 @@ package ImageWriter is
 	end record;
 
 	function Create(width, height: integer) return Image;
-	procedure Write(img: Image);
+	procedure Write(img: Image; filename: string);
 end;
 

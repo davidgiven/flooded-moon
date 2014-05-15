@@ -10,7 +10,7 @@ project TerrainMaker is
 		case profile is
 			when "debug" =>
 				for Switches("Ada")
-					use ("-g", "-gnat2012");
+					use ("-g", "-gnat2012", "-gnatel");
 			when "optimised" =>
 				for Switches("Ada")
 					use ("-O3", "-gnat2012");
