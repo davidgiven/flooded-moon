@@ -1,9 +1,12 @@
 with Ada.Sequential_IO;
+with Ada.Text_IO;
+with Ada.Unchecked_Deallocation;
 with Interfaces.C;
 with Config;
 with Colours;
 with Utils;
 
+use Ada.Text_IO;
 use Colours;
 use Utils;
 use Config;
@@ -12,7 +15,27 @@ package body ImageWriter is
 	function Create(width, height: integer) return Image is
 		img: Image(width-1, height-1);
 	begin
+		img.pixels := new PixelStore(img.maxw, img.maxh);
 		return img;
+	end;
+
+	procedure Adjust(img: in out Image) is
+	begin
+		if (img.pixels /= null) then
+			img.pixels.refcount := img.pixels.refcount + 1;
+		end if;
+	end;
+
+	procedure Finalize(img: in out Image) is
+		procedure FreePixels is
+			new Ada.Unchecked_Deallocation(PixelStore, PixelStoreRef);
+	begin
+		if (img.pixels /= null) then
+			img.pixels.refcount := img.pixels.refcount - 1;
+			if (img.pixels.refcount = 0) then
+				FreePixels(img.pixels);
+			end if;
+		end if;
 	end;
 
 	procedure Write(img: Image; filename: string) is
@@ -64,7 +87,7 @@ package body ImageWriter is
 		for y in 0..img.maxh loop
 			for x in 0..img.maxw loop
 				declare
-					c: Colour := img.Data(x, y);
+					c: Colour := img(x, y);
 				begin
 					write(c.r);
 					write(c.g);

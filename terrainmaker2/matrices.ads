@@ -28,7 +28,8 @@ package Matrices is
 	function "-" (left, right: Matrix) return Matrix;
 	function "*" (left, right: Matrix) return Matrix;
 
-	function transpose(m: Matrix) return Matrix;
+	function Transpose(m: Matrix) return Matrix;
+	function invert(m: Matrix) return Matrix;
 
 	function ToString(m: Matrix) return string;
 end;
