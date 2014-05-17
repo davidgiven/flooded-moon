@@ -10,5 +10,7 @@ package GenericVector is
 
 	function "+" (v1, v2: Vector) return Vector;
 	function "*" (v: Vector; n: Number) return Vector;
+
+	function ToString(v: Vector) return string;
 end;
 

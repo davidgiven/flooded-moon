@@ -25,6 +25,20 @@ package body GenericMatrix is
 		return r;
 	end;
 
+	function "*" (m: Matrix; v: Vector) return Vector is
+		r: Vector;
+		n: Number;
+	begin
+		for x in 1..size loop
+			n := 0.0;
+			for y in 1..size loop
+				n := n + m(x,y)*v(y);
+			end loop;
+			r(x) := n;
+		end loop;
+		return r;
+	end;
+
 	function Invert(m: Matrix) return Matrix is
 		a: Matrix := m;
 		c: Matrix := Zero;

@@ -16,5 +16,15 @@ package body GenericVector is
 		end loop;
 		return r;
 	end;
+
+	function ToString(v: Vector) return string is
+		LF: character := ASCII.LF;
+
+		function cells(x: integer) return string is
+			(Number'image(v(x)) &
+				(if (x < size) then (',' & cells(x+1)) else ""));
+	begin
+		return '(' & cells(1) & ')';
+	end;
 end;
 

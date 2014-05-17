@@ -47,6 +47,22 @@ procedure Tests is
 			end if;
 		end loop;
 
+		-- One string has reached the end. If the other string has
+		-- non-whitespace chars, it's a fail.
+		while (i1 <= s1'last) loop
+			if not isws(s1(i1)) then
+				return false;
+			end if;
+			i1 := i1 + 1;
+		end loop;
+
+		while (i2 <= s2'last) loop
+			if not isws(s2(i2)) then
+				return false;
+			end if;
+			i2 := i2 + 1;
+		end loop;
+
 		return true;
 	end;
 
@@ -58,7 +74,7 @@ procedure Tests is
 		end if;
 	end;
 
-	procedure MatrixMultiplication is
+	procedure MatrixInversion is
 		m: Matrix3 := ((3.0, 2.0, 4.0),
 					   (2.0,-3.0, 1.0),
 					   (1.0, 1.0, 2.0));
@@ -67,11 +83,26 @@ procedure Tests is
 		Check(
 			CompareWS(ToString(m),
 				"( 1.00000000000000E+00, 0.00000000000000E+00,-2.00000000000000E+00 4.28571428571428E-01,-2.85714285714286E-01,-7.14285714285714E-01 -7.14285714285714E-01, 1.42857142857143E-01, 1.85714285714286E+00)"),
-			"MatrixMultiplication fail:" & LF & ToString(m));
+			"MatrixInversion fail:" & LF & ToString(m));
 	end;
 
+	procedure MatrixMultiplyByVector is
+		m: Matrix3 := ((1.0, 2.0, 3.0),
+		               (5.0, 6.0, 7.0),
+					   (9.0, 10.0, 11.0));
+		v: Vector3 := (1.0, 2.0, 3.0);
+	begin
+		v := m * v;
+		Check(
+			CompareWS(ToString(v),
+				"( 1.40000000000000E+01, 3.80000000000000E+01, 6.20000000000000E+01)"),
+			"MatrixMultiplyByVector fail:" & LF & ToString(v));
+	end;
+
+		          
 begin
-	MatrixMultiplication;
+	MatrixInversion;
+	MatrixMultiplyByVector;
 end;
 
 

@@ -7,7 +7,7 @@ generic
 	size: natural;
 	with package VectorsN is new GenericVector(size);
 package GenericMatrix is
-	subtype Vector is VectorsN.Vector;
+	use VectorsN;
 
 	-- x, y
 	type Matrix is array(1..size, 1..size) of Number;
@@ -18,6 +18,7 @@ package GenericMatrix is
 	function Identity return Matrix;
 
 	function "*" (m: Matrix; n: Number) return Matrix;
+	function "*" (m: Matrix; v: Vector) return Vector;
 
 	function Invert(m: Matrix) return Matrix;
 	function ToString(m: Matrix) return string;
