@@ -1,36 +1,21 @@
+with Ada.Numerics.Generic_Real_Arrays;
 with Config;
 with Vectors;
+with GenericMatrix;
 
 use Config;
 use Vectors;
 
 package Matrices is
-	-- Column-major, so the order is x, y!
-	type Matrix is array(integer range 0..3, integer range 0..3) of Number;
-	-- Ensure column-major order, not row-major order.
-	pragma Convention(Fortran, Matrix);
+	package Matrices2 is new GenericMatrix(2);
+	use all type Matrices2.Matrix;
+	subtype Matrix2 is Matrices2.Matrix;
 
-	Identity: constant Matrix := (
-		(1.0, 0.0, 0.0, 0.0),
-		(0.0, 1.0, 0.0, 0.0),
-		(0.0, 0.0, 1.0, 0.0),
-		(0.0, 0.0, 0.0, 1.0)
-	);
+	package Matrices3 is new GenericMatrix(3);
+	use all type Matrices3.Matrix;
+	subtype Matrix3 is Matrices3.Matrix;
 
-	Zero: constant Matrix := (
-		(0.0, 0.0, 0.0, 0.0),
-		(0.0, 0.0, 0.0, 0.0),
-		(0.0, 0.0, 0.0, 0.0),
-		(0.0, 0.0, 0.0, 0.0)
-	);
-
-	function "+" (left, right: Matrix) return Matrix;
-	function "-" (left, right: Matrix) return Matrix;
-	function "*" (left, right: Matrix) return Matrix;
-
-	function Transpose(m: Matrix) return Matrix;
-	function invert(m: Matrix) return Matrix;
-
-	function ToString(m: Matrix) return string;
+	package Matrices4 is new GenericMatrix(4);
+	use all type Matrices4.Matrix;
+	subtype Matrix4 is Matrices4.Matrix;
 end;
-
