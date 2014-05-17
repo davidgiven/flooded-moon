@@ -2,7 +2,7 @@ package body GenericVector is
 	function "+" (v1, v2: Vector) return Vector is
 		r: Vector;
 	begin
-		for i in v1'range loop
+		for i in 1..size loop
 			r(i) := v1(i) + v2(i);
 		end loop;
 		return r;
@@ -11,7 +11,7 @@ package body GenericVector is
 	function "*" (v: Vector; n: Number) return Vector is
 		r: Vector;
 	begin
-		for i in v'range loop
+		for i in 1..size loop
 			r(i) := v(i) * n;
 		end loop;
 		return r;

@@ -4,7 +4,7 @@ project TerrainMaker is
 
 	for Object_Dir use ".obj/" & profile;
 	for Exec_Dir use ".";
-	for Main use ("terrainmaker.adb");
+	for Main use ("terrainmaker.adb", "tests.adb");
 
 	package Compiler is
 		case profile is

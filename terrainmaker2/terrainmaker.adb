@@ -26,9 +26,9 @@ procedure TerrainMaker is
 		ImageWriter.Write(img, Config.Options.Output_Filename);
 	end;
 
-	m: Matrix3 := ((1.0, 1.0, 1.0),
-	               (1.0, 1.0, 1.0),
-				   (1.0, 1.0, 1.0));
+	m: Matrix3 := ((3.0, 2.0, 4.0),
+	               (2.0,-3.0, 1.0),
+				   (1.0, 1.0, 2.0));
 begin
 	m := Invert(m);
 	Put_Line(ToString(m));

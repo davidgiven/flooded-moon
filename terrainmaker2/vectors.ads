@@ -1,6 +1,10 @@
 with GenericVector;
 
 package Vectors is
+	package Vectors2 is new GenericVector(2);
+	use all type Vectors2.Vector;
+	subtype Vector2 is Vectors2.Vector;
+
 	package Vectors3 is new GenericVector(3);
 	use all type Vectors3.Vector;
 	subtype Vector3 is Vectors3.Vector;
