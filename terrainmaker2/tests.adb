@@ -5,6 +5,7 @@ with Matrices;
 with Vectors;
 with Colours;
 with Utils;
+with ConfigFiles;
 
 use Ada.Text_IO;
 use Ada.Strings;
@@ -14,6 +15,7 @@ use Vectors;
 use all type Vectors.Vector3;
 use Matrices;
 use all type Matrices.Matrix3;
+use ConfigFiles;
 
 procedure Tests is
 	LF: character := ASCII.LF;
@@ -98,10 +100,18 @@ procedure Tests is
 			"MatrixMultiplyByVector fail:" & LF & ToString(v));
 	end;
 
+	procedure ConfigTest is
+		cf: ConfigFile := ConfigFiles.Load("testdata/testconfig.tm");
+	begin
+		Check(
+			CompareWS(cf("value").Get, "Hello, world!"),
+			"ConfigTest fail (simple value)");
+	end;
 		          
 begin
 	MatrixInversion;
 	MatrixMultiplyByVector;
+	ConfigTest;
 end;
 
 

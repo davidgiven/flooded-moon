@@ -17,8 +17,9 @@ use all type Matrices.Matrix3;
 
 procedure TerrainMaker is
 	procedure Render is
-		img: Image := Renderer.Render;
+		img: Image;
 	begin
+		img := Renderer.Render(Config.Options.Width, Config.Options.Height);
 		Write(img, Config.Options.Output_Filename);
 	end;
 begin

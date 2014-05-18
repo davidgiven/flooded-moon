@@ -5,6 +5,6 @@ use Config;
 use Images;
 
 package Renderer is
-	function Render return Image;
+	function Render(width, height: integer) return Image;
 end;
 

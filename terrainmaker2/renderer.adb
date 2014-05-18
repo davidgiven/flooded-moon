@@ -15,8 +15,8 @@ package body Renderer is
 		return RGB(1.0, 0.0, 0.0);
 	end;
 
-	function Render return Image is
-		screen: Image := Images.Create(Config.Options.Width, Config.Options.Height);
+	function Render(width, height: integer) return Image is
+		screen: Image := Images.Create(width, height);
 
 		task Scheduler is
 			-- Each worker calls this to find out what it needs to do.
