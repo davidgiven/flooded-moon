@@ -13,9 +13,11 @@ use Config;
 
 package body Images is
 	function Create(width, height: integer) return Image is
-		img: Image(width-1, height-1);
+		halfw: integer := width / 2;
+		halfh: integer := height / 2;
+		img: Image;
 	begin
-		img.pixels := new PixelStore(img.maxw, img.maxh);
+		img.pixels := new PixelStore(-halfw, halfw, -halfh, halfh);
 		return img;
 	end;
 
@@ -77,6 +79,8 @@ package body Images is
 			write(val);
 		end;
 	begin
+		Put_Line("writing image to " & filename);
+
 		SIO.Create(fp, SIO.Out_File, filename);
 		write("P6" & LF);
 		write(integer'image(img.Width));
@@ -84,8 +88,8 @@ package body Images is
 		write(LF);
 		write("65535" & LF);
 
-		for y in 0..img.maxh loop
-			for x in 0..img.maxw loop
+		for y in img.pixels.data'range(2) loop
+			for x in img.pixels.data'range(1) loop
 				declare
 					c: Colour := img(x, y);
 				begin

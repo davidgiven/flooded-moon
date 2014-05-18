@@ -1,8 +1,10 @@
+with Ada.Text_IO;
 with Config;
 with Images;
 with Colours;
 with System.Multiprocessors;
 
+use Ada.Text_IO;
 use Config;
 use Images;
 use Colours;
@@ -25,7 +27,7 @@ package body Renderer is
 		begin
 			-- Hand out each scanline in turn to tasks that want things to
 			-- do, then exit.
-			for yy in 0..screen.pixels.maxh loop
+			for yy in screen.pixels.data'range(2) loop
 				accept RequestWorkUnit(y: out integer) do
 					y := yy;
 				end RequestWorkUnit;
@@ -45,7 +47,7 @@ package body Renderer is
 			loop
 				Scheduler.RequestWorkUnit(y);
 
-				for x in 0..screen.pixels.maxw loop
+				for x in screen.pixels.data'range(1) loop
 					screen(x, y) := RenderPixel(x, y);
 				end loop;
 			end loop;

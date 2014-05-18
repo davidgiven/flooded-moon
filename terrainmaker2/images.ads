@@ -6,14 +6,14 @@ use Colours;
 package Images is
 	type Pixels is array(integer range <>, integer range <>) of aliased Colour;
 
-	type PixelStore(maxw, maxh: integer) is limited
+	type PixelStore(minw, maxw, minh, maxh: integer) is limited
 	record
 		refcount: natural := 1;
-		data: Pixels(0..maxw, 0..maxh);
+		data: Pixels(minw..maxw, minh..maxh);
 	end record;
 	type PixelStoreRef is access PixelStore;
 
-	type Image(maxw, maxh: integer) is new Ada.Finalization.Controlled with
+	type Image is new Ada.Finalization.Controlled with
 	record
 		pixels: PixelStoreRef;
 	end record with
@@ -21,9 +21,9 @@ package Images is
 		Variable_Indexing => Get;
 
 	function Width(img: Image) return integer is
-		(img.pixels.maxw + 1);
+		(img.pixels.data'length(1));
 	function Height(img: Image) return integer is
-		(img.pixels.maxh + 1);
+		(img.pixels.data'length(2));
 
 	type ColourRef(pixel: not null access Colour) is null record with
 		Implicit_Dereference => pixel;
