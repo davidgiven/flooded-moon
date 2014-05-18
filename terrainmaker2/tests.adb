@@ -3,7 +3,6 @@ with Ada.Strings;
 with Config;
 with Matrices;
 with Vectors;
-with ImageWriter;
 with Colours;
 with Utils;
 

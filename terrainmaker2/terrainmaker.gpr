@@ -20,5 +20,16 @@ project TerrainMaker is
 					use ("-O3", "-gnat2012");
 		end case;
 	end Compiler;
+
+	package Linker is
+		case profile is
+			when "debug" =>
+				for Switches("Ada")
+					use ("-g", "-gnat2012");
+			when "optimised" =>
+				for Switches("Ada")
+					use ("-O3", "-gnat2012");
+		end case;
+	end Linker;
 end TerrainMaker;
 
