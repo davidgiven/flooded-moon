@@ -4,6 +4,23 @@
 #declare Atmospheric_Depth      = 200 * km;
 #declare Atmospheric_Scale      = (Atmospheric_Depth * 2);
 
+#local Cirrus_Base              = 35*km;
+#local Cirrus_Depth             = 10*km;
+
+#local Bottom_Of_Atmosphere = Nominal_Terrain_Radius + Atmosphere_Base;
+#local Top_Of_Atmosphere = Bottom_Of_Atmosphere
+	+ Atmospheric_Depth;
+
+#local Height_From_Centre =
+	function(x, y, z) {
+		sqrt(x*x + y*y + z*z)
+	}
+	
+#local Height_From_Surface =
+	function(x, y, z) {
+		Height_From_Centre(x, y, z) - Bottom_Of_Atmosphere
+	}
+	   
 #local map =
 	function(x, lo, hi)
 	{
@@ -756,14 +773,119 @@
 	}
 
 // =======================================================================
+//                                CLOUDS  
+// =======================================================================
+
+#local Clouds_Selector_Function =
+	function
+	{
+		#local r = Nominal_Terrain_Radius;
+
+		#local ff_medium_streaks =
+			function
+			{
+				pattern
+				{
+					ripples
+					//frequency 200
+					translate <3*r, 3*r, 3*r>
+
+					warp
+					{
+						turbulence 0.4
+					}
+				}
+			}
+
+		#local ff_small_scale_selector =
+			function
+			{
+				pattern
+				{
+					bozo
+					scale 10
+
+					warp
+					{
+						turbulence 0.4
+					}
+				}
+			}
+
+		#local ff_large_scale_selector =
+			function
+			{
+				pigment
+				{
+					granite
+					scale 1000
+
+					color_map
+					{
+						[0 rgb 0]
+						[0.4 rgb 0]
+						[1 rgb 1]
+					}
+
+					warp
+					{
+						turbulence 0.5
+					}
+				}
+			}
+
+		f_sine_wave(ff_medium_streaks(x, y, z), 1, 1)
+//		* ff_small_scale_selector(x, y, z)
+//		ff_large_scale_selector(x, y, z).red
+	}
+
+#local Clouds_Density =
+	density
+	{
+		#local cirrus_height_factor =
+			function(h)
+			{
+				select(h - Cirrus_Base, 0,
+					select((Cirrus_Base+Cirrus_Depth) - h, 0,
+						1)) //(h - Cirrus_Base) / Cirrus_Depth))
+			}
+
+		#local cirrus_height_selector =
+			function(x, y, z)
+			{
+				cirrus_height_factor(Height_From_Surface(x, y, z))
+			}
+
+		function
+		{
+			//1 * Clouds_Selector_Function(x, y, z) * cirrus_height_selector(x, y, z)
+			cirrus_height_selector(x, y, z)
+		}
+	}
+
+#local Clouds_Media =
+	media
+	{
+		method 3
+		samples 50, 50000
+		scattering
+		{
+			MIE_HAZY_SCATTERING
+			color White
+			extinction 1
+		}
+		density
+		{
+			Clouds_Density
+		}
+	}
+
+
+// =======================================================================
 //                              ATMOSPHERE
 // =======================================================================
 
 // Note! Media units are all in kilometres!
-
-#local Bottom_Of_Atmosphere = Nominal_Terrain_Radius + Atmosphere_Base;
-#local Top_Of_Atmosphere = Bottom_Of_Atmosphere
-	+ Atmospheric_Depth;
 
 #local Base_Rayleigh_Power = 6.7;
 #local Rayleigh_Factor = 1 / Atmospheric_Scale;
@@ -783,16 +905,6 @@
 
 		#local dscale = 1.0; // from atmospheres to whatever Povray uses
 
-        #local height_from_centre =
-	        function(x, y, z) {
-	            sqrt(x*x + y*y + z*z)
-	        }
-	        
-	    #local height_from_surface =
-	        function(x, y, z) {
-	            height_from_centre(x, y, z) - Bottom_Of_Atmosphere
-	        }
-	   
 		// Calculates air pressure at a given height, in atmospheres (1 at
 		// ground level). Heights are in metres.
 
@@ -811,7 +923,7 @@
 
 		function
 		{
-			dscale * pressure(height_from_surface(x, y, z)*1000)
+			dscale * pressure(Height_From_Surface(x, y, z)*1000)
 		}
 	}
 
@@ -821,9 +933,9 @@
 	media
 	{
 		method 3
-		//samples 31
+		samples 50
 		//jitter 0.1
-		samples 60
+		//samples 60
 		scattering
 		{
 			RAYLEIGH_SCATTERING
@@ -858,6 +970,12 @@
 			{
 				Rayleigh_Media
 			}
+			/*
+			media
+			{
+				Clouds_Media
+			}
+			*/
 		}
 	}
 
@@ -865,45 +983,12 @@
 //                                  TREES 
 // ==========================================================================
 
-#if (0)
-#include "black_tupelo.inc"
-
-#local Tree_Object =
-	union { 
-		object
-		{
-			black_tupelo_13_stems
-			pigment
-			{
-				color rgb <0.5, 0.4, 0>
-			}
-		}
-		object
-		{
-			black_tupelo_13_leaves
-			texture
-			{
-				pigment
-				{
-					color rgb <17, 69, 17>/255
-				} 
-				finish
-				{
-				}
-			}
-		}
-
-		scale 1/black_tupelo_13_height
-	}
-#else
-
 #include "maple-mesh.inc"
 //#include "tomtree/TOMTREE.inc"
 #local Tree_Object =
 	object {
 		TREE
 	}
-#end
 
 #macro Tree(pos, upv, w, h, r)
 	object
@@ -923,6 +1008,198 @@
 	}
 
 // ==========================================================================
+//                              CIRRUS CLOUDS
+// ==========================================================================
+
+	/*
+#local Cirrus_Object =
+	difference
+	{
+		#local bottom = Nominal_Terrain_Radius + Cirrus_Base;
+		#local top = bottom + Cirrus_Depth;
+		#local f = 1 - (bottom / top);
+		#warning concat("Cirrus flatness: ", str(f, 0, 4))
+
+		#local cloudiness = 0.75;
+		#local softness = 0.05;
+
+		#local rf = 0.010;
+
+		#local d =
+			density
+			{
+				function
+				{
+//					f_granite(x/2, y/2, z/2)
+						f_ripples(x*rf, y*rf, z*rf)
+	//					* f_bozo(x/5, y/5, z/5)
+				}
+				warp
+				{
+					turbulence 0.9
+					lambda 3
+				}
+				scale .0025
+			}
+
+		#local d_base =
+			density
+			{
+				d
+
+				color_map
+				{
+					[0.0 rgb 0]
+					[(1-cloudiness) rgb 0]
+					[(1-cloudiness)+softness rgb 1]
+					[1.0 rgb 1]
+				}
+				warp
+				{
+					spherical
+				}
+			}
+
+		sphere
+		{
+			<0, 0, 0>, 1
+		}
+		sphere
+		{
+			<0, 0, 0>, 1 - f
+		}
+		hollow
+
+		texture
+		{
+			pigment
+			{
+				rgbt 1
+			}
+		}
+
+		interior
+		{
+			media
+			{
+				//intervals 1
+				absorption .04*5
+				scattering
+				{
+					1, 0.04
+				}
+				density
+				{
+					spherical
+					density_map
+					{
+						[0.0 d_base]
+						[f d_base]
+						[f rgb 1]
+						[1.0 rgb 1]
+					}
+				}
+			}
+		}
+
+		scale top
+	}
+		*/
+		/*
+	sphere
+	{
+		#local r = Nominal_Terrain_Radius + Cirrus_Base + Cirrus_Depth;
+
+		<0, 0, 0>, 1
+		hollow
+		double_illuminate
+
+		texture
+		{
+			pigment
+			{
+				function
+				{
+					#local ff_medium_streaks =
+						function
+						{
+							pattern
+							{
+								ripples
+								frequency r/200
+								translate <3, 3, 3>
+
+								warp
+								{
+									turbulence 0.4
+								}
+							}
+						}
+
+					#local ff_small_scale_selector =
+						function
+						{
+							pattern
+							{
+								bozo
+								scale 10/r
+
+								warp
+								{
+									turbulence 0.4
+								}
+							}
+						}
+
+					#local ff_large_scale_selector =
+						function
+						{
+							pigment
+							{
+								granite
+
+								color_map
+								{
+									[0 rgb 0]
+									[0.4 rgb 0]
+									[1 rgb 1]
+								}
+
+								warp
+								{
+									turbulence 0.5
+								}
+							}
+						}
+
+					f_sine_wave(ff_medium_streaks(x, y, z), 1, 1)
+					* ff_small_scale_selector(x, y, z)
+					* ff_large_scale_selector(x, y, z).red
+				}
+
+				warp
+				{
+					turbulence 0.1
+				}
+
+				color_map
+				{
+					[0 rgbt <1, 1, 1, 1>]
+					[1 rgbt <1, 1, 1, 0>]
+				}
+			}
+
+			finish
+			{
+				diffuse 1
+			}
+		}
+
+		scale r
+	}
+	*/
+
+// ==========================================================================
 //                                 OVERALL
 // ==========================================================================
 
@@ -932,5 +1209,6 @@
 		object { Terrain_Object }
 		object { Trees_Object }
 		object { Sea_Object }
-		object { Sky_Object }
+//		object { Sky_Object }
+//		object { Cirrus_Object }
 	}

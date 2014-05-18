@@ -3,7 +3,7 @@ with Colours;
 
 use Colours;
 
-package ImageWriter is
+package Images is
 	type Pixels is array(integer range <>, integer range <>) of aliased Colour;
 
 	type PixelStore(maxw, maxh: integer) is limited

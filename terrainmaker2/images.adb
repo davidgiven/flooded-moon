@@ -11,7 +11,7 @@ use Colours;
 use Utils;
 use Config;
 
-package body ImageWriter is
+package body Images is
 	function Create(width, height: integer) return Image is
 		img: Image(width-1, height-1);
 	begin

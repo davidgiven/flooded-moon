@@ -6,6 +6,10 @@ project TerrainMaker is
 	for Exec_Dir use ".";
 	for Main use ("terrainmaker.adb", "tests.adb");
 
+	package Builder is
+		for Default_Switches("Builder") use ("-j0");
+	end Builder;
+
 	package Compiler is
 		case profile is
 			when "debug" =>
