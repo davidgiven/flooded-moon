@@ -1,0 +1,3 @@
+#!/bin/sh
+exec gprbuild -P terrainmaker.gpr -p -j0 && ./tests && echo Tests Passed
+

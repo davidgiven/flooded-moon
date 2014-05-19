@@ -1,0 +1,3 @@
+#!/bin/sh
+exec ./terrainmaker -ofoo.pnm -W800 -H600 -s scripts/world.tm
+
