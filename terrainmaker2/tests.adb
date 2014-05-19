@@ -106,7 +106,7 @@ procedure Tests is
 		cf.Load("testdata/testconfig.tm");
 
 		Check(
-			CompareWS(cf("value").Get, "Hello, world!"),
+			CompareWS(cf("value").Value, "Hello, world!"),
 			"ConfigTest fail (simple value 1)");
 	end;
 		          

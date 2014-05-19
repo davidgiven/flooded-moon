@@ -94,3 +94,8 @@ const char* ada_config_setting_get_string(config_setting_t* setting)
 	return config_setting_get_string(setting);
 }
 
+const char* ada_config_setting_name(config_setting_t* setting)
+{
+	return config_setting_name(setting);
+}
+

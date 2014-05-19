@@ -79,7 +79,7 @@ package body Images is
 			write(val);
 		end;
 	begin
-		Put_Line("writing image to " & filename);
+		Put_Line("Writing image to " & filename);
 
 		SIO.Create(fp, SIO.Out_File, filename);
 		write("P6" & LF);

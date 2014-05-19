@@ -5,6 +5,7 @@ with Vectors;
 with Images;
 with Colours;
 with Renderer;
+with Scene;
 
 use Ada.Text_IO;
 use Config;
@@ -16,15 +17,13 @@ use Matrices;
 use all type Matrices.Matrix3;
 
 procedure TerrainMaker is
-	procedure Render is
-		img: Image;
-	begin
-		img := Renderer.Render(Config.Options.Width, Config.Options.Height);
-		Write(img, Config.Options.Output_Filename);
-	end;
+	img: Image;
 begin
 	ParseOptions;
-	Render;
+	Scene.Load(Config.Options.Scene_Filename);
+
+	img := Renderer.Render(Config.Options.Width, Config.Options.Height);
+	Write(img, Config.Options.Output_Filename);
 end;
 
 

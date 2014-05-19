@@ -23,6 +23,12 @@ package body ConfigFiles is
 		function ErrorText(cimpl: ConfigFileCRef) return chars_ptr;
 		pragma Import(C, ErrorText, "ada_config_error_text");
 
+		function ErrorFile(cimpl: ConfigFileCRef) return chars_ptr;
+		pragma Import(C, ErrorFile, "ada_config_error_file");
+
+		function ErrorLine(cimpl: ConfigFileCRef) return integer;
+		pragma Import(C, ErrorLine, "ada_config_error_line");
+
 		function ReadFile(cimpl: ConfigFileCRef; filename: chars_ptr) return integer;
 		pragma Import(C, ReadFile, "ada_config_read_file");
 
@@ -32,11 +38,20 @@ package body ConfigFiles is
 		function GetMember(s: ConfigSettingCRef; element: chars_ptr) return ConfigSettingCRef;
 		pragma Import(C, GetMember, "ada_config_setting_get_member");
 
+		function GetElement(s: ConfigSettingCRef; element: integer) return ConfigSettingCRef;
+		pragma Import(C, GetElement, "ada_config_setting_get_elem");
+
+		function Length(s: ConfigSettingCRef) return integer;
+		pragma Import(C, Length, "ada_config_setting_length");
+
 		function GetDouble(s: ConfigSettingCRef) return Interfaces.C.double;
 		pragma Import(C, GetDouble, "ada_config_setting_get_float");
 
 		function GetString(s: ConfigSettingCRef) return chars_ptr;
 		pragma Import(C, GetString, "ada_config_setting_get_string");
+
+		function Name(s: ConfigSettingCRef) return chars_ptr;
+		pragma Import(C, Name, "ada_config_setting_name");
 
 	end;
 
@@ -95,7 +110,10 @@ package body ConfigFiles is
 	begin
 		WrapString(filenamep, filename);
 		if (C.ReadFile(cf.impl.c, filenamep.c) = 0) then
-			raise configerror with Value(C.ErrorText(cf.impl.c));
+			raise configerror with
+				Value(C.ErrorText(cf.impl.c)) & " at " &
+				Value(C.ErrorFile(cf.impl.c)) & ":" &
+				C.ErrorLine(cf.impl.c)'img;
 		end if;
 
 		cf.s := C.RootSetting(cf.impl.c);
@@ -113,12 +131,36 @@ package body ConfigFiles is
 		return child;
 	end;
 
-	function Get(cf: ConfigFile) return Number is
+	function Get(cf: ConfigFile; element: integer) return ConfigFile is
+		child: ConfigFile := cf;
+	begin
+		child.s := C.GetElement(cf.s, element);
+		if (child.s = null) then
+			raise configerror with "value [" & element'img & "] not present";
+		end if;
+		return child;
+	end;
+
+	function Length(cf: ConfigFile) return integer is
+	begin
+		return C.Length(cf.s);
+	end;
+
+	function Name(cf: ConfigFile) return string is
+		s: chars_ptr := C.Name(cf.s);
+	begin
+		if (s = Null_Ptr) then
+			raise configerror with "value missing or does not have a name";
+		end if;
+		return Value(s);
+	end;
+
+	function Value(cf: ConfigFile) return Number is
 	begin
 		return Number(C.GetDouble(cf.s));
 	end;
 
-	function Get(cf: ConfigFile) return string is
+	function Value(cf: ConfigFile) return string is
 		s: chars_ptr := C.GetString(cf.s);
 	begin
 		if (s = Null_Ptr) then
