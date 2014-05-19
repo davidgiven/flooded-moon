@@ -13,6 +13,7 @@ package body Config is
 	output_filename_option: aliased String_Access;
 	width_option: aliased integer;
 	height_option: aliased integer;
+	scene_filename_option: aliased String_Access;
 
 	package body Options is
 		function Output_Filename return string is
@@ -21,6 +22,8 @@ package body Config is
 			(width_option);
 		function Height return integer is
 			(height_option);
+		function Scene_Filename return string is
+			(scene_filename_option.all);
 	end;
 
 	cmdline: Command_Line_Configuration;
@@ -39,15 +42,24 @@ package body Config is
 			Long_Switch => "--height=",
 			Help => "Set height of output file");
 
+		Define_Switch(cmdline, scene_filename_option'access, "-s:",
+			Long_Switch => "--scene=",
+			Help => "Supply scene description");
+
 		Getopt(cmdline);
 
+		if (Gnat.Command_Line.Get_Argument /= "") then
+			Error("mysterious argument supplied (you probably meant --scene)");
+		end if;
 		if (Options.Output_Filename'length = 0) then
 			Error("must specify an output filename");
 		end if;
 		if (Options.Width = 0) or (Options.Height = 0) then
 			Error("output image size must be non zero (in both directions)");
 		end if;
-
+		if (Options.Scene_Filename'length = 0) then
+			Error("must specify a scene description");
+		end if;
 	exception
 		when Exit_From_Command_Line =>
 			Gnat.OS_Lib.OS_Exit(0);

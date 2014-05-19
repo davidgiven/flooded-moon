@@ -11,7 +11,8 @@ package ConfigFiles is
 	procedure Adjust(cf: in out ConfigFile);
 	procedure Finalize(cf: in out ConfigFile);
 
-	function Load(filename: string) return ConfigFile;
+	function Create return ConfigFile;
+	procedure Load(cf: in out ConfigFile; filename: string);
 	function Get(cf: ConfigFile; element: string) return ConfigFile;
 
 	function Get(cf: ConfigFile) return Number;

@@ -17,12 +17,12 @@ project TerrainMaker is
 				for Switches("Ada")
 					use ("-g", "-gnat2012");
 				for Switches("C")
-					use ("-g");
+					use ("-g", "-I/Users/dg/homebrew/include");
 			when "optimised" =>
 				for Switches("Ada")
 					use ("-O3", "-gnat2012");
 				for Switches("C")
-					use ("-O3");
+					use ("-O3", "-I/Users/dg/homebrew/include");
 		end case;
 	end Compiler;
 
@@ -30,10 +30,10 @@ project TerrainMaker is
 		case profile is
 			when "debug" =>
 				for Switches("Ada")
-					use ("-g", "-gnat2012", "-lconfig");
+					use ("-g", "-gnat2012", "-L/Users/dg/homebrew/lib", "-lconfig");
 			when "optimised" =>
 				for Switches("Ada")
-					use ("-O3", "-gnat2012", "-lconfig");
+					use ("-O3", "-gnat2012", "-L/Users/dg/homebrew/lib", "-lconfig");
 		end case;
 	end Linker;
 end TerrainMaker;

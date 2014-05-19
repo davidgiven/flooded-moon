@@ -7,6 +7,7 @@ package Config is
 		function Output_Filename return string;
 		function Width return integer;
 		function Height return integer;
+		function Scene_Filename return string;
 	end;
 
 	procedure ParseOptions;

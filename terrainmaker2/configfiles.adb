@@ -77,9 +77,8 @@ package body ConfigFiles is
 		end if;
 	end;
 
-	function Load(filename: string) return ConfigFile is
+	function Create return ConfigFile is
 		cf: ConfigFile;
-		filenamep: WrappedString;
 	begin
 		cf.impl := new ConfigFileImpl;
 		cf.impl.c := C.Init;
@@ -87,13 +86,19 @@ package body ConfigFiles is
 			raise configerror with "memory allocation error";
 		end if;
 
+		cf.s := C.RootSetting(cf.impl.c);
+		return cf;
+	end;
+
+	procedure Load(cf: in out ConfigFile; filename: string) is
+		filenamep: WrappedString;
+	begin
 		WrapString(filenamep, filename);
 		if (C.ReadFile(cf.impl.c, filenamep.c) = 0) then
 			raise configerror with Value(C.ErrorText(cf.impl.c));
 		end if;
-				
+
 		cf.s := C.RootSetting(cf.impl.c);
-		return cf;
 	end;
 
 	function Get(cf: ConfigFile; element: string) return ConfigFile is

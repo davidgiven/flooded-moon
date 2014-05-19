@@ -101,11 +101,13 @@ procedure Tests is
 	end;
 
 	procedure ConfigTest is
-		cf: ConfigFile := ConfigFiles.Load("testdata/testconfig.tm");
+		cf: ConfigFile := ConfigFiles.Create;
 	begin
+		cf.Load("testdata/testconfig.tm");
+
 		Check(
 			CompareWS(cf("value").Get, "Hello, world!"),
-			"ConfigTest fail (simple value)");
+			"ConfigTest fail (simple value 1)");
 	end;
 		          
 begin
