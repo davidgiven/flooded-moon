@@ -4,7 +4,8 @@ use Config;
 generic
 	size: natural;
 package GenericVector is
-	type Vector is array(1..size) of Number;
+	type Index is new positive range 1..size;
+	type Vector is array(Index) of Number;
 
 	Zero: constant Vector := (others => 0.0);
 

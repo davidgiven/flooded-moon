@@ -7,15 +7,12 @@ use Config;
 use Vectors;
 
 package Matrices is
-	package Matrices2 is new GenericMatrix(2, Vectors.Vectors2);
-	use all type Matrices2.Matrix;
-	subtype Matrix2 is Matrices2.Matrix;
+	package Matrices2 is new GenericMatrix(Vectors.Vectors2.Index, Vector2);
+	type Matrix2 is new Matrices2.Matrix;
 
-	package Matrices3 is new GenericMatrix(3, Vectors.Vectors3);
-	use all type Matrices3.Matrix;
-	subtype Matrix3 is Matrices3.Matrix;
+	package Matrices3 is new GenericMatrix(Vectors.Vectors3.Index, Vector3);
+	type Matrix3 is new Matrices3.Matrix;
 
-	package Matrices4 is new GenericMatrix(4, Vectors.Vectors4);
-	use all type Matrices4.Matrix;
-	subtype Matrix4 is Matrices4.Matrix;
+	package Matrices4 is new GenericMatrix(Vectors.Vectors4.Index, Vector4);
+	type Matrix4 is new Matrices4.Matrix;
 end;

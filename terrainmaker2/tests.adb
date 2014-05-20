@@ -12,9 +12,7 @@ use Ada.Strings;
 use Config;
 use Colours;
 use Vectors;
-use all type Vectors.Vector3;
 use Matrices;
-use all type Matrices.Matrix3;
 use ConfigFiles;
 
 procedure Tests is
