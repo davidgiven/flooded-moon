@@ -1,11 +1,13 @@
 with Ada.Text_IO;
 with Ada.Strings;
+with Ada.Finalization;
 with Config;
 with Matrices;
 with Vectors;
 with Colours;
 with Utils;
 with ConfigFiles;
+with CountedPointers;
 
 use Ada.Text_IO;
 use Ada.Strings;
@@ -108,10 +110,67 @@ procedure Tests is
 			"ConfigTest fail (simple value 1)");
 	end;
 		          
+	procedure PointerTest is
+		count: natural := 1;
+		methodCalled: boolean := false;
+
+		package TestObjectPkg is
+			type TestObject is new Ada.Finalization.Limited_Controlled
+				with null record;
+			procedure Finalize(o: in out TestObject);
+			procedure Adjust(o: in out TestObject);
+			procedure Method(o: TestObject);
+		end;
+
+		package body TestObjectPkg is
+			procedure Finalize(o: in out TestObject) is
+			begin
+				count := count - 1;
+			end;
+
+			procedure Adjust(o: in out TestObject) is
+			begin
+				count := count + 1;
+			end;
+
+			procedure Method(o: TestObject) is
+			begin
+				methodCalled := true;
+			end;
+		end;
+
+		use TestObjectPkg;
+		package ObjCountedPointers is new CountedPointers(TestObject);
+		type ObjPtr is new ObjCountedPointers.Ptr with null record;
+
+	begin
+		declare
+			o: ObjPtr := NewPtr(new TestObject);
+			o2: ObjPtr := o;
+			o3: ObjPtr := o2;
+
+			function donothing(o: ObjPtr) return ObjPtr is
+			begin
+				return o;
+			end;
+		begin
+			o := donothing(o);
+			o.Get.Method;
+		end;
+
+		Check(
+			(count = 0),
+			"PointerTest fail: refcount not zero!");
+		Check(
+			methodCalled,
+			"PointerTest fail: method not called!");
+	end;
+
 begin
 	MatrixInversion;
 	MatrixMultiplyByVector;
 	ConfigTest;
+	PointerTest;
 end;
 
 
