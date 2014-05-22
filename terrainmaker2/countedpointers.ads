@@ -13,7 +13,10 @@ package CountedPointers is
 			new Ada.Finalization.Controlled
 			with null record;
 
-	function NewPtr(object: ElementRef) return Ptr;
+	function NewPtr return Ptr is
+		(Ptr'(Ada.Finalization.Controlled with
+			e => new Element, c => new natural'(1)
+		));
 
 	function Get(r: Ptr) return ElementRef is (r.e);
 	procedure Adjust(r: in out Ptr);

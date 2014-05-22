@@ -7,8 +7,14 @@ use Config;
 use Matrices;
 
 package body Planets is
-	function Create(cf: ConfigFile) return Planet is
-		p: Planet;
+	function Create(cf: ConfigFile) return Ptr is
+		p: Ptr := Pointers.NewPtr;
+	begin
+		p.Get.Init(cf);
+		return p;
+	end;
+
+	procedure Init(p: in out Planet; cf: ConfigFile) is
 	begin
 		Put_Line("Loading planet: " & cf.Name);
 		p.cf := cf;
@@ -16,7 +22,6 @@ package body Planets is
 		p.atmospheric_depth := cf("atmospheric_depth").Value;
 
 		p.bounding_radius := p.nominal_radius + p.atmospheric_depth;
-		return p;
 	end;
 end;
 

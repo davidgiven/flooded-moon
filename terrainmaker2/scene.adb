@@ -24,7 +24,7 @@ package body Scene is
 		for i in 0..(planets_cf.Length-1) loop
 			declare
 				cf: ConfigFile := planets_cf(i);
-				p: Planet := Planets.Create(cf);
+				p: Planets.Ptr := Planets.Create(cf);
 			begin
 				planets_list.Append(p);
 			end;

@@ -145,7 +145,7 @@ procedure Tests is
 
 	begin
 		declare
-			o: ObjPtr := NewPtr(new TestObject);
+			o: ObjPtr := NewPtr;
 			o2: ObjPtr := o;
 			o3: ObjPtr := o2;
 
