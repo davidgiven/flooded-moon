@@ -8,7 +8,7 @@ project TerrainMaker is
 	for Languages use ("Ada", "C");
 
 	package Builder is
-		for Default_Switches("Builder") use ("-j0");
+		for Switches(others) use ("-j0");
 	end Builder;
 
 	package Compiler is
