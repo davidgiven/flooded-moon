@@ -11,8 +11,6 @@ use Interfaces.C.Strings;
 use Config;
 
 package body ConfigFiles is
-	configerror: exception;
-
 	package C is
 		function Init return ConfigFileCRef;
 		pragma Import(C, Init, "ada_config_init");
@@ -98,7 +96,7 @@ package body ConfigFiles is
 		cf.impl := new ConfigFileImpl;
 		cf.impl.c := C.Init;
 		if (cf.impl.c = null) then
-			raise configerror with "memory allocation error";
+			raise ConfigError with "memory allocation error";
 		end if;
 
 		cf.s := C.RootSetting(cf.impl.c);
@@ -110,13 +108,20 @@ package body ConfigFiles is
 	begin
 		WrapString(filenamep, filename);
 		if (C.ReadFile(cf.impl.c, filenamep.c) = 0) then
-			raise configerror with
+			raise ConfigError with
 				Value(C.ErrorText(cf.impl.c)) & " at " &
 				Value(C.ErrorFile(cf.impl.c)) & ":" &
 				C.ErrorLine(cf.impl.c)'img;
 		end if;
 
 		cf.s := C.RootSetting(cf.impl.c);
+	end;
+
+	function Exists(cf: ConfigFile; element: string) return boolean is
+		elementp: WrappedString;
+	begin
+		WrapString(elementp, element);
+		return (C.GetMember(cf.s, elementp.c) /= null);
 	end;
 
 	function Get(cf: ConfigFile; element: string) return ConfigFile is
@@ -126,7 +131,7 @@ package body ConfigFiles is
 		WrapString(elementp, element);
 		child.s := C.GetMember(cf.s, elementp.c);
 		if (child.s = null) then
-			raise configerror with "value '" & element & "' not present";
+			raise ConfigError with "value '" & element & "' not present";
 		end if;
 		return child;
 	end;
@@ -136,7 +141,7 @@ package body ConfigFiles is
 	begin
 		child.s := C.GetElement(cf.s, element);
 		if (child.s = null) then
-			raise configerror with "value [" & element'img & "] not present";
+			raise ConfigError with "value [" & element'img & "] not present";
 		end if;
 		return child;
 	end;
@@ -150,7 +155,7 @@ package body ConfigFiles is
 		s: chars_ptr := C.Name(cf.s);
 	begin
 		if (s = Null_Ptr) then
-			raise configerror with "value missing or does not have a name";
+			raise ConfigError with "value missing or does not have a name";
 		end if;
 		return Value(s);
 	end;
@@ -164,7 +169,7 @@ package body ConfigFiles is
 		s: chars_ptr := C.GetString(cf.s);
 	begin
 		if (s = Null_Ptr) then
-			raise configerror with "value missing or not a string";
+			raise ConfigError with "value missing or not a string";
 		end if;
 		return Value(s);
 	end;

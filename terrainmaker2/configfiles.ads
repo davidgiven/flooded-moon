@@ -8,6 +8,9 @@ package ConfigFiles is
 	type ConfigFile is tagged private with
 		Constant_Indexing => Get;
 
+	ConfigError: exception;
+	ConfigParseError: exception;
+
 	procedure Adjust(cf: in out ConfigFile);
 	procedure Finalize(cf: in out ConfigFile);
 
@@ -15,6 +18,7 @@ package ConfigFiles is
 	procedure Load(cf: in out ConfigFile; filename: string);
 	function Get(cf: ConfigFile; element: string) return ConfigFile;
 	function Get(cf: ConfigFile; element: integer) return ConfigFile;
+	function Exists(cf: ConfigFile; element: string) return boolean;
 	function Length(cf: ConfigFile) return integer;
 	function Name(cf: ConfigFile) return string;
 

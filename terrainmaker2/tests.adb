@@ -128,6 +128,16 @@ procedure Tests is
 			"ConfigTest fail (simple value 1)");
 	end;
 		          
+	procedure ConfigMissingTest is
+		cf: ConfigFile := ConfigFiles.Create;
+	begin
+		cf.Load("testdata/testconfig.tm");
+
+		Check(
+			not cf.Exists("doesnotexist"),
+			"ConfigMissingTest fail (value existed!)");
+	end;
+		          
 	procedure ListsTest is
 		count: integer := 0;
 
@@ -180,6 +190,7 @@ begin
 	MatrixInversion;
 	MatrixMultiplyByVector;
 	ConfigTest;
+	ConfigMissingTest;
 	ListsTest;
 end;
 
