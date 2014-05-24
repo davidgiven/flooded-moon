@@ -16,6 +16,7 @@ package GenericMatrix is
 
 	function "*" (m: Matrix; n: Number) return Matrix;
 	function "*" (m: Matrix; v: Vector) return Vector;
+	function "*" (m: Matrix; o: Matrix) return Matrix;
 
 	function Invert(m: Matrix) return Matrix;
 	function ToString(m: Matrix) return string;

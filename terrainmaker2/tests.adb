@@ -8,6 +8,7 @@ with Colours;
 with Utils;
 with ConfigFiles;
 with GenericLists;
+with Transforms;
 
 use Ada.Text_IO;
 use Ada.Strings;
@@ -16,6 +17,7 @@ use Colours;
 use Vectors;
 use Matrices;
 use ConfigFiles;
+use Transforms;
 
 procedure Tests is
 	LF: character := ASCII.LF;
@@ -75,6 +77,22 @@ procedure Tests is
 		end if;
 	end;
 
+	procedure MatrixAndVectorSizes is
+	begin
+		Check(Vector2'length = 2,
+			"MatrixAndVectorSizes fail: Vector2 is not of length 2");
+		Check(Vector3'length = 3,
+			"MatrixAndVectorSizes fail: Vector3 is not of length 3");
+		Check(Vector4'length = 4,
+			"MatrixAndVectorSizes fail: Vector4 is not of length 4");
+		Check(Matrix2'length(1) = 2,
+			"MatrixAndVectorSizes fail: Matrix2 is not of length 2");
+		Check(Matrix3'length(1) = 3,
+			"MatrixAndVectorSizes fail: Matrix3 is not of length 3");
+		Check(Matrix4'length(1) = 4,
+			"MatrixAndVectorSizes fail: Matrix4 is not of length 4");
+	end;
+			
 	procedure MatrixInversion is
 		m: Matrix3 := ((3.0, 2.0, 4.0),
 					   (2.0,-3.0, 1.0),
@@ -158,6 +176,7 @@ procedure Tests is
 			"ListsTest fail (refcount is " & count'img & ")");
 	end;
 begin
+	MatrixAndVectorSizes;
 	MatrixInversion;
 	MatrixMultiplyByVector;
 	ConfigTest;

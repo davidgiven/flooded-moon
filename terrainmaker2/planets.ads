@@ -3,10 +3,12 @@ with Config;
 with Matrices;
 with ConfigFiles;
 with GenericLists;
+with Transforms;
 
 use Config;
 use Matrices;
 use ConfigFiles;
+use Transforms;
 
 package Planets is
 	type Planet is tagged limited record
@@ -15,7 +17,7 @@ package Planets is
 		atmospheric_depth: Number;
 
 		bounding_radius: Number;
-		transform: Matrix4;
+		transform: TransformMatrix;
 	end record;
 
 	procedure Init(p: in out Planet; cf: ConfigFile);
