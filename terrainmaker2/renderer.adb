@@ -53,12 +53,21 @@ package body Renderer is
 			end loop;
 		end;
  
-		-- Create some work threads (which will automatically start).
-		scanlines: array(System.Multiprocessors.CPU_Range
-			range 1..System.Multiprocessors.Number_Of_CPUs) of Worker;
-  begin
-    return screen;
-  end;
+	begin
+		Put_Line("Rendering with" & System.Multiprocessors.Number_Of_CPUs'img &
+			" threads");
+
+		declare
+			-- Create some work threads (which will automatically start).
+			scanlines: array(System.Multiprocessors.CPU_Range
+				range 1..System.Multiprocessors.Number_Of_CPUs) of Worker;
+		begin
+			null; -- just wait for threads to exit
+		end;
+
+		Put_Line("done");
+		return screen;
+	end;
 end;
 
 
