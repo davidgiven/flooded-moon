@@ -7,7 +7,7 @@ with Vectors;
 with Colours;
 with Utils;
 with ConfigFiles;
-with CountedPointers;
+with GenericLists;
 
 use Ada.Text_IO;
 use Ada.Strings;
@@ -110,67 +110,58 @@ procedure Tests is
 			"ConfigTest fail (simple value 1)");
 	end;
 		          
-	procedure PointerTest is
-		count: natural := 1;
-		methodCalled: boolean := false;
+	procedure ListsTest is
+		count: integer := 0;
 
-		package TestObjectPkg is
+		package P is
 			type TestObject is new Ada.Finalization.Limited_Controlled
 				with null record;
+			procedure Initialize(o: in out TestObject);
 			procedure Finalize(o: in out TestObject);
-			procedure Adjust(o: in out TestObject);
-			procedure Method(o: TestObject);
+			procedure Method(o: in out TestObject);
+
+			package Lists is new GenericLists(TestObject);
+			subtype List is Lists.List;
 		end;
 
-		package body TestObjectPkg is
+		package body P is
+			procedure Initialize(o: in out TestObject) is
+			begin
+				count := count + 1;
+			end;
+
 			procedure Finalize(o: in out TestObject) is
 			begin
 				count := count - 1;
 			end;
 
-			procedure Adjust(o: in out TestObject) is
+			procedure Method(o: in out TestObject) is
 			begin
-				count := count + 1;
-			end;
-
-			procedure Method(o: TestObject) is
-			begin
-				methodCalled := true;
+				null;
 			end;
 		end;
 
-		use TestObjectPkg;
-		package ObjCountedPointers is new CountedPointers(TestObject);
-		type ObjPtr is new ObjCountedPointers.Ptr with null record;
-
+		use P;
 	begin
 		declare
-			o: ObjPtr := NewPtr;
-			o2: ObjPtr := o;
-			o3: ObjPtr := o2;
-
-			function donothing(o: ObjPtr) return ObjPtr is
-			begin
-				return o;
-			end;
+			v: P.List;
 		begin
-			o := donothing(o);
-			o.Get.Method;
+			for i in 1..10 loop
+				v.Add;
+			end loop;
+			v.Add.Method;
+			v(0).Method;
 		end;
 
 		Check(
-			(count = 0),
-			"PointerTest fail: refcount not zero!");
-		Check(
-			methodCalled,
-			"PointerTest fail: method not called!");
+			count = 0,
+			"ListsTest fail (refcount is " & count'img & ")");
 	end;
-
 begin
 	MatrixInversion;
 	MatrixMultiplyByVector;
 	ConfigTest;
-	PointerTest;
+	ListsTest;
 end;
 
 

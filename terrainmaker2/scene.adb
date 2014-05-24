@@ -8,7 +8,7 @@ use Planets;
 
 package body Scene is
 	scene_cf: ConfigFile := ConfigFiles.Create;
-	planets_list: Planets.Vector;
+	planets_list: Planets.List;
 
 	procedure Load(filename: string) is
 		planets_cf: ConfigFile;
@@ -24,9 +24,8 @@ package body Scene is
 		for i in 0..(planets_cf.Length-1) loop
 			declare
 				cf: ConfigFile := planets_cf(i);
-				p: Planets.Ptr := Planets.Create(cf);
 			begin
-				planets_list.Append(p);
+				planets_list.Add.Init(cf);
 			end;
 		end loop;
 	end;
