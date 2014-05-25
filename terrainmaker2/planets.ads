@@ -4,11 +4,15 @@ with Matrices;
 with ConfigFiles;
 with GenericLists;
 with Transforms;
+with Scene;
+with Vectors;
 
 use Config;
 use Matrices;
 use ConfigFiles;
 use Transforms;
+use Scene;
+use Vectors;
 
 package Planets is
 	type Planet is tagged limited record
@@ -21,9 +25,12 @@ package Planets is
 	end record;
 
 	procedure Init(p: in out Planet; cf: ConfigFile);
+	function TestIntersection(p: Planet; r: Ray;
+			rayEntry, rayExit: in out Point)
+			return boolean;
 
 	package Lists is new GenericLists(Planet);
-	type List is new Lists.List with null record;
+	subtype List is Lists.List;
 end;
 
 

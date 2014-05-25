@@ -1,3 +1,7 @@
+with Config;
+
+use Config.NumberFunctions;
+
 package body GenericVector is
 	function "+" (v1, v2: Vector) return Vector is
 		r: Vector;
@@ -27,12 +31,12 @@ package body GenericVector is
 	end;
 
 	function Length(v: Vector) return Number is
-		len: Number := 0.0;
+		len2: Number := 0.0;
 	begin
 		for i in Index loop
-			len := len + v(i);
+			len2 := len2 + v(i)**2;
 		end loop;
-		return len;
+		return sqrt(len2);
 	end;
 
 	function Normalise(v: Vector) return Vector is
@@ -46,8 +50,6 @@ package body GenericVector is
 	end;
 
 	function ToString(v: Vector) return string is
-		LF: character := ASCII.LF;
-
 		function cells(x: Index) return string is
 			(Number'image(v(x)) &
 				(if (x < Index'last) then (',' & cells(x+1)) else ""));

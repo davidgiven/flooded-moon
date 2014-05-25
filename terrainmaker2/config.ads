@@ -21,5 +21,7 @@ package Config is
 
 	function DegToRad(n: Number) return Number is
 		(n * (Pi / 180.0));
+
+	LF: constant character := ASCII.LF;
 end;
 

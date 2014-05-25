@@ -15,7 +15,17 @@ package body Planets is
 		p.atmospheric_depth := cf("atmospheric_depth").Value;
 
 		p.bounding_radius := p.nominal_radius + p.atmospheric_depth;
-		p.transform := Load(cf("transform"));
+		if cf.Exists("transform") then
+			p.transform := Load(cf("transform"));
+		else
+			p.transform.Reset;
+		end if;
+	end;
+
+	function TestIntersection(p: Planet; r: Ray; rayEntry, rayExit: in out Point)
+			return boolean is
+	begin
+		return true;
 	end;
 end;
 

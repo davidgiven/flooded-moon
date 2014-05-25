@@ -1,18 +1,24 @@
 with Ada.Text_IO;
+with Ada.Exceptions;
 with Config;
 with Images;
 with Colours;
+with Scene;
 with System.Multiprocessors;
+with Utils;
 
 use Ada.Text_IO;
 use Config;
 use Images;
 use Colours;
+use Scene;
+use Utils;
 
 package body Renderer is
-	function RenderPixel(x, y: integer) return Colour is
+	function RenderPixel(r: Ray) return Colour is
+		ints: Intersections := ComputeObjectIntersections(r);
 	begin
-		return RGB(1.0, 0.0, 0.0);
+		return (if (ints'length>0) then RGB(1.0, 0.0, 0.0) else RGB(0.0, 1.0, 0.0));
 	end;
 
 	function Render(width, height: integer) return Image is
@@ -20,16 +26,25 @@ package body Renderer is
 
 		task Scheduler is
 			-- Each worker calls this to find out what it needs to do.
-			entry RequestWorkUnit(y: out integer);
+			entry RequestWorkUnit(y: out integer; finished: out boolean);
 		end;
  
 		task body Scheduler is
 		begin
 			-- Hand out each scanline in turn to tasks that want things to
-			-- do, then exit.
+			-- do.
 			for yy in screen.pixels.data'range(2) loop
-				accept RequestWorkUnit(y: out integer) do
+				accept RequestWorkUnit(y: out integer; finished: out boolean) do
 					y := yy;
+					finished := false;
+				end RequestWorkUnit;
+			end loop;
+
+			-- Now tell each worker thread it's done (each thread will ask
+			-- once).
+			for i in 1..System.Multiprocessors.Number_Of_CPUs loop
+				accept RequestWorkUnit(y: out integer; finished: out boolean) do
+					finished := true;
 				end RequestWorkUnit;
 			end loop;
 		end;
@@ -40,17 +55,25 @@ package body Renderer is
 		task type Worker;
 		task body Worker is
 			y: integer;
+			finished: boolean;
+			r: Ray;
 		begin
 			-- Keep asking for stuff to do, then do it. When the Scheduler
 			-- has terminated, requesting a work unit will throw an exception and
 			-- the task will safely exit.
 			loop
-				Scheduler.RequestWorkUnit(y);
+				Scheduler.RequestWorkUnit(y, finished);
+				exit when finished;
 
 				for x in screen.pixels.data'range(1) loop
-					screen(x, y) := RenderPixel(x, y);
+					r := ComputePrimaryRay(x, y, screen);
+					screen(x, y) := RenderPixel(r);
 				end loop;
 			end loop;
+		exception
+			when e: others =>
+				Error("Exception thrown from worker thread!" & LF &
+					Ada.Exceptions.Exception_Information(e));
 		end;
  
 	begin

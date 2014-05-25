@@ -179,6 +179,7 @@ procedure Tests is
 			end loop;
 			v.Add.Method;
 			v(0).Method;
+			v(3).Method;
 		end;
 
 		Check(

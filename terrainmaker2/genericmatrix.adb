@@ -121,8 +121,6 @@ package body GenericMatrix is
 	end;
 
 	function ToString(m: Matrix) return string is
-		LF: character := ASCII.LF;
-
 		function cols(x, y: Index) return string is
 			(m(x, y)'img &
 				(if (x < Index'last) then (',' & cols(x+1, y)) else ""));
