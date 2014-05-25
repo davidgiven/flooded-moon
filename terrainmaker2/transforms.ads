@@ -17,8 +17,8 @@ package Transforms is
 		itset: boolean := false;
 	end record;
 
-	function Transform(t: TransformMatrix; p: Point) return Point;
-	function Untransform(t: in out TransformMatrix; p: Point) return Point;
+	function Transform(t: TransformMatrix; p: Vector3) return Vector3;
+	function Untransform(t: in out TransformMatrix; p: Vector3) return Vector3;
 	function Inverse(t: in out TransformMatrix) return Matrix4;
 
 	procedure Set(t: in out TransformMatrix; m: Matrix4);

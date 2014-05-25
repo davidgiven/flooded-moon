@@ -12,7 +12,7 @@ package body Transforms is
 		return Point'(x/w, y/w, z/w);
 	end;
 
-	function Transform(t: TransformMatrix; p: Point) return Point is
+	function Transform(t: TransformMatrix; p: Vector3) return Vector3 is
 	begin
 		return MultiplyPoint(t.t, p);
 	end;
@@ -26,7 +26,7 @@ package body Transforms is
 		return t.it;
 	end;
 
-	function Untransform(t: in out TransformMatrix; p: Point) return Point is
+	function Untransform(t: in out TransformMatrix; p: Vector3) return Vector3 is
 	begin
 		return MultiplyPoint(t.Inverse, p);
 	end;
@@ -98,29 +98,29 @@ package body Transforms is
 
 	procedure Rotate(t: in out TransformMatrix; v: Vector3; angle: Number) is
 		vn: Vector3 := Normalise(v);
-		vnx: Number := vn(0);
-		vny: Number := vn(1);
-		vnz: Number := vn(2);
+		x: Number := vn(0);
+		y: Number := vn(1);
+		z: Number := vn(2);
 		angleRad: Number := degToRad(angle);
-		sinTheta: Number := sin(angleRad);
-		cosTheta: Number := cos(angleRad);
+		st: Number := sin(angleRad);
+		ct: Number := cos(angleRad);
 	begin
 		t.apply(
 			Matrix4'(
 				(
-					vnx * vnx + (1.0 - vnx * vnx) * cosTheta,
-					vnx * vnx * (1.0 - cosTheta) - vnz * sinTheta,
-					vnx * vnx * (1.0 - cosTheta) + vny * sinTheta,
+					x**2 + (y**2 + z**2)*ct,
+					x*y*(1.0-ct) - z*st,
+					x*z*(1.0-ct) + y*st,
 					0.0
 				), (
-					vnx * vny * (1.0 - cosTheta) - vnz * sinTheta,
-					vny * vny + (1.0 - vny * vny) * cosTheta,
-					vny * vnz * (1.0 - cosTheta) + vnx * sinTheta,
+					x*y*(1.0-ct) + z*st,
+					y**2 + (x**2 + z**2)*ct,
+					y*z*(1.0-ct) - x*st,
 					0.0
 				), (
-					vnx * vnz * (1.0 - cosTheta) - vny * sinTheta,
-					vny * vnz * (1.0 - cosTheta) + vnx * sinTheta,
-					vnz * vnz + (1.0 - vnz * vnz) * cosTheta,
+					x*z*(1.0-ct) - y*st,
+					y*z*(1.0-ct) + x*st,
+					z**2 + (x**2 + y**2)*ct,
 					0.0
 				), (
 					0.0, 0.0, 0.0, 1.0
