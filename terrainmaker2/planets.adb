@@ -15,6 +15,7 @@ package body Planets is
 		p.atmospheric_depth := cf("atmospheric_depth").Value;
 
 		p.bounding_radius := p.nominal_radius + p.atmospheric_depth;
+		p.transform := Load(cf("transform"));
 	end;
 end;
 

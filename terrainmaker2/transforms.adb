@@ -31,6 +31,38 @@ package body Transforms is
 		return MultiplyPoint(t.Inverse, p);
 	end;
 
+	procedure Set(t: in out TransformMatrix; m: Matrix4) is
+	begin
+		t.t := m;
+		t.itset := false;
+	end;
+
+	procedure Reset(t: in out TransformMatrix) is
+	begin
+		for x in t.t'range(1) loop
+			for y in t.t'range(2) loop
+				t.t(x,y) := 0.0;
+			end loop;
+			t.t(x,x) := 1.0;
+		end loop;
+		t.itset := false;
+	end;
+
+	procedure LookAt(t: in out TransformMatrix; location, target: Point;
+			up: Vector3) is
+		dir: Vector3 := Normalise(target-location);
+		left: Vector3 := Normalise(Cross(up, dir));
+		newUp: Vector3 := Cross(dir, left);
+	begin
+		t.Set(
+			Matrix4'(
+				(left(0),     left(1),     left(2),     0.0),
+				(newUp(0),    newUp(1),    newUp(2),    0.0),
+				(dir(0),      dir(1),      dir(2),      0.0),
+				(location(0), location(1), location(2), 1.0))
+		);
+	end;
+
 	procedure Apply(t: in out TransformMatrix; o: Matrix4) is
 	begin
 		t.t := o*t.t;
@@ -96,19 +128,24 @@ package body Transforms is
 			);
 	end;
 
-	function LookAt(p, t: Point; up: Vector3) return TransformMatrix is
-		dir: Vector3 := Normalise(t-p);
-		left: Vector3 := Normalise(Cross(up, dir));
-		newUp: Vector3 := Cross(dir, left);
-		tt: TransformMatrix;
+	function Load(cf: ConfigFile) return TransformMatrix is
 	begin
-		tt.t :=
-			Matrix4'(
-				(left(0),  left(1),  left(2),  0.0),
-				(newUp(0), newUp(1), newUp(2), 0.0),
-				(dir(0),   dir(1),   dir(2),   0.0),
-				(p(0),     p(1),     p(2),     1.0));
-		return tt;
+		return t: TransformMatrix do
+			t.Reset;
+
+			if cf.Exists("latitude") then
+				t.Rotate(Vectors.X, cf("latitude").Value);
+			end if;
+			if cf.Exists("longitude") then
+				t.Rotate(Vectors.Z, cf("longitude").Value);
+			end if;
+			if cf.Exists("tilt") then
+				t.Rotate(Vectors.X, cf("tilt").Value);
+			end if;
+			if cf.Exists("location") then
+				t.Translate(Load(cf("location")));
+			end if;
+		end return;
 	end;
 end;
 
