@@ -9,6 +9,7 @@ with Utils;
 with ConfigFiles;
 with GenericLists;
 with Transforms;
+with Calculon;
 
 use Ada.Text_IO;
 use Ada.Strings;
@@ -186,6 +187,35 @@ procedure Tests is
 			count = 0,
 			"ListsTest fail (refcount is " & count'img & ")");
 	end;
+
+	procedure CalculonTest is
+		type TestFunc is access procedure(i: Number; r: out Number);
+		package TestCalculon is new Calculon(TestFunc);
+		use TestCalculon;
+		func: TestCalculon.Func;
+		n: Number;
+	begin
+		Initialise(func, "let i=i+1 in return", "(i: real): (i: real)");
+		func.Call.all(1.0, n);
+		Check(
+			n = 2.0,
+			"CalculonTest fail");
+	end;
+
+	procedure CalculonVectorTest is
+		type TestFunc is access procedure(i: Number; r: out Vector3);
+		package TestCalculon is new Calculon(TestFunc);
+		use TestCalculon;
+		func: TestCalculon.Func;
+		n: Vector3;
+	begin
+		Initialise(func, "let r=[i,i,i] in return", "(i: real): (r: vector*3)");
+		func.Call.all(1.0, n);
+		Check(
+			(n(0) = 1.0) and (n(1) = 1.0) and (n(2) = 1.0),
+			"CalculonVectorTest fail");
+	end;
+
 begin
 	MatrixAndVectorSizes;
 	MatrixInversion;
@@ -193,6 +223,8 @@ begin
 	ConfigTest;
 	ConfigMissingTest;
 	ListsTest;
+	CalculonTest;
+	CalculonVectorTest;
 end;
 
 

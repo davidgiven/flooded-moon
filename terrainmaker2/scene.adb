@@ -76,7 +76,7 @@ package body Scene is
 	end;
 
 	procedure ComputeObjectIntersections(r: Ray;
-			ints: in out Intersections; num: in out natural) is
+			ints: out Intersections; num: out natural) is
 		procedure TestSingleObject(p: Planet; i: in out Intersection;
 				index: natural) is
 		begin

@@ -22,6 +22,6 @@ package Scene is
 	procedure Load(filename: string);
 	function ComputePrimaryRay(x, y: integer; img: Image) return Ray;
 	procedure ComputeObjectIntersections(r: Ray;
-		ints: in out Intersections; num: in out natural);
+		ints: out Intersections; num: out natural);
 end;
 

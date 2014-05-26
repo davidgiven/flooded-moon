@@ -51,6 +51,7 @@ package body Renderer is
 			-- once).
 			for i in 1..System.Multiprocessors.Number_Of_CPUs loop
 				accept RequestWorkUnit(y: out integer; finished: out boolean) do
+					y := 0;
 					finished := true;
 				end RequestWorkUnit;
 			end loop;
