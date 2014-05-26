@@ -69,8 +69,8 @@ package body Images is
 			lo: word := w mod 256;
 			hi: word := w / 256;
 		begin
-			write(byte'val(lo));
 			write(byte'val(hi));
+			write(byte'val(lo));
 		end;
 
 		procedure write(n: Number) is
