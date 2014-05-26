@@ -16,6 +16,8 @@ planets:
 		nominal_radius: 695500e3
 		atmospheric_depth: 0
 		location: (0, 149597871e6, 0)
+
+		terrain: "scripts/sun-terrain.cal"
 	}
 
 	moon:

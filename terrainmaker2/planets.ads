@@ -17,7 +17,8 @@ use Scene;
 use Vectors;
 
 package Planets is
-	type TerrainFunc is access procedure(r: out Number);
+	type TerrainFunc is access procedure(xyz: Point;
+			boundingRadius: number; rgb: out Point);
 	package TerrainCalculon is new Calculon(TerrainFunc);
 
 	type Planet is tagged limited record

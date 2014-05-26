@@ -7,6 +7,7 @@ with Vectors;
 with Transforms;
 with Images;
 with Utils;
+with Colours;
 
 use Ada.Text_IO;
 use Config;
@@ -16,6 +17,7 @@ use Vectors;
 use Transforms;
 use Images;
 use Utils;
+use Colours;
 
 package body Scene is
 	scene_cf: ConfigFile := ConfigFiles.Create;
@@ -114,5 +116,25 @@ package body Scene is
 			Sort(0, num-1);
 		end if;
 	end;
+
+	function ComputePixelColour(r: Ray) return Colour is
+		ints: Intersections;
+		num: natural;
+	begin
+		ComputeObjectIntersections(r, ints, num);
+		if (num = 0) then
+			return RGB(0.0, 0.0, 0.0);
+		else
+			declare
+				p: Planets.Lists.Ref := planets_list(ints(0).planet);
+				locRelToPlanet: Point := ints(0).rayEntry - p.location;
+				pixelColour: Vector3;
+			begin
+				p.terrain.Call.all(locRelToPlanet, p.bounding_radius, pixelColour);
+				return RGB(pixelColour(0), pixelColour(1), pixelColour(2));
+			end;
+		end if;
+	end;
+
 end;
 

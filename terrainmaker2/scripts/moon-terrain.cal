@@ -1,0 +1,9 @@
+let clip(v, min, max) =
+	if (v < min) then min else
+	if (v > max) then max else
+	v in
+
+let g = (xyz.z / boundingRadius) / 2 + 0.5 in
+let rgb = [1, g, 0] in
+return
+

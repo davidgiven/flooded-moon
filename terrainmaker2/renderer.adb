@@ -15,19 +15,6 @@ use Scene;
 use Utils;
 
 package body Renderer is
-	function RenderPixel(r: Ray) return Colour is
-		ints: Intersections;
-		num: natural;
-	begin
-		ComputeObjectIntersections(r, ints, num);
-		case (num) is
-			when 0 => return RGB(0.0, 0.0, 0.0);
-			when 1 => return RGB(1.0, 0.0, 0.0);
-			when 2 => return RGB(1.0, 1.0, 0.0);
-			when others => return RGB(1.0, 1.0, 1.0);
-		end case;
-	end;
-
 	function Render(width, height: integer) return Image is
 		screen: Image := Images.Create(width, height);
 
@@ -100,7 +87,7 @@ package body Renderer is
 
 				for x in screen.pixels.data'range(1) loop
 					r := ComputePrimaryRay(x, y, screen);
-					screen(x, y) := RenderPixel(r);
+					screen(x, y) := ComputePixelColour(r);
 				end loop;
 			end loop;
 		exception

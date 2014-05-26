@@ -25,6 +25,18 @@ package body Planets is
 		else
 			p.transform.Reset;
 		end if;
+
+		declare
+			bf: BigFile;
+		begin
+			bf.Open(cf("terrain").Value);
+			declare
+				s: string(1..integer(bf.size));
+				for s'address use bf.address;
+			begin
+				p.terrain.Initialise(s, "(xyz: vector*3, boundingRadius: real): (rgb: vector*3)");
+			end;
+		end;
 	end;
 
 	function TestIntersection(p: Planet; r: Ray; rayEntry, rayExit: in out Point)
