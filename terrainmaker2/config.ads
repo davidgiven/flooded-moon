@@ -6,6 +6,7 @@ use Ada.Numerics;
 
 package Config is
 	MaxObjects: constant Natural := 10;
+	ProgressBarSize: constant natural := 75;
 
 	type Number is new Interfaces.C.double;
 
@@ -25,5 +26,6 @@ package Config is
 		(n * (Pi / 180.0));
 
 	LF: constant character := ASCII.LF;
+	CR: constant character := ASCII.CR;
 end;
 

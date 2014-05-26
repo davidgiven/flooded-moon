@@ -37,6 +37,7 @@ package body Renderer is
 		end;
  
 		task body Scheduler is
+			progress: integer := -1;
 		begin
 			-- Hand out each scanline in turn to tasks that want things to
 			-- do.
@@ -45,6 +46,28 @@ package body Renderer is
 					y := yy;
 					finished := false;
 				end RequestWorkUnit;
+
+				-- Update progress bar.
+				declare
+					scanline: integer := yy - screen.pixels.data'first(2);
+					p: integer := integer(scanline)*ProgressBarSize /
+						screen.pixels.data'length(2);
+				begin
+					if (p /= progress) then
+						progress := p;
+						
+						Put('[');
+						for i in 1..progress loop
+							Put('=');
+						end loop;
+						for i in (progress+1)..(ProgressBarSize-1) loop
+							Put(' ');
+						end loop;
+						Put("]");
+						Put(CR);
+						Flush;
+					end if;
+				end;
 			end loop;
 
 			-- Now tell each worker thread it's done (each thread will ask
@@ -55,6 +78,8 @@ package body Renderer is
 					finished := true;
 				end RequestWorkUnit;
 			end loop;
+
+			Put(LF);
 		end;
  
 		-- Actually does the rendering. Each of these is self contained and will
