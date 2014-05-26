@@ -53,23 +53,6 @@ package body ConfigFiles is
 
 	end;
 
-	type WrappedString is new Ada.Finalization.Limited_Controlled with
-	record
-		c: chars_ptr;
-	end record;
-
-	procedure Finalize(ws: in out WrappedString) is
-	begin
-		if (ws.c /= Null_Ptr) then
-			Free(ws.c);
-		end if;
-	end;
-
-	procedure WrapString(ws: in out WrappedString; s: string) is
-	begin
-		ws.c := New_String(s);
-	end;
-
 	procedure Adjust(cf: in out ConfigFile) is
 	begin
 		if (cf.impl /= null) then

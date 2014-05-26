@@ -10,6 +10,8 @@ with ConfigFiles;
 with GenericLists;
 with Transforms;
 with Calculon;
+with BigFiles;
+with System.Storage_Elements;
 
 use Ada.Text_IO;
 use Ada.Strings;
@@ -19,6 +21,8 @@ use Vectors;
 use Matrices;
 use ConfigFiles;
 use Transforms;
+use BigFiles;
+use System.Storage_Elements;
 
 procedure Tests is
 	LF: character := ASCII.LF;
@@ -216,6 +220,21 @@ procedure Tests is
 			"CalculonVectorTest fail");
 	end;
 
+	procedure MapTest is
+		bf: BigFile;
+	begin
+		bf.Open("testdata/maptest.dat");
+
+		declare
+			s: string(1..integer(bf.size));
+			for s'address use bf.address;
+		begin
+			Check(
+				s = "Hello, world!",
+				"MapTest fail");
+		end;
+	end;
+
 begin
 	MatrixAndVectorSizes;
 	MatrixInversion;
@@ -225,6 +244,7 @@ begin
 	ListsTest;
 	CalculonTest;
 	CalculonVectorTest;
+	MapTest;
 end;
 
 

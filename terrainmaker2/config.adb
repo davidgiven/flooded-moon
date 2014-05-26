@@ -69,5 +69,18 @@ package body Config is
 		when Invalid_Parameter =>
 			Error("invalid parameter '" & Full_Switch & "'");
 	end;
+
+	procedure Finalize(ws: in out WrappedString) is
+	begin
+		if (ws.c /= Null_Ptr) then
+			Free(ws.c);
+		end if;
+	end;
+
+	procedure WrapString(ws: in out WrappedString; s: string) is
+	begin
+		ws.c := New_String(s);
+	end;
+
 end;
 

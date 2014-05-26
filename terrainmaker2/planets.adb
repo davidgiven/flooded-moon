@@ -2,11 +2,13 @@ with Ada.Text_IO;
 with Config;
 with Matrices;
 with Utils;
+with BigFiles;
 
 use Ada.Text_IO;
 use Config;
 use Matrices;
 use Utils;
+use BigFiles;
 
 package body Planets is
 	procedure Init(p: in out Planet; cf: ConfigFile) is

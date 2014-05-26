@@ -28,5 +28,7 @@ planets:
 		{
 			tilt: 1.5424
 		}
+
+		terrain: "scripts/moon-terrain.cal"
 	}
 }
