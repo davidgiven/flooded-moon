@@ -8,6 +8,7 @@ with Scene;
 with Vectors;
 
 use Config;
+use Config.NumberFunctions;
 use Matrices;
 use ConfigFiles;
 use Transforms;
@@ -17,6 +18,7 @@ use Vectors;
 package Planets is
 	type Planet is tagged limited record
 		cf: ConfigFile;
+		location: Point;
 		nominal_radius: Number;
 		atmospheric_depth: Number;
 

@@ -16,9 +16,16 @@ use Utils;
 
 package body Renderer is
 	function RenderPixel(r: Ray) return Colour is
-		ints: Intersections := ComputeObjectIntersections(r);
+		ints: Intersections;
+		num: natural;
 	begin
-		return (if (ints'length>0) then RGB(1.0, 0.0, 0.0) else RGB(0.0, 1.0, 0.0));
+		ComputeObjectIntersections(r, ints, num);
+		case (num) is
+			when 0 => return RGB(0.0, 0.0, 0.0);
+			when 1 => return RGB(1.0, 0.0, 0.0);
+			when 2 => return RGB(1.0, 1.0, 0.0);
+			when others => return RGB(1.0, 1.0, 1.0);
+		end case;
 	end;
 
 	function Render(width, height: integer) return Image is

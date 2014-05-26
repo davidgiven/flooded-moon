@@ -5,6 +5,8 @@ with Ada.Numerics.Generic_Elementary_Functions;
 use Ada.Numerics;
 
 package Config is
+	MaxObjects: constant Natural := 10;
+
 	type Number is new Interfaces.C.double;
 
 	package NumberFunctions is

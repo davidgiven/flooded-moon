@@ -49,6 +49,15 @@ package body GenericVector is
 		end return;
 	end;
 
+	function Dot(v1, v2: Vector) return Number is
+		d: Number := 0.0;
+	begin
+		for i in Index loop
+			d := d + v1(i)*v2(i);
+		end loop;
+		return d;
+	end;
+
 	function ToString(v: Vector) return string is
 		function cells(x: Index) return string is
 			(Number'image(v(x)) &

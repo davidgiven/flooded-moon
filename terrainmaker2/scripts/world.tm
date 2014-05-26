@@ -4,7 +4,7 @@ camera:
 {
 	hfov: 45
 	aspect: 1.777
-	location: (0, -100000e3, 0)
+	location: (0, -10000e3, 0)
 	forward: (0, 1, 0)
 	up: (0, 0, 1)
 }

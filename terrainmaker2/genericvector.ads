@@ -15,6 +15,7 @@ package GenericVector is
 
 	function Length(v: Vector) return Number;
 	function Normalise(v: Vector) return Vector;
+	function Dot(v1, v2: Vector) return Number;
 	function ToString(v: Vector) return string;
 end;
 

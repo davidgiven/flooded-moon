@@ -1,5 +1,5 @@
 with Ada.Text_IO;
-with Ada.Containers.Generic_Array_Sort;
+with Ada.Containers.Generic_Sort;
 with Config;
 with ConfigFiles;
 with Planets;
@@ -70,50 +70,49 @@ package body Scene is
 	begin
 		t.Reset;
 		t.Rotate(camera_up, xdegPerPixel * Number(x));
-		t.Rotate(camera_right, ydegPerPixel * Number(x));
+		t.Rotate(camera_right, ydegPerPixel * Number(y));
 		dir := t.Transform(camera_forward);
 		return Ray'(camera_location, dir);
 	end;
 
-	function ComputeObjectIntersections(r: Ray) return Intersections is
-		maxObjects: natural := planets_list.Length;
-		list: Intersections(0..maxObjects);
-		hitObjects: natural := 0;
-
+	procedure ComputeObjectIntersections(r: Ray;
+			ints: in out Intersections; num: in out natural) is
 		procedure TestSingleObject(p: Planet; i: in out Intersection;
 				index: natural) is
 		begin
 			if p.TestIntersection(r, i.rayEntry, i.rayExit) then
 				i.planet := index;
-				hitObjects := hitObjects + 1;
+				num := num + 1;
 			end if;
 		end;
 
-		function Comparator(left, right: Intersection) return boolean is
-			leftDistance: Number := Length(left.rayEntry - r.location);
-			rightDistance: Number := Length(right.rayEntry - r.location);
+		function Before(left, right: natural) return boolean is
+			leftDistance: Number := Length(ints(left).rayEntry - r.location);
+			rightDistance: Number := Length(ints(right).rayEntry - r.location);
 		begin
 			return leftDistance < rightDistance;
 		end;
+
+		procedure Swap(a, b: natural) is
+			t: Intersection := ints(a);
+		begin
+			ints(a) := ints(b);
+			ints(b) := t;
+		end;
+
+		procedure Sort is new Ada.Containers.Generic_Sort(
+				Index_Type => natural,
+				Swap => Swap,
+				Before => Before);
 	begin
+		num := 0;
 		for index in (planets_list.First_Index)..(planets_list.Last_Index) loop
-			TestSingleObject(planets_list(index), list(hitObjects), index);
+			TestSingleObject(planets_list(index), ints(num), index);
 		end loop;
 
-		-- Produce a correctly-sized array of intersections, from nearest to
-		-- furthest.
-		declare
-			smallerList: Intersections := list(list'first..(hitObjects-1));
-
-			procedure Sort is new Ada.Containers.Generic_Array_Sort(
-					Index_Type => natural,
-					Element_Type => Intersection,
-					Array_Type => Intersections,
-					"<" => Comparator);
-		begin
-			Sort(smallerList);
-			return smallerList;
-		end;
+		if (num > 1) then
+			Sort(0, num-1);
+		end if;
 	end;
 end;
 

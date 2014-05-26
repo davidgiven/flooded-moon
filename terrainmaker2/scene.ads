@@ -1,8 +1,10 @@
 with Vectors;
 with Images;
+with Config;
 
 use Vectors;
 use Images;
+use Config;
 
 package Scene is
 	type Ray is record
@@ -15,10 +17,11 @@ package Scene is
 		rayEntry: Point;
 		rayExit: Point;
 	end record;
-	type Intersections is array(natural range <>) of Intersection;
+	type Intersections is array(natural range 0..MaxObjects) of Intersection;
 
 	procedure Load(filename: string);
 	function ComputePrimaryRay(x, y: integer; img: Image) return Ray;
-	function ComputeObjectIntersections(r: Ray) return Intersections;
+	procedure ComputeObjectIntersections(r: Ray;
+		ints: in out Intersections; num: in out natural);
 end;
 
