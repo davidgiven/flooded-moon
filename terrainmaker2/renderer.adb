@@ -16,6 +16,12 @@ use Utils;
 
 package body Renderer is
 	function Render(width, height: integer) return Image is
+ 		thread_count: integer := (
+			if (Options.Number_Of_Threads = 0)
+			then integer(System.Multiprocessors.Number_Of_CPUs)
+			else Options.Number_Of_Threads
+		);
+
 		screen: Image := Images.Create(width, height);
 
 		task Scheduler is
@@ -59,7 +65,7 @@ package body Renderer is
 
 			-- Now tell each worker thread it's done (each thread will ask
 			-- once).
-			for i in 1..System.Multiprocessors.Number_Of_CPUs loop
+			for i in 1..thread_count loop
 				accept RequestWorkUnit(y: out integer; finished: out boolean) do
 					y := 0;
 					finished := true;
@@ -97,18 +103,14 @@ package body Renderer is
 		end;
  
 	begin
-		Put_Line("Rendering with" & System.Multiprocessors.Number_Of_CPUs'img &
-			" threads");
-
 		declare
 			-- Create some work threads (which will automatically start).
-			scanlines: array(System.Multiprocessors.CPU_Range
-				range 1..System.Multiprocessors.Number_Of_CPUs) of Worker;
+			scanlines: array(1..thread_count) of Worker;
 		begin
 			null; -- just wait for threads to exit
 		end;
 
-		Put_Line("done");
+		Put_Line(LF & "done");
 		return screen;
 	end;
 end;

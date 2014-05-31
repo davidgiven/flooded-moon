@@ -11,6 +11,7 @@ with Colours;
 
 use Ada.Text_IO;
 use Config;
+use Config.NumberFunctions;
 use ConfigFiles;
 use Planets;
 use Vectors;
@@ -117,23 +118,61 @@ package body Scene is
 		end if;
 	end;
 
+	procedure AccumulateSamplesThroughPlanet(p: Planet; int: Intersection;
+			r: Ray; emission, transmission: in out Colour) is
+		t: Number := 0.0;
+		maxt: Number := Length(int.rayExit - int.rayEntry);
+		loc: Point;
+		stepSize: Number;
+
+		light: Colour := RGB(1.0, 1.0, 1.0);
+		inscattering: Colour;
+		deltaTransmission: number;
+		kappa: number;
+		albedo: Colour;
+	begin
+		while (t < maxt) loop
+			loc := int.rayEntry + r.direction*t;
+			stepSize := 1000.0; -- one km
+
+			-- Is this sample underground?
+			if p.IsPointUnderground(loc) then
+				-- Ray gets stoppped by ground.
+				emission := Mix(emission, RGB(1.0, 0.0, 0.0), transmission);
+				transmission := RGB(0.0, 0.0, 0.0);
+				return;
+			end if;
+			albedo := (0.0, 1.0, 0.0);
+			kappa := 0.00001;
+
+			transmission := transmission * exp(-kappa * stepSize);
+			inscattering := albedo * kappa * stepSize * light;
+			emission := Mix(emission, inscattering, transmission);
+
+			-- Stop iterating if we're unlikely to see any more down this
+			-- ray.
+			exit when Length2(transmission) < 0.01;
+
+			t := t + stepSize;
+		end loop;
+
+		-- Ray escapes into space.
+	end;
+
 	function ComputePixelColour(r: Ray) return Colour is
 		ints: Intersections;
 		num: natural;
+		emission: Colour := RGB(0.0, 0.0, 0.0);
+		transmission: Colour := RGB(1.0, 1.0, 1.0);
 	begin
 		ComputeObjectIntersections(r, ints, num);
-		if (num = 0) then
-			return RGB(0.0, 0.0, 0.0);
-		else
-			declare
-				p: Planets.Lists.Ref := planets_list(ints(0).planet);
-				locRelToPlanet: Point := ints(0).rayEntry - p.location;
-				pixelColour: Vector3;
-			begin
-				p.terrain.Call.all(locRelToPlanet, p.bounding_radius, pixelColour);
-				return RGB(pixelColour(0), pixelColour(1), pixelColour(2));
-			end;
-		end if;
+		for i in 0..(num-1) loop
+			AccumulateSamplesThroughPlanet(
+					planets_list(ints(i).planet), ints(i), r,
+					emission, transmission);
+		end loop;
+
+		return Mix(emission, RGB(0.0, 0.0, 1.0), transmission);
 	end;
 
 end;

@@ -29,12 +29,16 @@ package body Planets is
 		declare
 			bf: BigFile;
 		begin
-			bf.Open(cf("terrain").Value);
+			bf.Open(cf("terrain_radius_func").Value);
 			declare
 				s: string(1..integer(bf.size));
 				for s'address use bf.address;
 			begin
-				p.terrain.Initialise(s, "(xyz: vector*3, boundingRadius: real): (rgb: vector*3)");
+				p.terrain_radius_func.Initialise(s, "(" &
+					"xyz: vector*3," & 
+					"boundingRadius: real," &
+					"nominalRadius: real" &
+					"): (radius: real)");
 			end;
 		end;
 	end;
@@ -58,6 +62,22 @@ package body Planets is
 		rayEntry := r.location + r.direction*(tca-thc);
 		rayExit := r.location + r.direction*(tca+thc);
 		return true;
+	end;
+
+	function GetActualRadius(p: Planet; xyz: Point) return number is
+		normalised_xyz: Point := NormaliseToSphere(xyz, p.nominal_radius);
+		radius: number;
+	begin
+		p.terrain_radius_func.Call.all(normalised_xyz, p.bounding_radius,
+			p.nominal_radius, radius);
+		return radius;
+	end;
+
+	function IsPointUnderground(p: Planet; xyz: Point) return boolean is
+		xyzr: number := Length(xyz);
+		realr: number := p.GetActualRadius(xyz);
+	begin
+		return xyzr < realr;
 	end;
 end;
 

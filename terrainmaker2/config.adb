@@ -14,6 +14,7 @@ package body Config is
 	width_option: aliased integer;
 	height_option: aliased integer;
 	scene_filename_option: aliased String_Access;
+	number_of_threads_option: aliased integer;
 
 	package body Options is
 		function Output_Filename return string is
@@ -24,6 +25,8 @@ package body Config is
 			(height_option);
 		function Scene_Filename return string is
 			(scene_filename_option.all);
+		function Number_Of_Threads return integer is
+			(number_of_threads_option);
 	end;
 
 	cmdline: Command_Line_Configuration;
@@ -46,6 +49,10 @@ package body Config is
 			Long_Switch => "--scene=",
 			Help => "Supply scene description");
 
+		Define_Switch(cmdline, number_of_threads_option'access, "-s:",
+			Long_Switch => "--threads=",
+			Help => "Number of threads to use for rendering (0 = all cores)");
+
 		Getopt(cmdline);
 
 		if (Gnat.Command_Line.Get_Argument /= "") then
@@ -59,6 +66,9 @@ package body Config is
 		end if;
 		if (Options.Scene_Filename'length = 0) then
 			Error("must specify a scene description");
+		end if;
+		if (Options.Number_Of_Threads < 0) then
+			Error("a negative number of threads? Really?");
 		end if;
 	exception
 		when Exit_From_Command_Line =>

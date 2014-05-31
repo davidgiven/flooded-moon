@@ -29,6 +29,7 @@ package Config is
 		function Width return integer;
 		function Height return integer;
 		function Scene_Filename return string;
+		function Number_Of_Threads return integer;
 	end;
 
 	procedure ParseOptions;

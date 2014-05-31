@@ -17,7 +17,7 @@ planets:
 		atmospheric_depth: 0
 		location: (0, 149597871e6, 0)
 
-		terrain: "scripts/sun-terrain.cal"
+		terrain_radius_func: "scripts/sun-terrain.cal"
 	}
 
 	moon:
@@ -31,6 +31,6 @@ planets:
 			tilt: 1.5424
 		}
 
-		terrain: "scripts/moon-terrain.cal"
+		terrain_radius_func: "scripts/moon-terrain.cal"
 	}
 }
