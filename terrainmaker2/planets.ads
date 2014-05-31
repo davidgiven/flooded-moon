@@ -7,6 +7,7 @@ with Transforms;
 with Scene;
 with Vectors;
 with Calculon;
+with Colours;
 
 use Config;
 use Config.NumberFunctions;
@@ -15,6 +16,7 @@ use ConfigFiles;
 use Transforms;
 use Scene;
 use Vectors;
+use Colours;
 
 package Planets is
 	type TerrainRadiusFunc is access procedure(
@@ -26,12 +28,25 @@ package Planets is
 	pragma Convention(C, TerrainRadiusFunc);
 	package TerrainRadiusCalculon is new Calculon(TerrainRadiusFunc);
 
+	type AtmosphereFunc is access procedure(
+			xyz: Point;
+			boundingRadius: number;
+			nominalRadius: number;
+			sunDirection: vector3;
+			sunColour: Colour;
+			extinction: in out Colour;
+			emission: in out Colour
+		);
+	pragma Convention(C, AtmosphereFunc);
+	package AtmosphereCalculon is new Calculon(AtmosphereFunc);
+
 	type Planet is tagged limited record
 		cf: ConfigFile;
 		location: Point;
 		nominal_radius: Number;
 		atmospheric_depth: Number;
 		terrain_radius_func: TerrainRadiusCalculon.Func;
+		atmosphere_func: AtmosphereCalculon.Func;
 
 		bounding_radius: Number;
 		transform: TransformMatrix;
@@ -48,6 +63,8 @@ package Planets is
 			return number;
 	function IsPointUnderground(p: Planet; xyz: Point)
 			return boolean;
+	procedure SampleAtmosphere(p: Planet; xyz: Point; sunDir: Vector3;
+			sunColour: Colour; extinction: out Colour; emission: out Colour);
 
 	package Lists is new GenericLists(Planet);
 	subtype List is Lists.List;

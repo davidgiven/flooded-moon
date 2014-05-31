@@ -1,0 +1,4 @@
+let extinction = [0.0, 0.0, 0.0] in
+let emission = [0.0, 0.003, 0.0] in
+return
+

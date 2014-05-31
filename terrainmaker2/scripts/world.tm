@@ -15,9 +15,11 @@ planets:
 	{
 		nominal_radius: 695500e3
 		atmospheric_depth: 0
-		location: (0, 149597871e6, 0)
+		location: (2.8e10, 149597871e3, 0)
+		colour: (1, 1, 1)
 
 		terrain_radius_func: "scripts/sun-terrain.cal"
+		atmosphere_func: "scripts/moon-atmosphere.cal"
 	}
 
 	moon:
@@ -32,5 +34,6 @@ planets:
 		}
 
 		terrain_radius_func: "scripts/moon-terrain.cal"
+		atmosphere_func: "scripts/moon-atmosphere.cal"
 	}
 }

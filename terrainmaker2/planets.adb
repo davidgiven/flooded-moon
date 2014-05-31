@@ -26,21 +26,30 @@ package body Planets is
 			p.transform.Reset;
 		end if;
 
-		declare
-			bf: BigFile;
-		begin
-			bf.Open(cf("terrain_radius_func").Value);
-			declare
-				s: string(1..integer(bf.size));
-				for s'address use bf.address;
-			begin
-				p.terrain_radius_func.Initialise(s, "(" &
+		p.terrain_radius_func.InitialiseFromFile(
+			cf("terrain_radius_func").Value,
+			"(" &
+				"xyz: vector*3," & 
+				"boundingRadius: real," &
+				"nominalRadius: real" &
+			"): (" & 
+				"radius: real" &
+			")");
+
+		if (p.atmospheric_depth > 0.0) then
+			p.atmosphere_func.InitialiseFromFile(
+				cf("atmosphere_func").Value,
+				"(" &
 					"xyz: vector*3," & 
 					"boundingRadius: real," &
-					"nominalRadius: real" &
-					"): (radius: real)");
-			end;
-		end;
+					"nominalRadius: real," &
+					"sunDirection: vector*3," &
+					"sunColour: vector*3" &
+				"): (" & 
+					"extinction: vector*3," &
+					"emission: vector*3" &
+				")");
+		end if;
 	end;
 
 	function TestIntersection(p: Planet; r: Ray; rayEntry, rayExit: in out Point)
@@ -78,6 +87,14 @@ package body Planets is
 		realr: number := p.GetActualRadius(xyz);
 	begin
 		return xyzr < realr;
+	end;
+
+	procedure SampleAtmosphere(p: Planet; xyz: Point; sunDir: Vector3;
+			sunColour: Colour; extinction: out Colour; emission: out Colour) is
+	begin
+		p.atmosphere_func.Call.all(xyz, p.bounding_radius, p.nominal_radius,
+				sunDir, sunColour,
+				extinction, emission);
 	end;
 end;
 

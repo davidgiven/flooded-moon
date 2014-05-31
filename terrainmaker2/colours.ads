@@ -1,6 +1,9 @@
 with Config;
+with ConfigFiles;
 
 use Config;
+use Config.NumberFunctions;
+use ConfigFiles;
 
 package Colours is
 	type ElementArray is array(0..3) of number;
@@ -10,6 +13,8 @@ package Colours is
 		g: Number := 0.0;
 		b: Number := 0.0;
 	end record;
+	pragma Convention(C, Colour);
+	for Colour'alignment use (4*8);
 
 	function RGB(r, g, b: Number) return Colour is
 		(r, g, b);
@@ -36,5 +41,15 @@ package Colours is
 		(n/c.r, n/c.g, n/c.b);
 	function "+" (c1, c2: Colour) return Colour is
 		(c1.r+c2.r, c1.g+c2.g, c1.b+c2.b);
+	function "-" (c: Colour) return Colour is
+		(-c.r, -c.g, -c.b);
+
+	function exp(c: Colour) return Colour is
+		(exp(c.r), exp(c.g), exp(c.b));
+
+	function ToString(c: Colour) return string is
+		("(" & c.r'img & "," & c.g'img & "," & c.b'img & ")");
+
+	function Load(cf: ConfigFile) return Colour;
 end;
 

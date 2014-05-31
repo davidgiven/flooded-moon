@@ -14,6 +14,8 @@ package Calculon is
 	end record;
 
 	procedure Initialise(cf: in out Func; code, signature: string);
+	procedure InitialiseFromFile(cf: in out Func;
+			filename: string; signature: string);
 	procedure Finalize(cf: in out Func);
 
 	function Call(cf: Func) return T;

@@ -207,17 +207,19 @@ procedure Tests is
 	end;
 
 	procedure CalculonVectorTest is
-		type TestFunc is access procedure(i: Number; r: out Vector3);
+		type TestFunc is access procedure(i: Number; r1, r2: out Vector3);
 		package TestCalculon is new Calculon(TestFunc);
 		use TestCalculon;
 		func: TestCalculon.Func;
-		n: Vector3;
+		n1, n2: Vector3;
 	begin
-		Initialise(func, "let r=[i,i,i] in return", "(i: real): (r: vector*3)");
-		func.Call.all(1.0, n);
+		Initialise(func, "let r1=[1,1,1] in let r2=[2,2,2] in return",
+			"(i: real): (r1: vector*3, r2: vector*3)");
+		func.Call.all(1.0, n1, n2);
 		Check(
-			(n(0) = 1.0) and (n(1) = 1.0) and (n(2) = 1.0),
-			"CalculonVectorTest fail");
+			(n1(0) = 1.0) and (n1(1) = 1.0) and (n1(2) = 1.0) and
+			(n2(0) = 2.0) and (n2(1) = 2.0) and (n2(2) = 2.0),
+			"CalculonVectorTest fail; n1=" & ToString(n1) & " n2=" & ToString(n2));
 	end;
 
 	procedure MapTest is

@@ -103,6 +103,8 @@ package body Renderer is
 		end;
  
 	begin
+		Put_Line("Rendering with" & thread_count'img & " threads");
+
 		declare
 			-- Create some work threads (which will automatically start).
 			scanlines: array(1..thread_count) of Worker;

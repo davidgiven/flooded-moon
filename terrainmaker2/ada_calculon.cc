@@ -31,7 +31,9 @@ extern "C" Function* ada_calculon_create(const char* code,
 {
 	try
 	{
-		return new Function(code, signature);
+		Function* f = new Function(code, signature);
+		//f->compiledFunction.dump();
+		return f;
 	}
 	catch (const Compiler::CompilationException e)
 	{

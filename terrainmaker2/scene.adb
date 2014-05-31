@@ -24,6 +24,7 @@ package body Scene is
 	scene_cf: ConfigFile := ConfigFiles.Create;
 	planets_list: Planets.List;
 	sun: integer := -1;
+	sunColour: Colour;
 	hfov, vfov: Number;
 	camera_location: Point;
 	camera_forward: Vector3;
@@ -57,6 +58,7 @@ package body Scene is
 
 				if (cf(i).Name = "sun") then
 					sun := i;
+					sunColour := Load(cf(i)("colour"));
 				end if;
 			end loop;
 		end;
@@ -122,32 +124,36 @@ package body Scene is
 			r: Ray; emission, transmission: in out Colour) is
 		t: Number := 0.0;
 		maxt: Number := Length(int.rayExit - int.rayEntry);
-		loc: Point;
+		loc, ploc: Point;
 		stepSize: Number;
 
-		light: Colour := RGB(1.0, 1.0, 1.0);
-		inscattering: Colour;
-		deltaTransmission: number;
-		kappa: number;
-		albedo: Colour;
+		sunObject: Planet renames planets_list(sun);
+		sunDir: Vector3;
+		extinctionHere, emissionHere: Colour;
 	begin
 		while (t < maxt) loop
 			loc := int.rayEntry + r.direction*t;
+			ploc := loc - p.location;
 			stepSize := 1000.0; -- one km
+			sunDir := loc - sunObject.location;
 
 			-- Is this sample underground?
-			if p.IsPointUnderground(loc) then
+			if p.IsPointUnderground(ploc) then
 				-- Ray gets stoppped by ground.
-				emission := Mix(emission, RGB(1.0, 0.0, 0.0), transmission);
+				emission := emission + transmission*RGB(1.0, 0.0, 0.0);
 				transmission := RGB(0.0, 0.0, 0.0);
 				return;
 			end if;
-			albedo := (0.0, 1.0, 0.0);
-			kappa := 0.00001;
+			if (p.atmospheric_depth > 0.0) then
+				p.SampleAtmosphere(ploc, sunDir, sunColour,
+						extinctionHere, emissionHere);
+			else
+				extinctionHere := (0.0, 0.0, 0.0);
+				emissionHere := (0.0, 0.0, 0.0);
+			end if;
 
-			transmission := transmission * exp(-kappa * stepSize);
-			inscattering := albedo * kappa * stepSize * light;
-			emission := Mix(emission, inscattering, transmission);
+			transmission := transmission * exp(-extinctionHere * stepSize);
+			emission := emission + transmission * emissionHere;
 
 			-- Stop iterating if we're unlikely to see any more down this
 			-- ray.
@@ -172,7 +178,7 @@ package body Scene is
 					emission, transmission);
 		end loop;
 
-		return Mix(emission, RGB(0.0, 0.0, 1.0), transmission);
+		return emission; --Mix(emission, RGB(0.0, 0.0, 1.0), transmission);
 	end;
 
 end;
