@@ -81,11 +81,13 @@ package body Scene is
 	end;
 
 	procedure ComputeObjectIntersections(r: Ray;
-			ints: out Intersections; num: out natural) is
+			ints: out Intersections; num: out natural;
+			Clip_Against_Atmosphere: boolean := true) is
 		procedure TestSingleObject(p: Planet; i: in out Intersection;
 				index: natural) is
 		begin
-			if p.TestIntersection(r, i.rayEntry, i.rayExit) then
+			if p.TestIntersection(r, i.rayEntry, i.rayExit,
+					Clip_Against_Atmosphere => Clip_Against_Atmosphere) then
 				i.planet := index;
 				num := num + 1;
 			end if;
@@ -120,6 +122,25 @@ package body Scene is
 		end if;
 	end;
 
+	function SunlightFromPoint(p: Planet;
+			loc: Point; sunDir: Vector3) return Colour is
+		r: Ray;
+		ints: Intersections;
+		num: natural;
+	begin
+		r.location := loc;
+		r.direction := sunDir;
+		-- Crudely intersect the ray of light with our objects
+		-- to see if we're in eclipse.
+		ComputeObjectIntersections(r, ints, num,
+			Clip_Against_Atmosphere => false);
+		if (num > 0) and (ints(0).planet = sun) then
+			return sunColour;
+		else
+			return Black;
+		end if;
+	end;
+
 	procedure AccumulateSamplesThroughPlanet(p: Planet; int: Intersection;
 			r: Ray; emission, transmission: in out Colour) is
 		t: Number := 0.0;
@@ -128,30 +149,34 @@ package body Scene is
 		stepSize: Number;
 
 		sunObject: Planet renames planets_list(sun);
+		sunlight: Colour;
 		sunDir, cameraDir: Vector3;
 		kappaHere, extinctionHere, emissionHere: Colour;
 	begin
 		while (t < maxt) loop
-			loc := int.rayEntry + r.direction*t;
+			-- Sample half-way along this segment (for slightly better
+			-- accuracy).
+			loc := int.rayEntry + r.direction*t*0.5;
 			ploc := loc - p.location;
 			stepSize := 1000.0; -- one km
-			sunDir := Normalise(loc - sunObject.location);
-			cameraDir := Normalise(loc - camera_location);
+			sunDir := Normalise(sunObject.location - loc);
+			cameraDir := Normalise(camera_location - loc);
+			sunlight := SunlightFromPoint(p, loc, sunDir);
 
 			-- Is this sample underground?
 			if p.IsPointUnderground(ploc) then
 				-- Ray gets stoppped by ground.
-				emission := emission + transmission*RGB(0.0, 0.0, 0.0);
-				transmission := RGB(0.0, 0.0, 0.0);
+				emission := emission + transmission*RGB(0.5, 0.0, 0.0)*sunlight;
+				transmission := Black;
 				return;
 			end if;
 			if (p.atmospheric_depth > 0.0) then
-				p.SampleAtmosphere(ploc, cameraDir, sunDir, sunColour,
+				p.SampleAtmosphere(ploc, cameraDir, sunDir, sunlight,
 						kappaHere, extinctionHere, emissionHere);
 			else
 				kappaHere := (1.0, 1.0, 1.0);
-				extinctionHere := (0.0, 0.0, 0.0);
-				emissionHere := (0.0, 0.0, 0.0);
+				extinctionHere := Black;
+				emissionHere := Black;
 			end if;
 
 			transmission := transmission * kappaHere * exp(-extinctionHere * stepSize);

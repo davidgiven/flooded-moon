@@ -57,7 +57,8 @@ package Planets is
 	procedure Init(p: in out Planet; cf: ConfigFile);
 	-- These take WORLD coordinates.
 	function TestIntersection(p: Planet; r: Ray;
-			rayEntry, rayExit: in out Point)
+			rayEntry, rayExit: in out Point;
+			Clip_Against_Atmosphere: boolean := true)
 			return boolean;
 
 	-- These take PLANET coordinates.

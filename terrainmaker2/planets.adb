@@ -54,10 +54,17 @@ package body Planets is
 		end if;
 	end;
 
-	function TestIntersection(p: Planet; r: Ray; rayEntry, rayExit: in out Point)
+	function TestIntersection(p: Planet;
+				r: Ray; rayEntry, rayExit: in out Point;
+				Clip_Against_Atmosphere: boolean := true)
 			return boolean is
 		tca, d2, thc: Number;
-		radius2: Number := p.bounding_radius**2;
+		thcn, thcp: Number;
+		radius: Number :=
+			(if Clip_Against_Atmosphere then
+				p.bounding_radius else
+				p.nominal_radius);
+		radius2: Number := radius**2;
 		L: Vector3 := p.location - r.location;
 	begin
 		tca := Dot(L, r.direction);
@@ -70,8 +77,13 @@ package body Planets is
 		end if;
 
 		thc := sqrt(radius2 - d2);
-		rayEntry := r.location + r.direction*(tca-thc);
-		rayExit := r.location + r.direction*(tca+thc);
+		thcn := tca - thc;
+		thcp := tca + thc;
+		if (thcn < 0.0) then
+			thcn := 0.0;
+		end if;
+		rayEntry := r.location + r.direction*thcn;
+		rayExit := r.location + r.direction*thcp;
 		return true;
 	end;
 

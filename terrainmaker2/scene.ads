@@ -24,7 +24,8 @@ package Scene is
 	procedure Load(filename: string);
 	function ComputePrimaryRay(x, y: integer; img: Image) return Ray;
 	procedure ComputeObjectIntersections(r: Ray;
-		ints: out Intersections; num: out natural);
+		ints: out Intersections; num: out natural;
+		Clip_Against_Atmosphere: boolean := true);
 	function ComputePixelColour(r: Ray) return Colour;
 end;
 

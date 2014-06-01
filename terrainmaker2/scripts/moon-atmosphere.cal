@@ -26,33 +26,34 @@ let PI = 3.1415926535898 in
 let dot(x: vector*3, y: vector*3): real =
 	(x*y).sum in
 
-let size(x: vector*3): real =
+let magnitude(x: vector*3): real =
 	sqrt(dot(x, x)) in
 
 let rayleighPhase(camera: vector*3, sun: vector*3): real =
-	let cosdir = dot(camera, sun) in
-	(3/16*PI) * (1 + cosdir*cosdir) in
+	let mu = dot(camera, sun) in
+	(3/16*PI) * (1 + mu*mu) in
 
-let altitude = size(xyz) - nominalRadius in
-let scaleAltitude = 25e3 in // metres
+let altitude = magnitude(xyz) - nominalRadius in
+let scaleAltitude = 13e3 in // metres
 let n = 1.000293 in
-let N = 1e23 in // picked arbitrarily
+let N = 5e22 in //2.415e25 in //1e23 in // picked arbitrarily
 let RED = 680e-9 in // m
 let GREEN = 550e-9 in // m
 let BLUE = 440e-9 in // m
 
 let rayleighExpTerm = exp(-altitude / scaleAltitude) in
 
-let rayleighLeftTerm(lambda) =
-	(8 * PI*PI*PI * (n*n - 1)*(n*n - 1)) / (3 * N * pow(lambda, 4)) in
+let rayleighBeta0(lambda) =
+	(8 * pow(PI, 3) * pow((n*n - 1), 2)) / (3 * N * pow(lambda, 4)) in
 
 let phase = rayleighPhase(cameraDirection, sunDirection) in
-let rayleighRed = sunColour.x * phase * rayleighLeftTerm(RED) * rayleighExpTerm in
-let rayleighGreen = sunColour.y * phase * rayleighLeftTerm(GREEN) * rayleighExpTerm in
-let rayleighBlue = sunColour.z * phase * rayleighLeftTerm(BLUE) * rayleighExpTerm in
+let rayleighRed = phase * rayleighBeta0(RED) * rayleighExpTerm in
+let rayleighGreen = phase * rayleighBeta0(GREEN) * rayleighExpTerm in
+let rayleighBlue = phase * rayleighBeta0(BLUE) * rayleighExpTerm in
+let rayleighRGB = [rayleighRed, rayleighGreen, rayleighBlue] in
 
 let kappa = [*3 1] in
 let extinction = [*3 0] in
-let emission = [rayleighRed, rayleighGreen, rayleighBlue] in
+let emission = rayleighRGB * sunColour in
 return
 

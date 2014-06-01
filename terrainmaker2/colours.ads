@@ -16,6 +16,8 @@ package Colours is
 	pragma Convention(C, Colour);
 	for Colour'alignment use (4*8);
 
+	Black: constant Colour := (0.0, 0.0, 0.0);
+
 	function RGB(r, g, b: Number) return Colour is
 		(r, g, b);
 	function Mix(c1, c2: Colour; a: Number) return Colour;
