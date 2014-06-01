@@ -32,8 +32,10 @@ package Planets is
 			xyz: Point;
 			boundingRadius: number;
 			nominalRadius: number;
+			cameraDirection: vector3;
 			sunDirection: vector3;
 			sunColour: Colour;
+			kappa: in out Colour;
 			extinction: in out Colour;
 			emission: in out Colour
 		);
@@ -63,8 +65,10 @@ package Planets is
 			return number;
 	function IsPointUnderground(p: Planet; xyz: Point)
 			return boolean;
-	procedure SampleAtmosphere(p: Planet; xyz: Point; sunDir: Vector3;
-			sunColour: Colour; extinction: out Colour; emission: out Colour);
+	procedure SampleAtmosphere(p: Planet; xyz: Point;
+			cameraDirection, sunDirection: Vector3;
+			sunColour: Colour;
+			kappa: out Colour; extinction: out Colour; emission: out Colour);
 
 	package Lists is new GenericLists(Planet);
 	subtype List is Lists.List;

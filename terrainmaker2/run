@@ -1,3 +1,4 @@
 #!/bin/sh
+#exec ./terrainmaker --threads 0 -ofoo.pnm -W1920 -H1080 -s scripts/world.tm
 exec ./terrainmaker --threads 0 -ofoo.pnm -W800 -H480 -s scripts/world.tm
 

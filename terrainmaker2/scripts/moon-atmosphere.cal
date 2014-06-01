@@ -1,4 +1,58 @@
-let extinction = [0.0, 0.0, 0.0] in
-let emission = [0.0, 0.003, 0.0] in
+let PI = 3.1415926535898 in
+
+// Okay, Rayleigh scattering. For the scattering factor:
+//
+//                    8 * pi^3 * (n^2 - 1)^2       -h
+//  beta(h, lambda) = ---------------------- * exp(--)
+//                         3*N*lambda^4            Hr
+//
+// h: height above sea level
+// Hr: scale height
+// lambda: wavelength of light
+// n: index of refraction of air
+// N: density at sea level
+// 
+// And for the phase:
+// 
+//             3
+//  Pr(mu) = ----- * (1 + mu^2)
+//           16*pi
+//
+// mu: cos of angle between sun and camera.
+//
+// The final emitted light is sunlight * beta * Pr. Simple enough,
+// right? Ha.
+
+let dot(x: vector*3, y: vector*3): real =
+	(x*y).sum in
+
+let size(x: vector*3): real =
+	sqrt(dot(x, x)) in
+
+let rayleighPhase(camera: vector*3, sun: vector*3): real =
+	let cosdir = dot(camera, sun) in
+	(3/16*PI) * (1 + cosdir*cosdir) in
+
+let altitude = size(xyz) - nominalRadius in
+let scaleAltitude = 25e3 in // metres
+let n = 1.000293 in
+let N = 1e23 in // picked arbitrarily
+let RED = 680e-9 in // m
+let GREEN = 550e-9 in // m
+let BLUE = 440e-9 in // m
+
+let rayleighExpTerm = exp(-altitude / scaleAltitude) in
+
+let rayleighLeftTerm(lambda) =
+	(8 * PI*PI*PI * (n*n - 1)*(n*n - 1)) / (3 * N * pow(lambda, 4)) in
+
+let phase = rayleighPhase(cameraDirection, sunDirection) in
+let rayleighRed = sunColour.x * phase * rayleighLeftTerm(RED) * rayleighExpTerm in
+let rayleighGreen = sunColour.y * phase * rayleighLeftTerm(GREEN) * rayleighExpTerm in
+let rayleighBlue = sunColour.z * phase * rayleighLeftTerm(BLUE) * rayleighExpTerm in
+
+let kappa = [*3 1] in
+let extinction = [*3 0] in
+let emission = [rayleighRed, rayleighGreen, rayleighBlue] in
 return
 

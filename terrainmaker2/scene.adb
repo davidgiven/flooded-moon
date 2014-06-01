@@ -128,31 +128,33 @@ package body Scene is
 		stepSize: Number;
 
 		sunObject: Planet renames planets_list(sun);
-		sunDir: Vector3;
-		extinctionHere, emissionHere: Colour;
+		sunDir, cameraDir: Vector3;
+		kappaHere, extinctionHere, emissionHere: Colour;
 	begin
 		while (t < maxt) loop
 			loc := int.rayEntry + r.direction*t;
 			ploc := loc - p.location;
 			stepSize := 1000.0; -- one km
-			sunDir := loc - sunObject.location;
+			sunDir := Normalise(loc - sunObject.location);
+			cameraDir := Normalise(loc - camera_location);
 
 			-- Is this sample underground?
 			if p.IsPointUnderground(ploc) then
 				-- Ray gets stoppped by ground.
-				emission := emission + transmission*RGB(1.0, 0.0, 0.0);
+				emission := emission + transmission*RGB(0.0, 0.0, 0.0);
 				transmission := RGB(0.0, 0.0, 0.0);
 				return;
 			end if;
 			if (p.atmospheric_depth > 0.0) then
-				p.SampleAtmosphere(ploc, sunDir, sunColour,
-						extinctionHere, emissionHere);
+				p.SampleAtmosphere(ploc, cameraDir, sunDir, sunColour,
+						kappaHere, extinctionHere, emissionHere);
 			else
+				kappaHere := (1.0, 1.0, 1.0);
 				extinctionHere := (0.0, 0.0, 0.0);
 				emissionHere := (0.0, 0.0, 0.0);
 			end if;
 
-			transmission := transmission * exp(-extinctionHere * stepSize);
+			transmission := transmission * kappaHere * exp(-extinctionHere * stepSize);
 			emission := emission + transmission * emissionHere;
 
 			-- Stop iterating if we're unlikely to see any more down this

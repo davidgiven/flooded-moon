@@ -43,9 +43,11 @@ package body Planets is
 					"xyz: vector*3," & 
 					"boundingRadius: real," &
 					"nominalRadius: real," &
+					"cameraDirection: vector*3," &
 					"sunDirection: vector*3," &
 					"sunColour: vector*3" &
 				"): (" & 
+					"kappa: vector*3," &
 					"extinction: vector*3," &
 					"emission: vector*3" &
 				")");
@@ -89,12 +91,13 @@ package body Planets is
 		return xyzr < realr;
 	end;
 
-	procedure SampleAtmosphere(p: Planet; xyz: Point; sunDir: Vector3;
-			sunColour: Colour; extinction: out Colour; emission: out Colour) is
+	procedure SampleAtmosphere(p: Planet; xyz: Point;
+			cameraDirection, sunDirection: Vector3;
+			sunColour: Colour; kappa, extinction, emission: out Colour) is
 	begin
 		p.atmosphere_func.Call.all(xyz, p.bounding_radius, p.nominal_radius,
-				sunDir, sunColour,
-				extinction, emission);
+				cameraDirection, sunDirection, sunColour,
+				kappa, extinction, emission);
 	end;
 end;
 
