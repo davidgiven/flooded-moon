@@ -35,7 +35,6 @@ package Planets is
 			cameraDirection: vector3;
 			sunDirection: vector3;
 			sunColour: Colour;
-			kappa: in out Colour;
 			extinction: in out Colour;
 			emission: in out Colour
 		);
@@ -69,7 +68,7 @@ package Planets is
 	procedure SampleAtmosphere(p: Planet; xyz: Point;
 			cameraDirection, sunDirection: Vector3;
 			sunColour: Colour;
-			kappa: out Colour; extinction: out Colour; emission: out Colour);
+			extinction, emission: out Colour);
 
 	package Lists is new GenericLists(Planet);
 	subtype List is Lists.List;

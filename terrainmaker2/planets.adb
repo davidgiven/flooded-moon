@@ -47,7 +47,6 @@ package body Planets is
 					"sunDirection: vector*3," &
 					"sunColour: vector*3" &
 				"): (" & 
-					"kappa: vector*3," &
 					"extinction: vector*3," &
 					"emission: vector*3" &
 				")");
@@ -58,32 +57,61 @@ package body Planets is
 				r: Ray; rayEntry, rayExit: in out Point;
 				Clip_Against_Atmosphere: boolean := true)
 			return boolean is
-		tca, d2, thc: Number;
-		thcn, thcp: Number;
-		radius: Number :=
-			(if Clip_Against_Atmosphere then
-				p.bounding_radius else
-				p.nominal_radius);
-		radius2: Number := radius**2;
-		L: Vector3 := p.location - r.location;
+		radius: Number;
+		ro: Vector3;
+		a, b, c, q: Number;
+		disc2, disc: Number;
+		t0, t1: Number;
+
+		procedure Swap(a, b: in out Number) is
+			t: Number;
+		begin
+			t := a;
+			a := b;
+			b := t;
+		end;
 	begin
-		tca := Dot(L, r.direction);
-		if (tca < 0.0) then
-			return false;
+		if Clip_Against_Atmosphere then
+			radius := p.bounding_radius;
+		else
+			radius := p.nominal_radius;
 		end if;
-		d2 := Dot(L, L) - tca**2;
-		if (d2 > radius2) then
+
+		ro := r.location - p.location;
+		a := Dot(r.direction, r.direction);
+		b := 2.0 * Dot(r.direction, ro);
+		c := Dot(ro, ro) - (radius*radius);
+		disc2 := b*b - 4.0*a*c;
+
+		if (disc2 < 0.0) then
+			-- Ray does not intersect sphere at all.
 			return false;
 		end if;
 
-		thc := sqrt(radius2 - d2);
-		thcn := tca - thc;
-		thcp := tca + thc;
-		if (thcn < 0.0) then
-			thcn := 0.0;
+		disc := sqrt(disc2);
+		if (b < 0.0) then
+			q := (-b - disc)/2.0;
+		else
+			q := (-b + disc)/2.0;
 		end if;
-		rayEntry := r.location + r.direction*thcn;
-		rayExit := r.location + r.direction*thcp;
+
+		t0 := q / a;
+		t1 := c / q;
+		if (t0 > t1) then
+			Swap(t0, t1);
+		end if;
+
+		if (t1 < 0.0) then
+			-- The sphere is completely behind the ray.
+			return false;
+		end if;
+		if (t0 < 1.0) then
+			-- Ray start appears to be inside the sphere.
+			t0 := 1.0;
+		end if;
+
+		rayEntry := r.location + r.direction*t0;
+		rayExit := r.location + r.direction*t1;
 		return true;
 	end;
 
@@ -105,11 +133,11 @@ package body Planets is
 
 	procedure SampleAtmosphere(p: Planet; xyz: Point;
 			cameraDirection, sunDirection: Vector3;
-			sunColour: Colour; kappa, extinction, emission: out Colour) is
+			sunColour: Colour; extinction, emission: out Colour) is
 	begin
 		p.atmosphere_func.Call.all(xyz, p.bounding_radius, p.nominal_radius,
 				cameraDirection, sunDirection, sunColour,
-				kappa, extinction, emission);
+				extinction, emission);
 	end;
 end;
 

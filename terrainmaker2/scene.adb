@@ -151,36 +151,41 @@ package body Scene is
 		sunObject: Planet renames planets_list(sun);
 		sunlight: Colour;
 		sunDir, cameraDir: Vector3;
-		kappaHere, extinctionHere, emissionHere: Colour;
+		extinctionHere, emissionHere: Colour;
+		expFactor: Colour;
 	begin
 		while (t < maxt) loop
 			-- Sample half-way along this segment (for slightly better
 			-- accuracy).
-			loc := int.rayEntry + r.direction*t*0.5;
+			loc := int.rayEntry + r.direction*t;
 			ploc := loc - p.location;
 			stepSize := 1000.0; -- one km
 			sunDir := Normalise(sunObject.location - loc);
 			cameraDir := Normalise(camera_location - loc);
 			sunlight := SunlightFromPoint(p, loc, sunDir);
 
-			-- Is this sample underground?
-			if p.IsPointUnderground(ploc) then
-				-- Ray gets stoppped by ground.
-				emission := emission + transmission*RGB(0.5, 0.0, 0.0)*sunlight;
-				transmission := Black;
-				return;
-			end if;
 			if (p.atmospheric_depth > 0.0) then
 				p.SampleAtmosphere(ploc, cameraDir, sunDir, sunlight,
-						kappaHere, extinctionHere, emissionHere);
+						extinctionHere, emissionHere);
 			else
-				kappaHere := (1.0, 1.0, 1.0);
 				extinctionHere := Black;
 				emissionHere := Black;
 			end if;
 
-			transmission := transmission * kappaHere * exp(-extinctionHere * stepSize);
-			emission := emission + transmission * emissionHere;
+			-- Calculate extinction for this segment and update
+			-- cumulative exinction.
+			expFactor := exp(-extinctionHere * stepSize);
+			transmission := transmission*expFactor;
+
+			-- Is this sample underground?
+			if p.IsPointUnderground(ploc) then
+				-- Ray gets stoppped by ground.
+				emissionHere := RGB(1.0, 0.0, 0.0);
+				transmission := Black;
+			end if;
+
+			-- Calculate light colour.
+			emission := emission + expFactor*emissionHere;
 
 			-- Stop iterating if we're unlikely to see any more down this
 			-- ray.
@@ -189,7 +194,7 @@ package body Scene is
 			t := t + stepSize;
 		end loop;
 
-		-- Ray escapes into space.
+		-- Finished with ray.
 	end;
 
 	function ComputePixelColour(r: Ray) return Colour is
@@ -198,7 +203,8 @@ package body Scene is
 		emission: Colour := RGB(0.0, 0.0, 0.0);
 		transmission: Colour := RGB(1.0, 1.0, 1.0);
 	begin
-		ComputeObjectIntersections(r, ints, num);
+		ComputeObjectIntersections(r, ints, num,
+					Clip_Against_Atmosphere => true);
 		for i in 0..(num-1) loop
 			AccumulateSamplesThroughPlanet(
 					planets_list(ints(i).planet), ints(i), r,
