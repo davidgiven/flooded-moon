@@ -142,7 +142,7 @@ package body Scene is
 	end;
 
 	procedure AccumulateSamplesThroughPlanet(p: Planet; int: Intersection;
-			r: Ray; emission, transmission: in out Colour) is
+			r: Ray; emission, transmittance: in out Colour) is
 		t: Number := 0.0;
 		maxt: Number := Length(int.rayExit - int.rayEntry);
 		loc, ploc: Point;
@@ -152,44 +152,53 @@ package body Scene is
 		sunlight: Colour;
 		sunDir, cameraDir: Vector3;
 		extinctionHere, emissionHere: Colour;
-		expFactor: Colour;
+		transmittanceHere: Colour;
+		densityHere: number;
 	begin
+		--Put_Line("sample");
 		while (t < maxt) loop
 			-- Sample half-way along this segment (for slightly better
 			-- accuracy).
 			loc := int.rayEntry + r.direction*t;
 			ploc := loc - p.location;
-			stepSize := 1000.0; -- one km
+			stepSize := 5000.0; -- one km
 			sunDir := Normalise(sunObject.location - loc);
 			cameraDir := Normalise(camera_location - loc);
 			sunlight := SunlightFromPoint(p, loc, sunDir);
 
-			if (p.atmospheric_depth > 0.0) then
+			if p.IsPointUnderground(ploc) then
+				-- Ray gets stoppped by ground.
+				emissionHere := RGB(1.0, 0.0, 0.0);
+				emission := emission + transmittance*emissionHere;
+				transmittance := Black;
+				return;
+			elsif (p.atmospheric_depth > 0.0) then
+				-- Ray travels through atmosphere.
 				p.SampleAtmosphere(ploc, cameraDir, sunDir, sunlight,
-						extinctionHere, emissionHere);
+						extinctionHere, emissionHere, densityHere);
 			else
+				-- Planet *has* no atmosphere! This shouldn't happen; it's
+				-- an edge case --- the next step will likely intercept the
+				-- surface.
 				extinctionHere := Black;
 				emissionHere := Black;
 			end if;
 
-			-- Calculate extinction for this segment and update
-			-- cumulative exinction.
-			expFactor := exp(-extinctionHere * stepSize);
-			transmission := transmission*expFactor;
+			-- Calculate transmittance for this segment (0 means opaque,
+			-- 1.0 means transparent).
+			transmittanceHere := exp(-extinctionHere *
+					densityHere * stepSize);
 
-			-- Is this sample underground?
-			if p.IsPointUnderground(ploc) then
-				-- Ray gets stoppped by ground.
-				emissionHere := RGB(1.0, 0.0, 0.0);
-				transmission := Black;
-			end if;
+			-- Calculate cumulative transmittance and emission.
+			transmittance := transmittance * transmittanceHere;
 
-			-- Calculate light colour.
-			emission := emission + expFactor*emissionHere;
+			-- Colour of this pixel is the colour accumulated so far, plus
+			-- the colour of the new segment attenuated 
+			emission := emission + transmittance*emissionHere*densityHere*stepSize*sunlight;
 
 			-- Stop iterating if we're unlikely to see any more down this
 			-- ray.
-			exit when Length2(transmission) < 0.01;
+			exit when Length2(transmittance) < 0.01;
 
 			t := t + stepSize;
 		end loop;
@@ -200,15 +209,16 @@ package body Scene is
 	function ComputePixelColour(r: Ray) return Colour is
 		ints: Intersections;
 		num: natural;
-		emission: Colour := RGB(0.0, 0.0, 0.0);
-		transmission: Colour := RGB(1.0, 1.0, 1.0);
+		emission: Colour := Black;
+		transmittance: Colour := White;
 	begin
 		ComputeObjectIntersections(r, ints, num,
 					Clip_Against_Atmosphere => true);
 		for i in 0..(num-1) loop
 			AccumulateSamplesThroughPlanet(
 					planets_list(ints(i).planet), ints(i), r,
-					emission, transmission);
+					emission, transmittance);
+			exit when Length2(transmittance) < 0.01;
 		end loop;
 
 		return emission; --Mix(emission, RGB(0.0, 0.0, 1.0), transmission);

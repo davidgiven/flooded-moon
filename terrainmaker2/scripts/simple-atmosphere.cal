@@ -1,0 +1,19 @@
+let dot(x: vector*3, y: vector*3): real =
+	(x*y).sum in
+
+let magnitude(x: vector*3): real =
+	sqrt(dot(x, x)) in
+
+let altitude = magnitude(xyz) - nominalRadius in
+let densityAtSealevel = 0.1 in
+let scaleAltitude = 8e3 in // metres
+
+let expfactor = exp(-altitude / scaleAltitude) in
+
+let emission = [*3 0.0001] in
+let extinction = [*3 0.0001] in
+
+let density = densityAtSealevel * expfactor in
+
+return
+

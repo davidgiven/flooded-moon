@@ -17,6 +17,7 @@ package Colours is
 	for Colour'alignment use (4*8);
 
 	Black: constant Colour := (0.0, 0.0, 0.0);
+	White: constant Colour := (1.0, 1.0, 1.0);
 
 	function RGB(r, g, b: Number) return Colour is
 		(r, g, b);
@@ -43,6 +44,10 @@ package Colours is
 		(n/c.r, n/c.g, n/c.b);
 	function "+" (c1, c2: Colour) return Colour is
 		(c1.r+c2.r, c1.g+c2.g, c1.b+c2.b);
+	function "-" (c1, c2: Colour) return Colour is
+		(c1.r-c2.r, c1.g-c2.g, c1.b-c2.b);
+	function "-" (n: Number; c: Colour) return Colour is
+		(n-c.r, n-c.g, n-c.b);
 	function "-" (c: Colour) return Colour is
 		(-c.r, -c.g, -c.b);
 

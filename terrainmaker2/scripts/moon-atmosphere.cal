@@ -64,13 +64,15 @@ let magnitude(x: vector*3): real =
 // Easy, right? Ha.
 
 let g = 0.76 in
-let betas_r_without_exp = [5.8e-6, 13.5e-6, 33.1e-6] in // metres^-1
+let betas_r_without_exp = [5.5e-6, 13.0e-6, 22.4e-6] in // metres^-1
 let betae_r_without_exp = betas_r_without_exp in
-let betas_m_without_exp = [*3 210e-5] in
+let betas_m_without_exp = 21e-6 in
 let betae_m_without_exp = betas_m_without_exp*1.1 in
 let mu = dot(cameraDirection, sunDirection) in
 let altitude = magnitude(xyz) - nominalRadius in
 let scaleAltitude = 8e3 in // metres
+let atmosphereHeight = boundingRadius - nominalRadius in
+let densityAtSealevel = 1 in
 
 let expfactor = exp(-altitude / scaleAltitude) in
 
@@ -83,14 +85,16 @@ let phase_m =
 
 let emission =
 	sunColour * (
-		betas_r_without_exp*phase_r +
-		betas_m_without_exp*phase_m
+		betas_r_without_exp*phase_r
+		//betas_m_without_exp*phase_m
 		) * expfactor in
 
 let extinction = (
-		betae_r_without_exp +
-		betae_m_without_exp
+		betae_r_without_exp
+		//betae_m_without_exp
 		) * expfactor in
-let extinction = [*3 0] in
+
+let density = densityAtSealevel * expfactor in
+
 return
 

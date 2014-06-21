@@ -48,7 +48,8 @@ package body Planets is
 					"sunColour: vector*3" &
 				"): (" & 
 					"extinction: vector*3," &
-					"emission: vector*3" &
+					"emission: vector*3," &
+					"density: real" &
 				")");
 		end if;
 	end;
@@ -133,11 +134,13 @@ package body Planets is
 
 	procedure SampleAtmosphere(p: Planet; xyz: Point;
 			cameraDirection, sunDirection: Vector3;
-			sunColour: Colour; extinction, emission: out Colour) is
+			sunColour: Colour;
+			extinction, emission: out Colour;
+			density: out number) is
 	begin
 		p.atmosphere_func.Call.all(xyz, p.bounding_radius, p.nominal_radius,
 				cameraDirection, sunDirection, sunColour,
-				extinction, emission);
+				extinction, emission, density);
 	end;
 end;
 
