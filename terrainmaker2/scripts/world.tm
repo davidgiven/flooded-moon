@@ -2,9 +2,9 @@
 
 camera:
 {
-	hfov: 45
+	hfov: 90
 	aspect: 1.777
-	location: (0, -1738e3, 0)
+	location: (0, -1740e3, 0)
 	forward: (1, 0, 0)
 	up: (0, 1, 0)
 }
@@ -15,7 +15,7 @@ planets:
 	{
 		nominal_radius: 1695500e4
 		atmospheric_depth: 0
-		location: (-149597871e3, 0, 0)
+		location: (149597871e3, 0, 0)
 		colour: (1, 1, 1)
 
 		terrain_radius_func: "scripts/sun-terrain.cal"

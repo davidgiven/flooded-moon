@@ -161,7 +161,7 @@ package body Scene is
 			-- accuracy).
 			loc := int.rayEntry + r.direction*t;
 			ploc := loc - p.location;
-			stepSize := 5000.0; -- one km
+			stepSize := 1000.0; -- one km
 			sunDir := Normalise(sunObject.location - loc);
 			cameraDir := Normalise(camera_location - loc);
 			sunlight := SunlightFromPoint(p, loc, sunDir);
