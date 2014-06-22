@@ -47,6 +47,18 @@ package body Scene is
 			camera_forward := Load(cf("forward"));
 			camera_up := Load(cf("up"));
 			camera_right := Cross(camera_forward, camera_up);
+
+			if cf.Exists("pitch") then
+				declare
+					t: TransformMatrix;
+				begin
+					t.Reset;
+					t.Rotate(camera_right, -cf("pitch").Value);
+					camera_forward := t.Transform(camera_forward);
+					camera_up := t.Transform(camera_up);
+					camera_right := t.Transform(camera_right);
+				end;
+			end if;
 		end;
 
 		-- Read in list of planets.
