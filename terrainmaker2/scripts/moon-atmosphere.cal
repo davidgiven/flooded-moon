@@ -31,70 +31,38 @@ let magnitude(x: vector*3): real =
 //
 // mu: cos of angle between sun and camera.
 //
-// Mie scattering. For the scatting and extinction factor:
-//
-//                                               -h
-//  betas_m(h, lambda) = beta_m(0, lambda) * exp(--)
-//                                               Hr
-//
-//  betae_m(h, lambda) = 1.1 * betas_m(h, lambda)
-//
-// h: height above sea level
-// Hr: scale height
-// lambda: wavelength of light
-//
-//              3            (1 - g^2) * (1 + mu^2)
-//  P_m(mu) = ------ * ------------------------------------
-//            8 * pi   (2 + g^2) * (1 + g^2 - 2*g*mu)^(3/2) 
-//
-// mu: cos of angle between sun and camera.
-//
 // The final emitted light and extinction factors are:
 //
-//  (input * betas_r * P_r) + (input * betas_m * P_m)
-//  betae_r + betae_m
+//  (input * betas_r * P_r)
+//  betae_r
 //
 // We simplify this to:
 //
-//  input * expfactor * (betas_r_without_exp*P_r + betas_m_without_exp*P_m)
-//  expfactor * (betae_r_without_exp + betae_m_without_exp)
+//  input * expfactor * betas_r_without_exp * P_r
+//  expfactor * betae_r_without_exp
 //
 // beta_r_without_exp and beta_m_without_exp end up being constants.
 //
 // Easy, right? Ha.
 
-let g = 0.76 in
+// Arbitrary scaling factor for atmospheric thickness.
+let density = 0.5 in
+
 let betas_r_without_exp = [5.5e-6, 13.0e-6, 22.4e-6] in // metres^-1
 let betae_r_without_exp = betas_r_without_exp in
-let betas_m_without_exp = [*3 21e-6] in
-let betae_m_without_exp = betas_m_without_exp*1.1 in
 let mu = dot(cameraDirection, sunDirection) in
 let altitude = magnitude(xyz) - nominalRadius in
 let scaleAltitude = 25e3 in // metres
 let atmosphereHeight = boundingRadius - nominalRadius in
-let densityAtSealevel = 1 in
 
-let expfactor = exp(-altitude / scaleAltitude) in
+let expfactor = density * exp(-altitude / scaleAltitude) in
 
 let phase_r =
 	(3/16*PI) * (1 + mu*mu) in
 
-let phase_m =
-	(3*8/PI) * (1 - g*g) * (1 + mu*mu) /
-	((2 + g*g) * pow((1 + g*g - 2*g*mu), 3/2)) in
-
-let emission =
-	sunColour * (
-		//betas_r_without_exp*phase_r +
-		betas_m_without_exp*phase_m
-		) * expfactor in
-
-let extinction = (
-		//betae_r_without_exp +
-		betae_m_without_exp
-		) * expfactor in
-
-let density = densityAtSealevel * expfactor in
+// Final output.
+let emission = sunColour * betas_r_without_exp*phase_r * expfactor in
+let extinction = betae_r_without_exp * expfactor in
 
 return
 

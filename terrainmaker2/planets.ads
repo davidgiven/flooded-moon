@@ -36,8 +36,7 @@ package Planets is
 			sunDirection: vector3;
 			sunColour: Colour;
 			extinction: in out Colour;
-			emission: in out Colour;
-			density: out number
+			emission: in out Colour
 		);
 	pragma Convention(C, AtmosphereFunc);
 	package AtmosphereCalculon is new Calculon(AtmosphereFunc);
@@ -69,8 +68,7 @@ package Planets is
 	procedure SampleAtmosphere(p: Planet; xyz: Point;
 			cameraDirection, sunDirection: Vector3;
 			sunColour: Colour;
-			extinction, emission: out Colour;
-			density: out number);
+			extinction, emission: out Colour);
 
 	package Lists is new GenericLists(Planet);
 	subtype List is Lists.List;

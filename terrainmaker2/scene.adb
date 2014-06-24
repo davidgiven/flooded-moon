@@ -165,7 +165,6 @@ package body Scene is
 		sunDir, cameraDir: Vector3;
 		extinctionHere, emissionHere: Colour;
 		transmittanceHere: Colour;
-		densityHere: number;
 	begin
 		--Put_Line("sample");
 		while (t < maxt) loop
@@ -187,7 +186,7 @@ package body Scene is
 			elsif (p.atmospheric_depth > 0.0) then
 				-- Ray travels through atmosphere.
 				p.SampleAtmosphere(ploc, cameraDir, sunDir, sunlight,
-						extinctionHere, emissionHere, densityHere);
+						extinctionHere, emissionHere);
 			else
 				-- Planet *has* no atmosphere! This shouldn't happen; it's
 				-- an edge case --- the next step will likely intercept the
@@ -198,15 +197,14 @@ package body Scene is
 
 			-- Calculate transmittance for this segment (0 means opaque,
 			-- 1.0 means transparent).
-			transmittanceHere := exp(-extinctionHere *
-					densityHere * stepSize);
+			transmittanceHere := exp(-extinctionHere * stepSize);
 
 			-- Calculate cumulative transmittance and emission.
 			transmittance := transmittance * transmittanceHere;
 
 			-- Colour of this pixel is the colour accumulated so far, plus
 			-- the colour of the new segment attenuated 
-			emission := emission + transmittance*emissionHere*densityHere*stepSize*sunlight;
+			emission := emission + transmittance*emissionHere*stepSize*sunlight;
 
 			-- Stop iterating if we're unlikely to see any more down this
 			-- ray.
