@@ -5,41 +5,41 @@ with Config;
 use Config;
 
 package ConfigFiles is
-	type ConfigFile is tagged private with
+	type node_t is tagged private with
 		Constant_Indexing => Get;
 
-	ConfigError: exception;
-	ConfigParseError: exception;
+	config_exception: exception;
+	config_parse_exception: exception;
 
-	procedure Adjust(cf: in out ConfigFile);
-	procedure Finalize(cf: in out ConfigFile);
+	procedure Adjust(cf: in out node_t);
+	procedure Finalize(cf: in out node_t);
 
-	function Create return ConfigFile;
-	procedure Load(cf: in out ConfigFile; filename: string);
-	function Get(cf: ConfigFile; element: string) return ConfigFile;
-	function Get(cf: ConfigFile; element: integer) return ConfigFile;
-	function Exists(cf: ConfigFile; element: string) return boolean;
-	function Length(cf: ConfigFile) return integer;
-	function Name(cf: ConfigFile) return string;
+	function Create return node_t;
+	procedure Load(cf: in out node_t; filename: string);
+	function Get(cf: node_t; element: string) return node_t;
+	function Get(cf: node_t; element: integer) return node_t;
+	function Exists(cf: node_t; element: string) return boolean;
+	function Length(cf: node_t) return integer;
+	function Name(cf: node_t) return string;
 
-	function Value(cf: ConfigFile) return Number;
-	function Value(cf: ConfigFile) return string;
+	function Value(cf: node_t) return number;
+	function Value(cf: node_t) return string;
 private
-	type ConfigFileC is null record;
-	type ConfigFileCRef is access ConfigFileC;
+	type node_c_t is null record;
+	type node_c_ref is access node_c_t;
 	
-	type ConfigFileImpl is limited record
+	type node_impl_t is limited record
 		refcount: natural := 1;
-		c: ConfigFileCRef;
+		c: node_c_ref;
 	end record;
-	type ConfigFileImplRef is access ConfigFileImpl;
+	type node_impl_ref is access node_impl_t;
 
-	type ConfigSettingC is null record;
-	type ConfigSettingCRef is access ConfigSettingC;
+	type setting_c_t is null record;
+	type setting_c_ref is access setting_c_t;
 
-	type ConfigFile is new Ada.Finalization.Controlled with
+	type node_t is new Ada.Finalization.Controlled with
 	record
-		impl: ConfigFileImplRef;
-		s: ConfigSettingCRef;
+		impl: node_impl_ref;
+		s: setting_c_ref;
 	end record;
 end;

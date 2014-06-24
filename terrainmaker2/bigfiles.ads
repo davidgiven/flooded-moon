@@ -1,20 +1,21 @@
 with Ada.Finalization;
+with System;
 with System.Storage_Elements;
 
+use System;
 use System.Storage_Elements;
 
 package BigFiles is
-	BigFileException: exception;
-	NullAddress: constant System.Address := To_Address(0);
+	bigfile_exception: exception;
 
-	type BigFile is new Ada.Finalization.Limited_Controlled with
+	type bigfile_t is new Ada.Finalization.Limited_Controlled with
 	record
 		fd: integer := -1;
-		address: System.Address := NullAddress;
+		address: System.Address := Null_Address;
 		size: Storage_Offset;
 	end record;
 
-	procedure Open(bf: in out BigFile; filename: string);
-	procedure Finalize(bf: in out BigFile);
+	procedure Open(bf: in out bigfile_t; filename: string);
+	procedure Finalize(bf: in out bigfile_t);
 end;
 

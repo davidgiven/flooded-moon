@@ -37,5 +37,5 @@ package Vectors is
 	function NormaliseToSphere(v: Vector3; r: number) return Vector3 is
 		(Normalise(v) * r);
 
-	function Load(cf: ConfigFile) return Vector3;
+	function Load(cf: node_t) return Vector3;
 end;

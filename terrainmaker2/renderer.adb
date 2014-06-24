@@ -15,14 +15,14 @@ use Scene;
 use Utils;
 
 package body Renderer is
-	function Render(width, height: integer) return Image is
+	function Render(width, height: integer) return image_t is
  		thread_count: integer := (
 			if (Options.Number_Of_Threads = 0)
-			then integer(System.Multiprocessors.Number_Of_CPUs)
+			then integer(System.Multiprocessors.number_Of_CPUs)
 			else Options.Number_Of_Threads
 		);
 
-		screen: Image := Images.Create(width, height);
+		screen: image_t := Images.Create(width, height);
 
 		task Scheduler is
 			-- Each worker calls this to find out what it needs to do.
@@ -92,8 +92,8 @@ package body Renderer is
 				exit when finished;
 
 				for x in screen.pixels.data'range(1) loop
-					r := ComputePrimaryRay(x, y, screen);
-					screen(x, y) := ComputePixelColour(r);
+					r := Compute_Primary_Ray(x, y, screen);
+					screen(x, y) := Compute_Pixel_Colour(r);
 				end loop;
 			end loop;
 		exception

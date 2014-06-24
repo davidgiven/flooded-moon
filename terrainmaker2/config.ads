@@ -11,18 +11,18 @@ package Config is
 	MaxObjects: constant Natural := 10;
 	ProgressBarSize: constant natural := 75;
 
-	type Number is new Interfaces.C.double;
+	type number is new Interfaces.C.double;
 
-	type WrappedString is new Ada.Finalization.Limited_Controlled with
+	type wrapped_string_t is new Ada.Finalization.Limited_Controlled with
 	record
 		c: chars_ptr;
 	end record;
 
-	procedure Finalize(ws: in out WrappedString);
-	procedure WrapString(ws: in out WrappedString; s: string);
+	procedure Finalize(ws: in out wrapped_string_t);
+	procedure Wrap(ws: in out wrapped_string_t; s: string);
 
-	package NumberFunctions is
-		new Ada.Numerics.Generic_Elementary_Functions(Number);
+	package Number_Functions is
+		new Ada.Numerics.Generic_Elementary_Functions(number);
 
 	package Options is
 		function Output_Filename return string;
@@ -34,7 +34,7 @@ package Config is
 
 	procedure ParseOptions;
 
-	function DegToRad(n: Number) return Number is
+	function DegToRad(n: number) return number is
 		(n * (Pi / 180.0));
 
 	LF: constant character := ASCII.LF;

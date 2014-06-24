@@ -124,7 +124,7 @@ procedure Tests is
 	end;
 
 	procedure ConfigTest is
-		cf: ConfigFile := ConfigFiles.Create;
+		cf: node_t := ConfigFiles.Create;
 	begin
 		cf.Load("testdata/testconfig.tm");
 
@@ -134,7 +134,7 @@ procedure Tests is
 	end;
 		          
 	procedure ConfigMissingTest is
-		cf: ConfigFile := ConfigFiles.Create;
+		cf: node_t := ConfigFiles.Create;
 	begin
 		cf.Load("testdata/testconfig.tm");
 
@@ -193,11 +193,11 @@ procedure Tests is
 	end;
 
 	procedure CalculonTest is
-		type TestFunc is access procedure(i: Number; r: out Number);
+		type TestFunc is access procedure(i: number; r: out number);
 		package TestCalculon is new Calculon(TestFunc);
 		use TestCalculon;
 		func: TestCalculon.Func;
-		n: Number;
+		n: number;
 	begin
 		Initialise(func, "let i=i+1 in return", "(i: real): (i: real)");
 		func.Call.all(1.0, n);
@@ -207,7 +207,7 @@ procedure Tests is
 	end;
 
 	procedure CalculonVectorTest is
-		type TestFunc is access procedure(i: Number; r1, r2: out Vector3);
+		type TestFunc is access procedure(i: number; r1, r2: out Vector3);
 		package TestCalculon is new Calculon(TestFunc);
 		use TestCalculon;
 		func: TestCalculon.Func;
@@ -223,7 +223,7 @@ procedure Tests is
 	end;
 
 	procedure MapTest is
-		bf: BigFile;
+		bf: bigfile_t;
 	begin
 		bf.Open("testdata/maptest.dat");
 

@@ -17,7 +17,7 @@ use Matrices;
 use all type Matrices.Matrix3;
 
 procedure TerrainMaker is
-	img: Image;
+	img: image_t;
 begin
 	ParseOptions;
 	Scene.Load(Config.Options.Scene_Filename);

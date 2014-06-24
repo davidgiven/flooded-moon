@@ -15,7 +15,7 @@ package body GenericMatrix is
 		end return;
 	end;
 
-	function "*" (m: Matrix; n: Number) return Matrix is
+	function "*" (m: Matrix; n: number) return Matrix is
 	begin
 		return r: Matrix do
 			for x in Index loop
@@ -27,7 +27,7 @@ package body GenericMatrix is
 	end;
 
 	function "*" (m: Matrix; v: Vector) return Vector is
-		n: Number;
+		n: number;
 	begin
 		return r: Vector do
 			for x in Index loop
@@ -41,7 +41,7 @@ package body GenericMatrix is
 	end;
 
 	function "*" (m: Matrix; o: Matrix) return Matrix is
-		sum: Number;
+		sum: number;
 	begin
 		return r: Matrix do
 			for x in Index loop
@@ -62,7 +62,7 @@ package body GenericMatrix is
 		L: Matrix := Zero;
 		U: Matrix := Zero;
 		b, d, x: Vector;
-		coeff: Number;
+		coeff: number;
 	begin
 		-- Forward elimination
 		for k in Index'first..(Index'last - 1) loop

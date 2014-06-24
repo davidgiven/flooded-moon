@@ -4,7 +4,7 @@ with Vectors;
 with ConfigFiles;
 
 use Config;
-use Config.NumberFunctions;
+use Config.Number_Functions;
 use Matrices;
 use Vectors;
 use ConfigFiles;
@@ -28,9 +28,9 @@ package Transforms is
 	procedure Apply(t: in out TransformMatrix; o: Matrix4);
 	procedure Translate(t: in out TransformMatrix; v: Vector3);
 	procedure Scale(t: in out TransformMatrix; v: Vector3);
-	procedure Scale(t: in out TransformMatrix; d: Number);
-	procedure Rotate(t: in out TransformMatrix; v: Vector3; angle: Number);
+	procedure Scale(t: in out TransformMatrix; d: number);
+	procedure Rotate(t: in out TransformMatrix; v: Vector3; angle: number);
 
-	function Load(cf: ConfigFile) return TransformMatrix;
+	function Load(cf: node_t) return TransformMatrix;
 end;
 

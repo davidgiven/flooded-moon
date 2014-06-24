@@ -7,6 +7,6 @@ use Images;
 use Vectors;
 
 package Renderer is
-	function Render(width, height: integer) return Image;
+	function Render(width, height: integer) return image_t;
 end;
 

@@ -1,6 +1,6 @@
 
 package body Colours is
-	function Mix(c1, c2: Colour; a: Number) return Colour is
+	function Mix(c1, c2: colour_t; a: number) return colour_t is
 	begin
 		return RGB(
 			c1.r*(1.0-a) + c2.r*a,
@@ -9,10 +9,10 @@ package body Colours is
 		);
 	end;
 
-	function Load(cf: ConfigFile) return Colour is
+	function Load(cf: node_t) return colour_t is
 	begin
 		if (cf.Length /= 3) then
-			raise ConfigParseError with "expected colour";
+			raise config_parse_exception with "expected colour";
 		end if;
 		
 		return RGB(

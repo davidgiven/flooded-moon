@@ -23,41 +23,41 @@ package body Calculon is
 		pragma Import(C, GetPointer, "ada_calculon_get_pointer");
 	end;
 
-	type WrappedString is new Ada.Finalization.Limited_Controlled with
+	type wrapped_string_t is new Ada.Finalization.Limited_Controlled with
 	record
 			c: chars_ptr;
 	end record;
 
-	procedure Finalize(ws: in out WrappedString) is
+	procedure Finalize(ws: in out wrapped_string_t) is
 	begin
 			if (ws.c /= Null_Ptr) then
 					Free(ws.c);
 			end if;
 	end;
 
-	procedure WrapString(ws: in out WrappedString; s: string) is
+	procedure Wrap(ws: in out wrapped_string_t; s: string) is
 	begin
 			ws.c := New_String(s);
 	end;
 
 	procedure Initialise(cf: in out Func; code, signature: String) is
-		codew, signaturew: WrappedString;
+		codew, signaturew: wrapped_string_t;
 	begin
 		if (cf.impl /= null) then
 			C.Destroy(cf.impl);
 		end if;
-		WrapString(codew, code);
-		WrapString(signaturew, signature);
+		Wrap(codew, code);
+		Wrap(signaturew, signature);
 		cf.impl := C.Create(codew.c, signaturew.c);
 
 		if (cf.impl = null) then
-			raise CompilationException with Value(C.LastError);
+			raise compilation_exception with Value(C.LastError);
 		end if;
 	end;
 
-	procedure InitialiseFromFile(cf: in out Func;
+	procedure Initialise_From_File(cf: in out Func;
 			filename: string; signature: string) is
-		bf: BigFile;
+		bf: bigfile_t;
 	begin
 		bf.Open(filename);
 		declare

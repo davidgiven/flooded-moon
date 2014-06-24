@@ -5,10 +5,10 @@ use Config;
 use ConfigFiles;
 
 package body Vectors is
-	function Load(cf: ConfigFile) return Vector3 is
+	function Load(cf: node_t) return Vector3 is
 	begin
 		if (cf.Length /= 3) then
-			raise ConfigParseError with "expected vector";
+			raise config_parse_exception with "expected vector";
 		end if;
 		
 		return Vector3'(

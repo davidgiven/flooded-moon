@@ -10,7 +10,7 @@ with Calculon;
 with Colours;
 
 use Config;
-use Config.NumberFunctions;
+use Config.Number_Functions;
 use Matrices;
 use ConfigFiles;
 use Transforms;
@@ -34,41 +34,41 @@ package Planets is
 			nominalRadius: number;
 			cameraDirection: vector3;
 			sunDirection: vector3;
-			sunColour: Colour;
-			extinction: in out Colour;
-			emission: in out Colour
+			sunColour: colour_t;
+			extinction: in out colour_t;
+			emission: in out colour_t
 		);
 	pragma Convention(C, AtmosphereFunc);
 	package AtmosphereCalculon is new Calculon(AtmosphereFunc);
 
 	type Planet is tagged limited record
-		cf: ConfigFile;
+		cf: node_t;
 		location: Point;
-		nominal_radius: Number;
-		atmospheric_depth: Number;
+		nominal_radius: number;
+		atmospheric_depth: number;
 		terrain_radius_func: TerrainRadiusCalculon.Func;
 		atmosphere_func: AtmosphereCalculon.Func;
 
-		bounding_radius: Number;
+		bounding_radius: number;
 		transform: TransformMatrix;
 	end record;
 
-	procedure Init(p: in out Planet; cf: ConfigFile);
+	procedure Init(p: in out Planet; cf: node_t);
 	-- These take WORLD coordinates.
-	function TestIntersection(p: Planet; r: Ray;
+	function Test_Intersection(p: Planet; r: Ray;
 			rayEntry, rayExit: in out Point;
 			Clip_Against_Atmosphere: boolean := true)
 			return boolean;
 
 	-- These take PLANET coordinates.
-	function GetActualRadius(p: Planet; xyz: Point)
+	function Get_Actual_Radius(p: Planet; xyz: Point)
 			return number;
-	function IsPointUnderground(p: Planet; xyz: Point)
+	function Is_Point_Underground(p: Planet; xyz: Point)
 			return boolean;
-	procedure SampleAtmosphere(p: Planet; xyz: Point;
+	procedure Sample_Atmosphere(p: Planet; xyz: Point;
 			cameraDirection, sunDirection: Vector3;
-			sunColour: Colour;
-			extinction, emission: out Colour);
+			sunColour: colour_t;
+			extinction, emission: out colour_t);
 
 	package Lists is new GenericLists(Planet);
 	subtype List is Lists.List;

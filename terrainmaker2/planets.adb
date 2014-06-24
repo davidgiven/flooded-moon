@@ -11,7 +11,7 @@ use Utils;
 use BigFiles;
 
 package body Planets is
-	procedure Init(p: in out Planet; cf: ConfigFile) is
+	procedure Init(p: in out Planet; cf: node_t) is
 	begin
 		Put_Line("Loading planet: " & cf.Name);
 		p.cf := cf;
@@ -26,7 +26,7 @@ package body Planets is
 			p.transform.Reset;
 		end if;
 
-		p.terrain_radius_func.InitialiseFromFile(
+		p.terrain_radius_func.Initialise_From_File(
 			cf("terrain_radius_func").Value,
 			"(" &
 				"xyz: vector*3," & 
@@ -37,7 +37,7 @@ package body Planets is
 			")");
 
 		if (p.atmospheric_depth > 0.0) then
-			p.atmosphere_func.InitialiseFromFile(
+			p.atmosphere_func.Initialise_From_File(
 				cf("atmosphere_func").Value,
 				"(" &
 					"xyz: vector*3," & 
@@ -53,18 +53,18 @@ package body Planets is
 		end if;
 	end;
 
-	function TestIntersection(p: Planet;
+	function Test_Intersection(p: Planet;
 				r: Ray; rayEntry, rayExit: in out Point;
 				Clip_Against_Atmosphere: boolean := true)
 			return boolean is
-		radius: Number;
+		radius: number;
 		ro: Vector3;
-		a, b, c, q: Number;
-		disc2, disc: Number;
-		t0, t1: Number;
+		a, b, c, q: number;
+		disc2, disc: number;
+		t0, t1: number;
 
-		procedure Swap(a, b: in out Number) is
-			t: Number;
+		procedure Swap(a, b: in out number) is
+			t: number;
 		begin
 			t := a;
 			a := b;
@@ -115,7 +115,7 @@ package body Planets is
 		return true;
 	end;
 
-	function GetActualRadius(p: Planet; xyz: Point) return number is
+	function Get_Actual_Radius(p: Planet; xyz: Point) return number is
 		normalised_xyz: Point := NormaliseToSphere(xyz, p.nominal_radius);
 		radius: number;
 	begin
@@ -124,17 +124,17 @@ package body Planets is
 		return radius;
 	end;
 
-	function IsPointUnderground(p: Planet; xyz: Point) return boolean is
+	function Is_Point_Underground(p: Planet; xyz: Point) return boolean is
 		xyzr: number := Length(xyz);
-		realr: number := p.GetActualRadius(xyz);
+		realr: number := p.Get_Actual_Radius(xyz);
 	begin
 		return xyzr < realr;
 	end;
 
-	procedure SampleAtmosphere(p: Planet; xyz: Point;
+	procedure Sample_Atmosphere(p: Planet; xyz: Point;
 			cameraDirection, sunDirection: Vector3;
-			sunColour: Colour;
-			extinction, emission: out Colour) is
+			sunColour: colour_t;
+			extinction, emission: out colour_t) is
 	begin
 		p.atmosphere_func.Call.all(xyz, p.bounding_radius, p.nominal_radius,
 				cameraDirection, sunDirection, sunColour,

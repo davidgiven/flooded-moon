@@ -35,7 +35,7 @@ package body Config is
 	begin
 		Define_Switch(cmdline, output_filename_option'access, "-o:",
 			Long_Switch => "--output=",
-			Help => "Set output image filename");
+			Help => "Set output image_t filename");
 
 		Define_Switch(cmdline, width_option'access, "-W:",
 			Long_Switch => "--width=",
@@ -51,7 +51,7 @@ package body Config is
 
 		Define_Switch(cmdline, number_of_threads_option'access, "-s:",
 			Long_Switch => "--threads=",
-			Help => "Number of threads to use for rendering (0 = all cores)");
+			Help => "number of threads to use for rendering (0 = all cores)");
 
 		Getopt(cmdline);
 
@@ -62,7 +62,7 @@ package body Config is
 			Error("must specify an output filename");
 		end if;
 		if (Options.Width = 0) or (Options.Height = 0) then
-			Error("output image size must be non zero (in both directions)");
+			Error("output image_t size must be non zero (in both directions)");
 		end if;
 		if (Options.Scene_Filename'length = 0) then
 			Error("must specify a scene description");
@@ -80,14 +80,14 @@ package body Config is
 			Error("invalid parameter '" & Full_Switch & "'");
 	end;
 
-	procedure Finalize(ws: in out WrappedString) is
+	procedure Finalize(ws: in out wrapped_string_t) is
 	begin
 		if (ws.c /= Null_Ptr) then
 			Free(ws.c);
 		end if;
 	end;
 
-	procedure WrapString(ws: in out WrappedString; s: string) is
+	procedure Wrap(ws: in out wrapped_string_t; s: string) is
 	begin
 		ws.c := New_String(s);
 	end;

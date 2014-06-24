@@ -1,14 +1,10 @@
 with Ada.Text_IO;
 with Ada.Unchecked_Conversion;
 with Interfaces.C.Strings;
-with System;
-with System.Storage_Elements;
 with Config;
 
 use Ada.Text_IO;
 use Interfaces.C.Strings;
-use System;
-use System.Storage_Elements;
 use Config;
 
 package body BigFiles is
@@ -32,32 +28,32 @@ package body BigFiles is
 		pragma import(C, Unmap, "ada_bigfile_unmap");
 	end;
 
-	procedure Open(bf: in out BigFile; filename: string) is
-		filenamew: WrappedString;
+	procedure Open(bf: in out bigfile_t; filename: string) is
+		filenamew: wrapped_string_t;
 	begin
 		Finalize(bf);
 
-		WrapString(filenamew, filename);
+		Wrap(filenamew, filename);
 		bf.fd := C.Open(filenamew.c);
 		if (bf.fd = -1) then
-			raise BigFileException with
+			raise bigfile_exception with
 				filename & " open: " & Value(C.Error);
 		end if;
 
 		bf.size := C.Size(bf.fd);
 		bf.address := C.Map(bf.fd);
-		if (bf.address = NullAddress) then
-			raise BigFileException with
+		if (bf.address = Null_Address) then
+			raise bigfile_exception with
 				filename & " map: " & Value(C.Error);
 		end if;
 	end;
 
-	procedure Finalize(bf: in out BigFile) is
+	procedure Finalize(bf: in out bigfile_t) is
 	begin
 		if (bf.fd /= -1) then
-			if (bf.address /= NullAddress) then
+			if (bf.address /= Null_Address) then
 				C.Unmap(bf.fd, bf.address);
-				bf.address := NullAddress;
+				bf.address := Null_Address;
 			end if;
 
 			C.Close(bf.fd);

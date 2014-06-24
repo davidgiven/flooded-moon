@@ -4,10 +4,10 @@ use Config;
 
 package body Transforms is
 	function MultiplyPoint(m: Matrix4; p: Point) return Point is
-		x: Number := m(0,0)*p(0) + m(0,1)*p(1) + m(0,2)*p(2) + m(0,3);
-		y: Number := m(1,0)*p(0) + m(1,1)*p(1) + m(1,2)*p(2) + m(1,3);
-		z: Number := m(2,0)*p(0) + m(2,1)*p(1) + m(2,2)*p(2) + m(2,3);
-		w: Number := m(3,0)*p(0) + m(3,1)*p(1) + m(3,2)*p(2) + m(3,3);
+		x: number := m(0,0)*p(0) + m(0,1)*p(1) + m(0,2)*p(2) + m(0,3);
+		y: number := m(1,0)*p(0) + m(1,1)*p(1) + m(1,2)*p(2) + m(1,3);
+		z: number := m(2,0)*p(0) + m(2,1)*p(1) + m(2,2)*p(2) + m(2,3);
+		w: number := m(3,0)*p(0) + m(3,1)*p(1) + m(3,2)*p(2) + m(3,3);
 	begin
 		return Point'(x/w, y/w, z/w);
 	end;
@@ -91,19 +91,19 @@ package body Transforms is
 			);
 	end;
 
-	procedure Scale(t: in out TransformMatrix; d: Number) is
+	procedure Scale(t: in out TransformMatrix; d: number) is
 	begin
 		t.Scale(Vector3'(d, d, d));
 	end;
 
-	procedure Rotate(t: in out TransformMatrix; v: Vector3; angle: Number) is
+	procedure Rotate(t: in out TransformMatrix; v: Vector3; angle: number) is
 		vn: Vector3 := Normalise(v);
-		x: Number := vn(0);
-		y: Number := vn(1);
-		z: Number := vn(2);
-		angleRad: Number := degToRad(angle);
-		st: Number := sin(angleRad);
-		ct: Number := cos(angleRad);
+		x: number := vn(0);
+		y: number := vn(1);
+		z: number := vn(2);
+		angleRad: number := degToRad(angle);
+		st: number := sin(angleRad);
+		ct: number := cos(angleRad);
 	begin
 		t.apply(
 			Matrix4'(
@@ -128,7 +128,7 @@ package body Transforms is
 			);
 	end;
 
-	function Load(cf: ConfigFile) return TransformMatrix is
+	function Load(cf: node_t) return TransformMatrix is
 	begin
 		return t: TransformMatrix do
 			t.Reset;

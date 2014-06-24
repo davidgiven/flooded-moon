@@ -11,7 +11,7 @@ with Colours;
 
 use Ada.Text_IO;
 use Config;
-use Config.NumberFunctions;
+use Config.Number_Functions;
 use ConfigFiles;
 use Planets;
 use Vectors;
@@ -21,11 +21,11 @@ use Utils;
 use Colours;
 
 package body Scene is
-	scene_cf: ConfigFile := ConfigFiles.Create;
+	scene_cf: node_t := ConfigFiles.Create;
 	planets_list: Planets.List;
 	sun: integer := -1;
-	sunColour: Colour;
-	hfov, vfov: Number;
+	sunColour: colour_t;
+	hfov, vfov: number;
 	camera_location: Point;
 	camera_forward: Vector3;
 	camera_right: Vector3;
@@ -37,8 +37,8 @@ package body Scene is
 
 		-- Crudely initialise the camera.
 		declare
-			cf: ConfigFile := scene_cf("camera");
-			aspect: Number;
+			cf: node_t := scene_cf("camera");
+			aspect: number;
 		begin
 			hfov := cf("hfov").Value;
 			aspect := cf("aspect").Value;
@@ -63,7 +63,7 @@ package body Scene is
 
 		-- Read in list of planets.
 		declare
-			cf: ConfigFile := scene_cf("planets");
+			cf: node_t := scene_cf("planets");
 		begin
 			for i in 0..(cf.Length-1) loop
 				planets_list.Add.Init(cf(i));
@@ -79,26 +79,26 @@ package body Scene is
 		end if;
 	end;
 
-	function ComputePrimaryRay(x, y: integer; img: Image) return Ray is
+	function Compute_Primary_Ray(x, y: integer; img: image_t) return Ray is
 		t: TransformMatrix;
-		xdegPerPixel: Number := hfov / Number(img.Width);
-		ydegPerPixel: Number := vfov / Number(img.Height);
+		xdegPerPixel: number := hfov / number(img.Width);
+		ydegPerPixel: number := vfov / number(img.Height);
 		dir: Vector3;
 	begin
 		t.Reset;
-		t.Rotate(camera_up, xdegPerPixel * Number(x));
-		t.Rotate(camera_right, ydegPerPixel * Number(y));
+		t.Rotate(camera_up, xdegPerPixel * number(x));
+		t.Rotate(camera_right, ydegPerPixel * number(y));
 		dir := t.Transform(camera_forward);
 		return Ray'(camera_location, dir);
 	end;
 
-	procedure ComputeObjectIntersections(r: Ray;
+	procedure Compute_Object_Intersections(r: Ray;
 			ints: out Intersections; num: out natural;
 			Clip_Against_Atmosphere: boolean := true) is
 		procedure TestSingleObject(p: Planet; i: in out Intersection;
 				index: natural) is
 		begin
-			if p.TestIntersection(r, i.rayEntry, i.rayExit,
+			if p.Test_Intersection(r, i.rayEntry, i.rayExit,
 					Clip_Against_Atmosphere => Clip_Against_Atmosphere) then
 				i.planet := index;
 				num := num + 1;
@@ -106,8 +106,8 @@ package body Scene is
 		end;
 
 		function Before(left, right: natural) return boolean is
-			leftDistance: Number := Length(ints(left).rayEntry - r.location);
-			rightDistance: Number := Length(ints(right).rayEntry - r.location);
+			leftDistance: number := Length(ints(left).rayEntry - r.location);
+			rightDistance: number := Length(ints(right).rayEntry - r.location);
 		begin
 			return leftDistance < rightDistance;
 		end;
@@ -135,7 +135,7 @@ package body Scene is
 	end;
 
 	function SunlightFromPoint(p: Planet;
-			loc: Point; sunDir: Vector3) return Colour is
+			loc: Point; sunDir: Vector3) return colour_t is
 		r: Ray;
 		ints: Intersections;
 		num: natural;
@@ -144,7 +144,7 @@ package body Scene is
 		r.direction := sunDir;
 		-- Crudely intersect the ray of light with our objects
 		-- to see if we're in eclipse.
-		ComputeObjectIntersections(r, ints, num,
+		Compute_Object_Intersections(r, ints, num,
 			Clip_Against_Atmosphere => false);
 		if (num > 0) and (ints(0).planet = sun) then
 			return sunColour;
@@ -154,17 +154,17 @@ package body Scene is
 	end;
 
 	procedure AccumulateSamplesThroughPlanet(p: Planet; int: Intersection;
-			r: Ray; emission, transmittance: in out Colour) is
-		t: Number := 0.0;
-		maxt: Number := Length(int.rayExit - int.rayEntry);
+			r: Ray; emission, transmittance: in out colour_t) is
+		t: number := 0.0;
+		maxt: number := Length(int.rayExit - int.rayEntry);
 		loc, ploc: Point;
-		stepSize: Number;
+		stepSize: number;
 
 		sunObject: Planet renames planets_list(sun);
-		sunlight: Colour;
+		sunlight: colour_t;
 		sunDir, cameraDir: Vector3;
-		extinctionHere, emissionHere: Colour;
-		transmittanceHere: Colour;
+		extinctionHere, emissionHere: colour_t;
+		transmittanceHere: colour_t;
 	begin
 		--Put_Line("sample");
 		while (t < maxt) loop
@@ -177,7 +177,7 @@ package body Scene is
 			cameraDir := Normalise(camera_location - loc);
 			sunlight := SunlightFromPoint(p, loc, sunDir);
 
-			if p.IsPointUnderground(ploc) then
+			if p.Is_Point_Underground(ploc) then
 				-- Ray gets stoppped by ground.
 				emissionHere := RGB(1.0, 0.0, 0.0);
 				emission := emission + transmittance*emissionHere;
@@ -185,7 +185,7 @@ package body Scene is
 				return;
 			elsif (p.atmospheric_depth > 0.0) then
 				-- Ray travels through atmosphere.
-				p.SampleAtmosphere(ploc, cameraDir, sunDir, sunlight,
+				p.Sample_Atmosphere(ploc, cameraDir, sunDir, sunlight,
 						extinctionHere, emissionHere);
 			else
 				-- Planet *has* no atmosphere! This shouldn't happen; it's
@@ -202,8 +202,8 @@ package body Scene is
 			-- Calculate cumulative transmittance and emission.
 			transmittance := transmittance * transmittanceHere;
 
-			-- Colour of this pixel is the colour accumulated so far, plus
-			-- the colour of the new segment attenuated 
+			-- colour_t of this pixel is the colour_t accumulated so far, plus
+			-- the colour_t of the new segment attenuated 
 			emission := emission + transmittance*emissionHere*stepSize*sunlight;
 
 			-- Stop iterating if we're unlikely to see any more down this
@@ -216,13 +216,13 @@ package body Scene is
 		-- Finished with ray.
 	end;
 
-	function ComputePixelColour(r: Ray) return Colour is
+	function Compute_Pixel_Colour(r: Ray) return colour_t is
 		ints: Intersections;
 		num: natural;
-		emission: Colour := Black;
-		transmittance: Colour := White;
+		emission: colour_t := Black;
+		transmittance: colour_t := White;
 	begin
-		ComputeObjectIntersections(r, ints, num,
+		Compute_Object_Intersections(r, ints, num,
 					Clip_Against_Atmosphere => true);
 		for i in 0..(num-1) loop
 			AccumulateSamplesThroughPlanet(

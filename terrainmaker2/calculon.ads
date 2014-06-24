@@ -3,7 +3,7 @@ with Ada.Finalization;
 generic
 	type T is private;
 package Calculon is
-	CompilationException: exception;
+	compilation_exception: exception;
 
 	type FuncC is null record;
 	type FuncCRef is access FuncC;
@@ -14,7 +14,7 @@ package Calculon is
 	end record;
 
 	procedure Initialise(cf: in out Func; code, signature: string);
-	procedure InitialiseFromFile(cf: in out Func;
+	procedure Initialise_From_File(cf: in out Func;
 			filename: string; signature: string);
 	procedure Finalize(cf: in out Func);
 

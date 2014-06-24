@@ -22,10 +22,10 @@ package Scene is
 	type Intersections is array(natural range 0..MaxObjects) of Intersection;
 
 	procedure Load(filename: string);
-	function ComputePrimaryRay(x, y: integer; img: Image) return Ray;
-	procedure ComputeObjectIntersections(r: Ray;
+	function Compute_Primary_Ray(x, y: integer; img: image_t) return Ray;
+	procedure Compute_Object_Intersections(r: Ray;
 		ints: out Intersections; num: out natural;
 		Clip_Against_Atmosphere: boolean := true);
-	function ComputePixelColour(r: Ray) return Colour;
+	function Compute_Pixel_Colour(r: Ray) return colour_t;
 end;
 
