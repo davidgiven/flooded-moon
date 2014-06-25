@@ -24,7 +24,7 @@ package body Scene is
 	scene_cf: node_t := ConfigFiles.Create;
 	planets_list: Planets.List;
 	sun: integer := -1;
-	sunColour: colour_t;
+	sun_colour: colour_t;
 	hfov, vfov: number;
 	camera_location: Point;
 	camera_forward: Vector3;
@@ -70,7 +70,7 @@ package body Scene is
 
 				if (cf(i).Name = "sun") then
 					sun := i;
-					sunColour := Load(cf(i)("colour"));
+					sun_colour := Load(cf(i)("colour"));
 				end if;
 			end loop;
 		end;
@@ -94,20 +94,20 @@ package body Scene is
 
 	procedure Compute_Object_Intersections(r: Ray;
 			ints: out Intersections; num: out natural;
-			Clip_Against_Atmosphere: boolean := true) is
+			include_atmosphere: boolean := true) is
 		procedure TestSingleObject(p: Planet; i: in out Intersection;
 				index: natural) is
 		begin
-			if p.Test_Intersection(r, i.rayEntry, i.rayExit,
-					Clip_Against_Atmosphere => Clip_Against_Atmosphere) then
+			if p.Test_Intersection(r, i.ray_entry, i.ray_exit,
+					include_atmosphere => include_atmosphere) then
 				i.planet := index;
 				num := num + 1;
 			end if;
 		end;
 
 		function Before(left, right: natural) return boolean is
-			leftDistance: number := Length(ints(left).rayEntry - r.location);
-			rightDistance: number := Length(ints(right).rayEntry - r.location);
+			leftDistance: number := Length(ints(left).ray_entry - r.location);
+			rightDistance: number := Length(ints(right).ray_entry - r.location);
 		begin
 			return leftDistance < rightDistance;
 		end;
@@ -145,9 +145,9 @@ package body Scene is
 		-- Crudely intersect the ray of light with our objects
 		-- to see if we're in eclipse.
 		Compute_Object_Intersections(r, ints, num,
-			Clip_Against_Atmosphere => false);
+			include_atmosphere => false);
 		if (num > 0) and (ints(0).planet = sun) then
-			return sunColour;
+			return sun_colour;
 		else
 			return Black;
 		end if;
@@ -156,7 +156,7 @@ package body Scene is
 	procedure AccumulateSamplesThroughPlanet(p: Planet; int: Intersection;
 			r: Ray; emission, transmittance: in out colour_t) is
 		t: number := 0.0;
-		maxt: number := Length(int.rayExit - int.rayEntry);
+		maxt: number := Length(int.ray_exit - int.ray_entry);
 		loc, ploc: Point;
 		stepSize: number;
 
@@ -170,7 +170,7 @@ package body Scene is
 		while (t < maxt) loop
 			-- Sample half-way along this segment (for slightly better
 			-- accuracy).
-			loc := int.rayEntry + r.direction*t;
+			loc := int.ray_entry + r.direction*t;
 			ploc := loc - p.location;
 			stepSize := 1000.0; -- one km
 			sunDir := Normalise(sunObject.location - loc);
@@ -223,7 +223,7 @@ package body Scene is
 		transmittance: colour_t := White;
 	begin
 		Compute_Object_Intersections(r, ints, num,
-					Clip_Against_Atmosphere => true);
+					include_atmosphere => true);
 		for i in 0..(num-1) loop
 			AccumulateSamplesThroughPlanet(
 					planets_list(ints(i).planet), ints(i), r,

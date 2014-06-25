@@ -101,7 +101,7 @@ package body Transforms is
 		x: number := vn(0);
 		y: number := vn(1);
 		z: number := vn(2);
-		angleRad: number := degToRad(angle);
+		angleRad: number := Rad(angle);
 		st: number := sin(angleRad);
 		ct: number := cos(angleRad);
 	begin

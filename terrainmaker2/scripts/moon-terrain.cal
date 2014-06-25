@@ -1,2 +1,2 @@
-let radius = nominalRadius in
+let radius = nominal_radius in
 return

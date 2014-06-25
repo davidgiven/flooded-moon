@@ -31,7 +31,7 @@ package body Config is
 
 	cmdline: Command_Line_Configuration;
 
-	procedure ParseOptions is
+	procedure Parse_Options is
 	begin
 		Define_Switch(cmdline, output_filename_option'access, "-o:",
 			Long_Switch => "--output=",

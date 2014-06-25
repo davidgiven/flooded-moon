@@ -8,8 +8,8 @@ use Ada.Numerics;
 use Interfaces.C.Strings;
 
 package Config is
-	MaxObjects: constant Natural := 10;
-	ProgressBarSize: constant natural := 75;
+	Max_Objects: constant Natural := 10;
+	Progress_Bar_Size: constant natural := 75;
 
 	type number is new Interfaces.C.double;
 
@@ -32,9 +32,10 @@ package Config is
 		function Number_Of_Threads return integer;
 	end;
 
-	procedure ParseOptions;
+	procedure Parse_Options;
 
-	function DegToRad(n: number) return number is
+	-- Convert degrees to radians.
+	function Rad(n: number) return number is
 		(n * (Pi / 180.0));
 
 	LF: constant character := ASCII.LF;

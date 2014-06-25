@@ -30,8 +30,8 @@ package body Planets is
 			cf("terrain_radius_func").Value,
 			"(" &
 				"xyz: vector*3," & 
-				"boundingRadius: real," &
-				"nominalRadius: real" &
+				"bounding_radius: real," &
+				"nominal_radius: real" &
 			"): (" & 
 				"radius: real" &
 			")");
@@ -41,11 +41,11 @@ package body Planets is
 				cf("atmosphere_func").Value,
 				"(" &
 					"xyz: vector*3," & 
-					"boundingRadius: real," &
-					"nominalRadius: real," &
-					"cameraDirection: vector*3," &
-					"sunDirection: vector*3," &
-					"sunColour: vector*3" &
+					"bounding_radius: real," &
+					"nominal_radius: real," &
+					"camera_direction: vector*3," &
+					"sun_direction: vector*3," &
+					"sun_colour: vector*3" &
 				"): (" & 
 					"extinction: vector*3," &
 					"emission: vector*3" &
@@ -54,8 +54,8 @@ package body Planets is
 	end;
 
 	function Test_Intersection(p: Planet;
-				r: Ray; rayEntry, rayExit: in out Point;
-				Clip_Against_Atmosphere: boolean := true)
+				r: Ray; ray_entry, ray_exit: in out Point;
+				include_atmosphere: boolean := true)
 			return boolean is
 		radius: number;
 		ro: Vector3;
@@ -71,7 +71,7 @@ package body Planets is
 			b := t;
 		end;
 	begin
-		if Clip_Against_Atmosphere then
+		if include_atmosphere then
 			radius := p.bounding_radius;
 		else
 			radius := p.nominal_radius;
@@ -110,8 +110,8 @@ package body Planets is
 			t0 := 1.0;
 		end if;
 
-		rayEntry := r.location + r.direction*t0;
-		rayExit := r.location + r.direction*t1;
+		ray_entry := r.location + r.direction*t0;
+		ray_exit := r.location + r.direction*t1;
 		return true;
 	end;
 
@@ -132,12 +132,12 @@ package body Planets is
 	end;
 
 	procedure Sample_Atmosphere(p: Planet; xyz: Point;
-			cameraDirection, sunDirection: Vector3;
-			sunColour: colour_t;
+			camera_direction, sun_direction: Vector3;
+			sun_colour: colour_t;
 			extinction, emission: out colour_t) is
 	begin
 		p.atmosphere_func.Call.all(xyz, p.bounding_radius, p.nominal_radius,
-				cameraDirection, sunDirection, sunColour,
+				camera_direction, sun_direction, sun_colour,
 				extinction, emission);
 	end;
 end;

@@ -50,10 +50,10 @@ let density = 0.5 in
 
 let betas_r_without_exp = [5.5e-6, 13.0e-6, 22.4e-6] in // metres^-1
 let betae_r_without_exp = betas_r_without_exp in
-let mu = dot(cameraDirection, sunDirection) in
-let altitude = magnitude(xyz) - nominalRadius in
+let mu = dot(camera_direction, sun_direction) in
+let altitude = magnitude(xyz) - nominal_radius in
 let scaleAltitude = 25e3 in // metres
-let atmosphereHeight = boundingRadius - nominalRadius in
+let atmosphereHeight = bounding_radius - nominal_radius in
 
 let expfactor = density * exp(-altitude / scaleAltitude) in
 
@@ -61,7 +61,7 @@ let phase_r =
 	(3/16*PI) * (1 + mu*mu) in
 
 // Final output.
-let emission = sunColour * betas_r_without_exp*phase_r * expfactor in
+let emission = sun_colour * betas_r_without_exp*phase_r * expfactor in
 let extinction = betae_r_without_exp * expfactor in
 
 return

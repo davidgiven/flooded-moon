@@ -19,35 +19,35 @@ use Vectors;
 use Colours;
 
 package Planets is
-	type TerrainRadiusFunc is access procedure(
+	type terrain_radius_f is access procedure(
 			xyz: Point;
-			boundingRadius: number;
-			nominalRadius: number;
+			bounding_radius: number;
+			nominal_radius: number;
 			radius: out number
 		);
-	pragma Convention(C, TerrainRadiusFunc);
-	package TerrainRadiusCalculon is new Calculon(TerrainRadiusFunc);
+	pragma Convention(C, terrain_radius_f);
+	package terrain_radius_c_f is new Calculon(terrain_radius_f);
 
-	type AtmosphereFunc is access procedure(
+	type atmosphere_media_f is access procedure(
 			xyz: Point;
-			boundingRadius: number;
-			nominalRadius: number;
-			cameraDirection: vector3;
-			sunDirection: vector3;
-			sunColour: colour_t;
+			bounding_radius: number;
+			nominal_radius: number;
+			camera_direction: vector3;
+			sun_direction: vector3;
+			sun_colour: colour_t;
 			extinction: in out colour_t;
 			emission: in out colour_t
 		);
-	pragma Convention(C, AtmosphereFunc);
-	package AtmosphereCalculon is new Calculon(AtmosphereFunc);
+	pragma Convention(C, atmosphere_media_f);
+	package atmosphere_media_c_t is new Calculon(atmosphere_media_f);
 
 	type Planet is tagged limited record
 		cf: node_t;
 		location: Point;
 		nominal_radius: number;
 		atmospheric_depth: number;
-		terrain_radius_func: TerrainRadiusCalculon.Func;
-		atmosphere_func: AtmosphereCalculon.Func;
+		terrain_radius_func: terrain_radius_c_f.Func;
+		atmosphere_func: atmosphere_media_c_t.Func;
 
 		bounding_radius: number;
 		transform: TransformMatrix;
@@ -56,8 +56,8 @@ package Planets is
 	procedure Init(p: in out Planet; cf: node_t);
 	-- These take WORLD coordinates.
 	function Test_Intersection(p: Planet; r: Ray;
-			rayEntry, rayExit: in out Point;
-			Clip_Against_Atmosphere: boolean := true)
+			ray_entry, ray_exit: in out Point;
+			include_atmosphere: boolean := true)
 			return boolean;
 
 	-- These take PLANET coordinates.
@@ -66,8 +66,8 @@ package Planets is
 	function Is_Point_Underground(p: Planet; xyz: Point)
 			return boolean;
 	procedure Sample_Atmosphere(p: Planet; xyz: Point;
-			cameraDirection, sunDirection: Vector3;
-			sunColour: colour_t;
+			camera_direction, sun_direction: Vector3;
+			sun_colour: colour_t;
 			extinction, emission: out colour_t);
 
 	package Lists is new GenericLists(Planet);

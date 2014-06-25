@@ -4,7 +4,7 @@ let dot(x: vector*3, y: vector*3): real =
 let magnitude(x: vector*3): real =
 	sqrt(dot(x, x)) in
 
-let altitude = magnitude(xyz) - nominalRadius in
+let altitude = magnitude(xyz) - nominal_radius in
 let densityAtSealevel = 0.1 in
 let scaleAltitude = 8e3 in // metres
 

@@ -19,7 +19,7 @@ use all type Matrices.Matrix3;
 procedure TerrainMaker is
 	img: image_t;
 begin
-	ParseOptions;
+	Parse_Options;
 	Scene.Load(Config.Options.Scene_Filename);
 
 	img := Renderer.Render(Config.Options.Width, Config.Options.Height);
