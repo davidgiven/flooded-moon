@@ -11,7 +11,7 @@ use Utils;
 use BigFiles;
 
 package body Planets is
-	procedure Init(p: in out Planet; cf: node_t) is
+	procedure Init(p: in out planet_t; cf: node_t) is
 	begin
 		Put_Line("Loading planet: " & cf.Name);
 		p.cf := cf;
@@ -53,8 +53,8 @@ package body Planets is
 		end if;
 	end;
 
-	function Test_Intersection(p: Planet;
-				r: Ray; ray_entry, ray_exit: in out Point;
+	function Test_Intersection(p: planet_t;
+				r: ray_t; ray_entry, ray_exit: in out Point;
 				include_atmosphere: boolean := true)
 			return boolean is
 		radius: number;
@@ -84,7 +84,7 @@ package body Planets is
 		disc2 := b*b - 4.0*a*c;
 
 		if (disc2 < 0.0) then
-			-- Ray does not intersect sphere at all.
+			-- ray_t does not intersect sphere at all.
 			return false;
 		end if;
 
@@ -102,11 +102,11 @@ package body Planets is
 		end if;
 
 		if (t1 < 0.0) then
-			-- The sphere is completely behind the ray.
+			-- The sphere is completely behind the ray_t.
 			return false;
 		end if;
 		if (t0 < 1.0) then
-			-- Ray start appears to be inside the sphere.
+			-- ray_t start appears to be inside the sphere.
 			t0 := 1.0;
 		end if;
 
@@ -115,7 +115,7 @@ package body Planets is
 		return true;
 	end;
 
-	function Get_Actual_Radius(p: Planet; xyz: Point) return number is
+	function Get_Actual_Radius(p: planet_t; xyz: Point) return number is
 		normalised_xyz: Point := NormaliseToSphere(xyz, p.nominal_radius);
 		radius: number;
 	begin
@@ -124,14 +124,14 @@ package body Planets is
 		return radius;
 	end;
 
-	function Is_Point_Underground(p: Planet; xyz: Point) return boolean is
+	function Is_Point_Underground(p: planet_t; xyz: Point) return boolean is
 		xyzr: number := Length(xyz);
 		realr: number := p.Get_Actual_Radius(xyz);
 	begin
 		return xyzr < realr;
 	end;
 
-	procedure Sample_Atmosphere(p: Planet; xyz: Point;
+	procedure Sample_Atmosphere(p: planet_t; xyz: Point;
 			camera_direction, sun_direction: Vector3;
 			sun_colour: colour_t;
 			extinction, emission: out colour_t) is

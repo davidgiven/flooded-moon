@@ -22,7 +22,7 @@ use Colours;
 
 package body Scene is
 	scene_cf: node_t := ConfigFiles.Create;
-	planets_list: Planets.List;
+	planets_list: planet_list_t;
 	sun: integer := -1;
 	sun_colour: colour_t;
 	hfov, vfov: number;
@@ -79,7 +79,7 @@ package body Scene is
 		end if;
 	end;
 
-	function Compute_Primary_Ray(x, y: integer; img: image_t) return Ray is
+	function Compute_Primary_Ray(x, y: integer; img: image_t) return ray_t is
 		t: TransformMatrix;
 		xdegPerPixel: number := hfov / number(img.Width);
 		ydegPerPixel: number := vfov / number(img.Height);
@@ -89,18 +89,18 @@ package body Scene is
 		t.Rotate(camera_up, xdegPerPixel * number(x));
 		t.Rotate(camera_right, ydegPerPixel * number(y));
 		dir := t.Transform(camera_forward);
-		return Ray'(camera_location, dir);
+		return ray_t'(camera_location, dir);
 	end;
 
-	procedure Compute_Object_Intersections(r: Ray;
+	procedure Compute_Object_Intersections(r: ray_t;
 			ints: out Intersections; num: out natural;
 			include_atmosphere: boolean := true) is
-		procedure TestSingleObject(p: Planet; i: in out Intersection;
+		procedure TestSingleObject(p: planet_t; i: in out intersection_t;
 				index: natural) is
 		begin
 			if p.Test_Intersection(r, i.ray_entry, i.ray_exit,
 					include_atmosphere => include_atmosphere) then
-				i.planet := index;
+				i.planet_t := index;
 				num := num + 1;
 			end if;
 		end;
@@ -113,7 +113,7 @@ package body Scene is
 		end;
 
 		procedure Swap(a, b: natural) is
-			t: Intersection := ints(a);
+			t: intersection_t := ints(a);
 		begin
 			ints(a) := ints(b);
 			ints(b) := t;
@@ -134,33 +134,33 @@ package body Scene is
 		end if;
 	end;
 
-	function SunlightFromPoint(p: Planet;
+	function SunlightFromPoint(p: planet_t;
 			loc: Point; sunDir: Vector3) return colour_t is
-		r: Ray;
+		r: ray_t;
 		ints: Intersections;
 		num: natural;
 	begin
 		r.location := loc;
 		r.direction := sunDir;
-		-- Crudely intersect the ray of light with our objects
+		-- Crudely intersect the ray_t of light with our objects
 		-- to see if we're in eclipse.
 		Compute_Object_Intersections(r, ints, num,
 			include_atmosphere => false);
-		if (num > 0) and (ints(0).planet = sun) then
+		if (num > 0) and (ints(0).planet_t = sun) then
 			return sun_colour;
 		else
 			return Black;
 		end if;
 	end;
 
-	procedure AccumulateSamplesThroughPlanet(p: Planet; int: Intersection;
-			r: Ray; emission, transmittance: in out colour_t) is
+	procedure AccumulateSamplesThroughPlanet(p: planet_t; int: intersection_t;
+			r: ray_t; emission, transmittance: in out colour_t) is
 		t: number := 0.0;
 		maxt: number := Length(int.ray_exit - int.ray_entry);
 		loc, ploc: Point;
 		stepSize: number;
 
-		sunObject: Planet renames planets_list(sun);
+		sunObject: planet_t renames planets_list(sun);
 		sunlight: colour_t;
 		sunDir, cameraDir: Vector3;
 		extinctionHere, emissionHere: colour_t;
@@ -178,17 +178,17 @@ package body Scene is
 			sunlight := SunlightFromPoint(p, loc, sunDir);
 
 			if p.Is_Point_Underground(ploc) then
-				-- Ray gets stoppped by ground.
+				-- ray_t gets stoppped by ground.
 				emissionHere := RGB(1.0, 0.0, 0.0);
 				emission := emission + transmittance*emissionHere;
 				transmittance := Black;
 				return;
 			elsif (p.atmospheric_depth > 0.0) then
-				-- Ray travels through atmosphere.
+				-- ray_t travels through atmosphere.
 				p.Sample_Atmosphere(ploc, cameraDir, sunDir, sunlight,
 						extinctionHere, emissionHere);
 			else
-				-- Planet *has* no atmosphere! This shouldn't happen; it's
+				-- planet_t *has* no atmosphere! This shouldn't happen; it's
 				-- an edge case --- the next step will likely intercept the
 				-- surface.
 				extinctionHere := Black;
@@ -207,16 +207,16 @@ package body Scene is
 			emission := emission + transmittance*emissionHere*stepSize*sunlight;
 
 			-- Stop iterating if we're unlikely to see any more down this
-			-- ray.
+			-- ray_t.
 			exit when Length2(transmittance) < 0.01;
 
 			t := t + stepSize;
 		end loop;
 
-		-- Finished with ray.
+		-- Finished with ray_t.
 	end;
 
-	function Compute_Pixel_Colour(r: Ray) return colour_t is
+	function Compute_Pixel_Colour(r: ray_t) return colour_t is
 		ints: Intersections;
 		num: natural;
 		emission: colour_t := Black;
@@ -226,7 +226,7 @@ package body Scene is
 					include_atmosphere => true);
 		for i in 0..(num-1) loop
 			AccumulateSamplesThroughPlanet(
-					planets_list(ints(i).planet), ints(i), r,
+					planets_list(ints(i).planet_t), ints(i), r,
 					emission, transmittance);
 			exit when Length2(transmittance) < 0.01;
 		end loop;

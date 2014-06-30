@@ -9,23 +9,23 @@ use Config;
 use Colours;
 
 package Scene is
-	type Ray is record
+	type ray_t is record
 		location: Point;
 		direction: Vector3;
 	end record;
 
-	type Intersection is record
-		planet: integer;
+	type intersection_t is record
+		planet_t: integer;
 		ray_entry: Point;
 		ray_exit: Point;
 	end record;
-	type Intersections is array(natural range 0..Max_Objects) of Intersection;
+	type Intersections is array(natural range 0..Max_Objects) of intersection_t;
 
 	procedure Load(filename: string);
-	function Compute_Primary_Ray(x, y: integer; img: image_t) return Ray;
-	procedure Compute_Object_Intersections(r: Ray;
+	function Compute_Primary_Ray(x, y: integer; img: image_t) return ray_t;
+	procedure Compute_Object_Intersections(r: ray_t;
 		ints: out Intersections; num: out natural;
 		include_atmosphere: boolean := true);
-	function Compute_Pixel_Colour(r: Ray) return colour_t;
+	function Compute_Pixel_Colour(r: ray_t) return colour_t;
 end;
 

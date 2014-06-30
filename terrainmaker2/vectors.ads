@@ -16,10 +16,10 @@ package Vectors is
 	type Vector3 is new Vectors3.Vector;
 	for Vector3'alignment use (4*8);
 
-	X: constant Vector3 := (1.0, 0.0, 0.0);
-	Y: constant Vector3 := (0.0, 1.0, 0.0);
-	Z: constant Vector3 := (0.0, 0.0, 1.0);
-	Zero: constant Vector3 := (0.0, 0.0, 0.0);
+	function X return Vector3 is (1.0, 0.0, 0.0);
+	function Y return Vector3 is (0.0, 1.0, 0.0);
+	function Z return Vector3 is (0.0, 0.0, 1.0);
+	function Zero return Vector3 is (0.0, 0.0, 0.0);
 
 	type Vector4Index is range 0..3;
 	package Vectors4 is new GenericVector(Vector4Index);
@@ -38,4 +38,7 @@ package Vectors is
 		(Normalise(v) * r);
 
 	function Load(cf: node_t) return Vector3;
+	
+	type vec3_index_t is (X, Y, Z);
+	type vec3_t is array(vec3_index_t) of number;
 end;

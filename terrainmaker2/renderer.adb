@@ -82,7 +82,7 @@ package body Renderer is
 		task body Worker is
 			y: integer;
 			finished: boolean;
-			r: Ray;
+			r: ray_t;
 		begin
 			-- Keep asking for stuff to do, then do it. When the Scheduler
 			-- has terminated, requesting a work unit will throw an exception and
