@@ -20,7 +20,7 @@ use Colours;
 
 package Planets is
 	type terrain_radius_f is access procedure(
-			xyz: Point;
+			xyz: vec3_t;
 			bounding_radius: number;
 			nominal_radius: number;
 			radius: out number
@@ -29,11 +29,11 @@ package Planets is
 	package terrain_radius_c_f is new Calculon(terrain_radius_f);
 
 	type atmosphere_media_f is access procedure(
-			xyz: Point;
+			xyz: vec3_t;
 			bounding_radius: number;
 			nominal_radius: number;
-			camera_direction: vector3;
-			sun_direction: vector3;
+			camera_direction: vec3_t;
+			sun_direction: vec3_t;
 			sun_colour: colour_t;
 			extinction: in out colour_t;
 			emission: in out colour_t
@@ -43,7 +43,7 @@ package Planets is
 
 	type planet_t is tagged limited record
 		cf: node_t;
-		location: Point;
+		location: vec3_t;
 		nominal_radius: number;
 		atmospheric_depth: number;
 		terrain_radius_func: terrain_radius_c_f.Func;
@@ -56,17 +56,17 @@ package Planets is
 	procedure Init(p: in out planet_t; cf: node_t);
 	-- These take WORLD coordinates.
 	function Test_Intersection(p: planet_t; r: ray_t;
-			ray_entry, ray_exit: in out Point;
+			ray_entry, ray_exit: in out vec3_t;
 			include_atmosphere: boolean := true)
 			return boolean;
 
 	-- These take planet_t coordinates.
-	function Get_Actual_Radius(p: planet_t; xyz: Point)
+	function Get_Actual_Radius(p: planet_t; xyz: vec3_t)
 			return number;
-	function Is_Point_Underground(p: planet_t; xyz: Point)
+	function Is_Point_Underground(p: planet_t; xyz: vec3_t)
 			return boolean;
-	procedure Sample_Atmosphere(p: planet_t; xyz: Point;
-			camera_direction, sun_direction: Vector3;
+	procedure Sample_Atmosphere(p: planet_t; xyz: vec3_t;
+			camera_direction, sun_direction: vec3_t;
 			sun_colour: colour_t;
 			extinction, emission: out colour_t);
 

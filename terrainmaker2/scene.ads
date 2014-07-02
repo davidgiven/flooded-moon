@@ -10,14 +10,14 @@ use Colours;
 
 package Scene is
 	type ray_t is record
-		location: Point;
-		direction: Vector3;
+		location: vec3_t;
+		direction: vec3_t;
 	end record;
 
 	type intersection_t is record
 		planet_t: integer;
-		ray_entry: Point;
-		ray_exit: Point;
+		ray_entry: vec3_t;
+		ray_exit: vec3_t;
 	end record;
 	type Intersections is array(natural range 0..Max_Objects) of intersection_t;
 

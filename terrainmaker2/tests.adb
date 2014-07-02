@@ -90,7 +90,7 @@ procedure Tests is
 	end;
 			
 	procedure MatrixInversion is
-		-- Matrix literals can't be loaded directly into a mat4_t
+		-- mat4_t literals can't be loaded directly into a mat4_t
 		-- (the storage order is wrong). They need to be transposed
 		-- first.
 		m: mat4_t := Transpose(((3.0, 2.0, 4.0, 1.0),
@@ -210,18 +210,18 @@ procedure Tests is
 	end;
 
 	procedure CalculonVectorTest is
-		type TestFunc is access procedure(i: number; r1, r2: out Vector3);
+		type TestFunc is access procedure(i: number; r1, r2: out vec3_t);
 		package TestCalculon is new Calculon(TestFunc);
 		use TestCalculon;
 		func: TestCalculon.Func;
-		n1, n2: Vector3;
+		n1, n2: vec3_t;
 	begin
 		Initialise(func, "let r1=[1,1,1] in let r2=[2,2,2] in return",
 			"(i: real): (r1: vector*3, r2: vector*3)");
 		func.Call.all(1.0, n1, n2);
 		Check(
-			(n1(0) = 1.0) and (n1(1) = 1.0) and (n1(2) = 1.0) and
-			(n2(0) = 2.0) and (n2(1) = 2.0) and (n2(2) = 2.0),
+			(n1.x = 1.0) and (n1.y = 1.0) and (n1.z = 1.0) and
+			(n2.x = 2.0) and (n2.y = 2.0) and (n2.z = 2.0),
 			"CalculonVectorTest fail; n1=" & ToString(n1) & " n2=" & ToString(n2));
 	end;
 

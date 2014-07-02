@@ -12,9 +12,7 @@ use Config;
 use Colours;
 use Images;
 use Vectors;
-use all type Vectors.Vector3;
 use Matrices;
-use all type Matrices.Matrix3;
 
 procedure TerrainMaker is
 	img: image_t;

@@ -26,10 +26,10 @@ package body Scene is
 	sun: integer := -1;
 	sun_colour: colour_t;
 	hfov, vfov: number;
-	camera_location: Point;
-	camera_forward: Vector3;
-	camera_right: Vector3;
-	camera_up: Vector3;
+	camera_location: vec3_t;
+	camera_forward: vec3_t;
+	camera_right: vec3_t;
+	camera_up: vec3_t;
 
 	procedure Load(filename: string) is
 	begin
@@ -83,7 +83,7 @@ package body Scene is
 		t: TransformMatrix;
 		xdegPerPixel: number := hfov / number(img.Width);
 		ydegPerPixel: number := vfov / number(img.Height);
-		dir: Vector3;
+		dir: vec3_t;
 	begin
 		t.Reset;
 		t.Rotate(camera_up, xdegPerPixel * number(x));
@@ -135,7 +135,7 @@ package body Scene is
 	end;
 
 	function SunlightFromPoint(p: planet_t;
-			loc: Point; sunDir: Vector3) return colour_t is
+			loc: vec3_t; sunDir: vec3_t) return colour_t is
 		r: ray_t;
 		ints: Intersections;
 		num: natural;
@@ -157,12 +157,12 @@ package body Scene is
 			r: ray_t; emission, transmittance: in out colour_t) is
 		t: number := 0.0;
 		maxt: number := Length(int.ray_exit - int.ray_entry);
-		loc, ploc: Point;
+		loc, ploc: vec3_t;
 		stepSize: number;
 
 		sunObject: planet_t renames planets_list(sun);
 		sunlight: colour_t;
-		sunDir, cameraDir: Vector3;
+		sunDir, cameraDir: vec3_t;
 		extinctionHere, emissionHere: colour_t;
 		transmittanceHere: colour_t;
 	begin

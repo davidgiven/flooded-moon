@@ -32,7 +32,5 @@ package Colours is
 		(c1*(1.0-a) + c2*a);
 	function Mix(c1, c2: colour_t; a: colour_t) return colour_t is
 		(c1*(1.0-a) + c2*a);
-
-	function Load(cf: node_t) return colour_t;
 end;
 

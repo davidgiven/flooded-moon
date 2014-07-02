@@ -76,7 +76,7 @@ package body Renderer is
 		end;
  
 		-- Actually does the rendering. Each of these is self contained and will
-		-- keep working until there's nothing left to do, at which point it
+		-- keep working until there's nothing left to do, at which vec3_t it
 		-- exits.
 		task type Worker;
 		task body Worker is

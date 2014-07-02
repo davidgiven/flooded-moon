@@ -54,11 +54,11 @@ package body Planets is
 	end;
 
 	function Test_Intersection(p: planet_t;
-				r: ray_t; ray_entry, ray_exit: in out Point;
+				r: ray_t; ray_entry, ray_exit: in out vec3_t;
 				include_atmosphere: boolean := true)
 			return boolean is
 		radius: number;
-		ro: Vector3;
+		ro: vec3_t;
 		a, b, c, q: number;
 		disc2, disc: number;
 		t0, t1: number;
@@ -115,8 +115,8 @@ package body Planets is
 		return true;
 	end;
 
-	function Get_Actual_Radius(p: planet_t; xyz: Point) return number is
-		normalised_xyz: Point := NormaliseToSphere(xyz, p.nominal_radius);
+	function Get_Actual_Radius(p: planet_t; xyz: vec3_t) return number is
+		normalised_xyz: vec3_t := NormaliseToSphere(xyz, p.nominal_radius);
 		radius: number;
 	begin
 		p.terrain_radius_func.Call.all(normalised_xyz, p.bounding_radius,
@@ -124,15 +124,15 @@ package body Planets is
 		return radius;
 	end;
 
-	function Is_Point_Underground(p: planet_t; xyz: Point) return boolean is
+	function Is_Point_Underground(p: planet_t; xyz: vec3_t) return boolean is
 		xyzr: number := Length(xyz);
 		realr: number := p.Get_Actual_Radius(xyz);
 	begin
 		return xyzr < realr;
 	end;
 
-	procedure Sample_Atmosphere(p: planet_t; xyz: Point;
-			camera_direction, sun_direction: Vector3;
+	procedure Sample_Atmosphere(p: planet_t; xyz: vec3_t;
+			camera_direction, sun_direction: vec3_t;
 			sun_colour: colour_t;
 			extinction, emission: out colour_t) is
 	begin
