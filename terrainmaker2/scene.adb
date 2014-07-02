@@ -179,7 +179,7 @@ package body Scene is
 
 			if p.Is_Point_Underground(ploc) then
 				-- ray_t gets stoppped by ground.
-				emissionHere := RGB(1.0, 0.0, 0.0);
+				emissionHere := (1.0, 0.0, 0.0);
 				emission := emission + transmittance*emissionHere;
 				transmittance := Black;
 				return;

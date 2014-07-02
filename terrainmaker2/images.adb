@@ -93,9 +93,9 @@ package body Images is
 				declare
 					c: colour_t := img(x, y);
 				begin
-					write(c.r);
-					write(c.g);
-					write(c.b);
+					write(Red(c));
+					write(Green(c));
+					write(Blue(c));
 				end;
 			end loop;
 		end loop;

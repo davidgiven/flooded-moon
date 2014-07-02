@@ -84,43 +84,46 @@ procedure Tests is
 
 	procedure MatrixAndVectorSizes is
 	begin
-		Check(Vector2'length = 2,
-			"MatrixAndVectorSizes fail: Vector2 is not of length 2");
-		Check(Vector3'length = 3,
-			"MatrixAndVectorSizes fail: Vector3 is not of length 3");
-		Check(Vector4'length = 4,
-			"MatrixAndVectorSizes fail: Vector4 is not of length 4");
-		Check(Matrix2'length(1) = 2,
-			"MatrixAndVectorSizes fail: Matrix2 is not of length 2");
-		Check(Matrix3'length(1) = 3,
-			"MatrixAndVectorSizes fail: Matrix3 is not of length 3");
-		Check(Matrix4'length(1) = 4,
-			"MatrixAndVectorSizes fail: Matrix4 is not of length 4");
+		Check(vec3_t'alignment = 4*8,
+			"MatrixAndVectorSizes fail: vec3_t alignment is"
+				& vec3_t'alignment & " not" & 4*8);
 	end;
 			
 	procedure MatrixInversion is
-		m: Matrix3 := ((3.0, 2.0, 4.0),
-					   (2.0,-3.0, 1.0),
-					   (1.0, 1.0, 2.0));
+		-- Matrix literals can't be loaded directly into a mat4_t
+		-- (the storage order is wrong). They need to be transposed
+		-- first.
+		m: mat4_t := Transpose(((3.0, 2.0, 4.0, 1.0),
+					            (2.0,-3.0, 1.0, 1.0),
+					            (1.0, 1.0, 2.0, 1.0),
+					            (3.0, 2.0, 1.0, 1.0)));
+
+		r: mat4_t := Transpose((( 5.0, 3.0, -15.0, 7.0),
+		                        (-1.0,-6.0,  3.0, 4.0),
+					            ( 9.0,-0.0, -0.0, -9.0),
+					            (-22.0, 3.0, 39.0, 7.0))) / 27.0;
 	begin
 		m := Invert(m);
 		Check(
-			CompareWS(ToString(m),
-				"( 1.00000000000000E+00, 0.00000000000000E+00,-2.00000000000000E+00 4.28571428571428E-01,-2.85714285714286E-01,-7.14285714285714E-01 -7.14285714285714E-01, 1.42857142857143E-01, 1.85714285714286E+00)"),
-			"MatrixInversion fail:" & LF & ToString(m));
+			CompareWS(ToString(m), ToString(r)),
+			"MatrixInversion fail; should be:" & LF & r & 
+				LF & "but was:" & LF & m);
 	end;
 
 	procedure MatrixMultiplyByVector is
-		m: Matrix3 := ((1.0, 2.0, 3.0),
-		               (5.0, 6.0, 7.0),
-					   (9.0, 10.0, 11.0));
-		v: Vector3 := (1.0, 2.0, 3.0);
+		m: mat4_t := Transpose(((1.0, 2.0, 3.0, 4.0),
+		                        (5.0, 6.0, 7.0, 8.0),
+								(9.0, 10.0, 11.0, 12.0),
+								(13.0, 14.0, 15.0, 16.0)));
+
+		v: vec3_t := (0.0, 1.0, 2.0);
+		r: vec3_t := (4.5, 5.0, 5.5) / 6.0;
 	begin
 		v := m * v;
 		Check(
-			CompareWS(ToString(v),
-				"( 1.40000000000000E+01, 3.80000000000000E+01, 6.20000000000000E+01)"),
-			"MatrixMultiplyByVector fail:" & LF & ToString(v));
+			CompareWS(ToString(v), ToString(r)),
+			"MatrixMultiplyByVector fail; should be:" & LF & r &
+				LF & "but was:" & LF & v);
 	end;
 
 	procedure ConfigTest is
@@ -248,6 +251,4 @@ begin
 	CalculonVectorTest;
 	MapTest;
 end;
-
-
 

@@ -40,5 +40,11 @@ package Config is
 
 	LF: constant character := ASCII.LF;
 	CR: constant character := ASCII.CR;
+
+	-- Automatic conversion of numbers to strings.
+	function "&" (s: string; n: number) return string is
+		(s & n'img);
+	function "&" (s: string; n: integer) return string is
+		(s & n'img);
 end;
 
