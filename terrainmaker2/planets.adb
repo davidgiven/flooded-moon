@@ -36,6 +36,18 @@ package body Planets is
 				"radius: real" &
 			")");
 
+		p.terrain_surface_func.Initialise_From_File(
+			cf("terrain_surface_func").Value,
+			"(" &
+				"xyz: vector*3," &
+				"nominal_radius: real," &
+				"camera_direction: vector*3," &
+				"sun_direction: vector*3," &
+				"sun_colour: vector*3" &
+			"): (" & 
+				"emission: vector*3" &
+			")");
+
 		if (p.atmospheric_depth > 0.0) then
 			p.atmosphere_func.Initialise_From_File(
 				cf("atmosphere_func").Value,
@@ -115,8 +127,11 @@ package body Planets is
 		return true;
 	end;
 
+	-- xyz is a *world* coordinate.
 	function Get_Actual_Radius(p: planet_t; xyz: vec3_t) return number is
-		normalised_xyz: vec3_t := NormaliseToSphere(xyz, p.nominal_radius);
+		xyz_rel_planet: vec3_t := xyz - p.location;
+		normalised_xyz: vec3_t := NormaliseToSphere(xyz_rel_planet,
+			p.nominal_radius);
 		radius: number;
 	begin
 		p.terrain_radius_func.Call.all(normalised_xyz, p.bounding_radius,
@@ -124,21 +139,38 @@ package body Planets is
 		return radius;
 	end;
 
+	-- xyz is a *world* coordinate.
 	function Is_Point_Underground(p: planet_t; xyz: vec3_t) return boolean is
-		xyzr: number := Length(xyz);
-		realr: number := p.Get_Actual_Radius(xyz);
+		xyz_r: number := Length(xyz - p.location);
+		real_r: number := p.Get_Actual_Radius(xyz);
 	begin
-		return xyzr < realr;
+		return xyz_r < real_r;
 	end;
 
+	-- xyz is a *world* coordinate.
 	procedure Sample_Atmosphere(p: planet_t; xyz: vec3_t;
 			camera_direction, sun_direction: vec3_t;
 			sun_colour: colour_t;
 			extinction, emission: out colour_t) is
+		xyz_rel_planet: vec3_t := xyz - p.location;
 	begin
-		p.atmosphere_func.Call.all(xyz, p.bounding_radius, p.nominal_radius,
+		p.atmosphere_func.Call.all(xyz_rel_planet,
+				p.bounding_radius, p.nominal_radius,
 				camera_direction, sun_direction, sun_colour,
 				extinction, emission);
+	end;
+
+	-- xyz is a *world* coordinate.
+	procedure Sample_Surface(p: planet_t; xyz: vec3_t;
+			camera_direction, sun_direction: vec3_t;
+			sun_colour: colour_t;
+			emission: out colour_t) is
+		xyz_rel_planet: vec3_t := xyz - p.location;
+	begin
+		p.terrain_surface_func.Call.all(xyz_rel_planet,
+				p.nominal_radius,
+				camera_direction, sun_direction, sun_colour,
+				emission);
 	end;
 end;
 

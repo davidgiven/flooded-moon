@@ -177,7 +177,7 @@ package body Scene is
 
 		-- Sample the atmosphere here.
 		camera_dir := Normalise(camera_location - here);
-		planet.Sample_Atmosphere(here - planet.location,
+		planet.Sample_Atmosphere(here,
 				camera_dir, sun_dir, sunlight,
 				extinction_here, emission_here);
 
@@ -204,7 +204,7 @@ package body Scene is
 		p: vec3_t;
 	begin
 		-- Bail immediately if the end of the segment isn't underground.
-		if not planet.Is_Point_Underground(segment_end - planet.location) then
+		if not planet.Is_Point_Underground(segment_end) then
 			return false;
 		end if;
 
@@ -220,7 +220,7 @@ package body Scene is
 			p := segment_start + segment_delta*pmid;
 			exit when (segment_length * (phi-plo)) < 1.0;
 
-			if planet.Is_Point_Underground(p - planet.location) then
+			if planet.Is_Point_Underground(p) then
 				phi := pmid;
 			else
 				plo := pmid;
@@ -238,12 +238,16 @@ package body Scene is
 			emission, transmittance: in out colour_t) is
 		camera_dir, sun_dir: vec3_t;
 		sunlight: colour_t;
+		emission_here: colour_t;
 	begin
 		sun_dir := Normalise(planets_list(sun).location - here);
 		sunlight := Sunlight_From_Point(planet, here, sun_dir);
 		camera_dir := Normalise(camera_location - here);
 
-		emission := emission + transmittance*(1.0, 0.0, 0.0)*sunlight;
+		planet.Sample_Surface(here,
+				camera_dir, sun_dir, sunlight,
+				emission_here);
+		emission := emission + transmittance*emission_here;
 		transmittance := Black;
 	end;
 

@@ -28,6 +28,17 @@ package Planets is
 	pragma Convention(C, terrain_radius_f);
 	package terrain_radius_c_f is new Calculon(terrain_radius_f);
 
+	type terrain_surface_f is access procedure(
+			xyz: vec3_t;
+			nominal_radius: number;
+			camera_direction: vec3_t;
+			sun_direction: vec3_t;
+			sun_colour: colour_t;
+			emission: out colour_t
+		);
+	pragma Convention(C, terrain_surface_f);
+	package terrain_surface_c_f is new Calculon(terrain_surface_f);
+
 	type atmosphere_media_f is access procedure(
 			xyz: vec3_t;
 			bounding_radius: number;
@@ -47,6 +58,7 @@ package Planets is
 		nominal_radius: number;
 		atmospheric_depth: number;
 		terrain_radius_func: terrain_radius_c_f.Func;
+		terrain_surface_func: terrain_surface_c_f.Func;
 		atmosphere_func: atmosphere_media_c_t.Func;
 
 		bounding_radius: number;
@@ -69,6 +81,10 @@ package Planets is
 			camera_direction, sun_direction: vec3_t;
 			sun_colour: colour_t;
 			extinction, emission: out colour_t);
+	procedure Sample_Surface(p: planet_t; xyz: vec3_t;
+			camera_direction, sun_direction: vec3_t;
+			sun_colour: colour_t;
+			emission: out colour_t);
 
 	package Lists is new GenericLists(planet_t);
 	subtype planet_list_t is Lists.List;
