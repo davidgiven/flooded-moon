@@ -156,12 +156,12 @@ package body Scene is
 	-- Coordinates here are *world* based.
 	procedure Calculate_Atmosphere_For_Segment(planet: planet_t;
 			segment_start, segment_end: vec3_t;
-			segment_length: number;
 			emission, transmittance: in out colour_t) is
 		here: vec3_t;
 		camera_dir, sun_dir: vec3_t;
 		sunlight: colour_t;
 		extinction_here, emission_here, transmittance_here: colour_t;
+		segment_length: number;
 	begin
 		-- Give up immediately if there is no atmosphere.
 		if (planet.atmospheric_depth = 0.0) then
@@ -183,6 +183,7 @@ package body Scene is
 
 		-- Calculate transmittance for this segment (0 means opaque,
 		-- 1.0 means transparent).
+		segment_length := Length(segment_end - segment_start);
 		transmittance_here := exp(-extinction_here * segment_length);
 
 		-- Calculate cumulative transmittance and emission.
@@ -194,47 +195,73 @@ package body Scene is
 			transmittance*emission_here*segment_length*sunlight;
 	end;
 
-	procedure Accumulate_Samples_Through_Planet(p: planet_t; int: intersection_t;
+	-- Coordinates here are *world* based.
+	function Find_Intersection_With_Terrain(planet: planet_t;
+			segment_start: vec3_t; segment_end: in out vec3_t) return boolean is
+	begin
+		return planet.Is_Point_Underground(segment_end - planet.location);
+	end;
+
+	-- Coordinates here are *world* based.
+	procedure Render_Terrain(planet: planet_t;
+			here: vec3_t;
+			emission, transmittance: in out colour_t) is
+		camera_dir, sun_dir: vec3_t;
+		sunlight: colour_t;
+	begin
+		sun_dir := Normalise(planets_list(sun).location - here);
+		sunlight := Sunlight_From_Point(planet, here, sun_dir);
+		camera_dir := Normalise(camera_location - here);
+
+		emission := emission + transmittance*(1.0, 0.0, 0.0)*sunlight;
+		transmittance := Black;
+	end;
+
+	-- Coordinates here are *world* based.
+	procedure Accumulate_Samples_Through_Planet(planet: planet_t;
+			int: intersection_t;
 			r: ray_t; emission, transmittance: in out colour_t) is
 		t: number := 0.0;
 		maxt: number := Length(int.ray_exit - int.ray_entry);
-		loc, ploc: vec3_t;
-		stepSize: number;
+		segment_start, segment_end: vec3_t;
+		step_size: number;
+		underground: boolean;
 
 		sunlight: colour_t;
 		sunDir, cameraDir: vec3_t;
 		extinctionHere, emissionHere: colour_t;
 		transmittanceHere: colour_t;
 	begin
-		--Put_Line("sample");
 		while (t < maxt) loop
-			-- Sample half-way along this segment (for slightly better
-			-- accuracy).
-			loc := int.ray_entry + r.direction*t;
-			ploc := loc - p.location;
-			stepSize := 1000.0; -- one km
-			sunlight := Sunlight_From_Point(p, loc, sunDir);
+			-- Determine segment under consideration.
+			step_size := 1000.0;
+			segment_start := int.ray_entry + r.direction*t;
+			t := t + step_size;
+			segment_end := int.ray_entry + r.direction*t;
 
-			if p.Is_Point_Underground(ploc) then
-				-- ray_t gets stoppped by ground.
-				emissionHere := (1.0, 0.0, 0.0)*sunlight;
-				emission := emission + transmittance*emissionHere;
-				transmittance := Black;
-				return;
-			end if;
+			-- Are we underground? If so, adjust the end of the segment to
+			-- be at ground level.
+			underground := Find_Intersection_With_Terrain(planet,
+				segment_start, segment_end);
 
-			Calculate_Atmosphere_For_Segment(p,
-				loc, loc + r.direction*stepSize, stepSize,
+			-- Render atmosphere for the (possibly adjusted) segment.
+			Calculate_Atmosphere_For_Segment(planet,
+				segment_start, segment_end,
 				emission, transmittance);
+
+			-- If we've reached the planet, render that and stop.
+			if underground then
+				Render_Terrain(planet, segment_end,
+					emission, transmittance);
+				exit;
+			end if;
 
 			-- Stop iterating if we're unlikely to see any more down this
 			-- ray_t.
 			exit when Length2(transmittance) < 0.01;
-
-			t := t + stepSize;
 		end loop;
 
-		-- Finished with ray_t.
+		-- Finished with ray.
 	end;
 
 	function Compute_Pixel_Colour(r: ray_t) return colour_t is
