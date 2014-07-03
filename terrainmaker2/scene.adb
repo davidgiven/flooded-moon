@@ -134,7 +134,7 @@ package body Scene is
 		end if;
 	end;
 
-	function SunlightFromPoint(p: planet_t;
+	function Sunlight_From_Point(planet: planet_t;
 			loc: vec3_t; sunDir: vec3_t) return colour_t is
 		r: ray_t;
 		ints: Intersections;
@@ -153,14 +153,54 @@ package body Scene is
 		end if;
 	end;
 
-	procedure AccumulateSamplesThroughPlanet(p: planet_t; int: intersection_t;
+	-- Coordinates here are *world* based.
+	procedure Calculate_Atmosphere_For_Segment(planet: planet_t;
+			segment_start, segment_end: vec3_t;
+			segment_length: number;
+			emission, transmittance: in out colour_t) is
+		here: vec3_t;
+		camera_dir, sun_dir: vec3_t;
+		sunlight: colour_t;
+		extinction_here, emission_here, transmittance_here: colour_t;
+	begin
+		-- Give up immediately if there is no atmosphere.
+		if (planet.atmospheric_depth = 0.0) then
+			return;
+		end if;
+
+		-- Sampling is done for the middle of our segment.
+		here := (segment_start + segment_end) / 2.0;
+
+		-- Calculate sunlight at this point.
+		sun_dir := Normalise(planets_list(sun).location - here);
+		sunlight := Sunlight_From_Point(planet, here, sun_dir);
+
+		-- Sample the atmosphere here.
+		camera_dir := Normalise(camera_location - here);
+		planet.Sample_Atmosphere(here - planet.location,
+				camera_dir, sun_dir, sunlight,
+				extinction_here, emission_here);
+
+		-- Calculate transmittance for this segment (0 means opaque,
+		-- 1.0 means transparent).
+		transmittance_here := exp(-extinction_here * segment_length);
+
+		-- Calculate cumulative transmittance and emission.
+		transmittance := transmittance * transmittance_here;
+
+		-- colour_t of this pixel is the colour_t accumulated so far, plus
+		-- the colour_t of the new segment attenuated 
+		emission := emission +
+			transmittance*emission_here*segment_length*sunlight;
+	end;
+
+	procedure Accumulate_Samples_Through_Planet(p: planet_t; int: intersection_t;
 			r: ray_t; emission, transmittance: in out colour_t) is
 		t: number := 0.0;
 		maxt: number := Length(int.ray_exit - int.ray_entry);
 		loc, ploc: vec3_t;
 		stepSize: number;
 
-		sunObject: planet_t renames planets_list(sun);
 		sunlight: colour_t;
 		sunDir, cameraDir: vec3_t;
 		extinctionHere, emissionHere: colour_t;
@@ -173,38 +213,19 @@ package body Scene is
 			loc := int.ray_entry + r.direction*t;
 			ploc := loc - p.location;
 			stepSize := 1000.0; -- one km
-			sunDir := Normalise(sunObject.location - loc);
-			cameraDir := Normalise(camera_location - loc);
-			sunlight := SunlightFromPoint(p, loc, sunDir);
+			sunlight := Sunlight_From_Point(p, loc, sunDir);
 
 			if p.Is_Point_Underground(ploc) then
 				-- ray_t gets stoppped by ground.
-				emissionHere := (1.0, 0.0, 0.0);
+				emissionHere := (1.0, 0.0, 0.0)*sunlight;
 				emission := emission + transmittance*emissionHere;
 				transmittance := Black;
 				return;
-			elsif (p.atmospheric_depth > 0.0) then
-				-- ray_t travels through atmosphere.
-				p.Sample_Atmosphere(ploc, cameraDir, sunDir, sunlight,
-						extinctionHere, emissionHere);
-			else
-				-- planet_t *has* no atmosphere! This shouldn't happen; it's
-				-- an edge case --- the next step will likely intercept the
-				-- surface.
-				extinctionHere := Black;
-				emissionHere := Black;
 			end if;
 
-			-- Calculate transmittance for this segment (0 means opaque,
-			-- 1.0 means transparent).
-			transmittanceHere := exp(-extinctionHere * stepSize);
-
-			-- Calculate cumulative transmittance and emission.
-			transmittance := transmittance * transmittanceHere;
-
-			-- colour_t of this pixel is the colour_t accumulated so far, plus
-			-- the colour_t of the new segment attenuated 
-			emission := emission + transmittance*emissionHere*stepSize*sunlight;
+			Calculate_Atmosphere_For_Segment(p,
+				loc, loc + r.direction*stepSize, stepSize,
+				emission, transmittance);
 
 			-- Stop iterating if we're unlikely to see any more down this
 			-- ray_t.
@@ -225,7 +246,7 @@ package body Scene is
 		Compute_Object_Intersections(r, ints, num,
 					include_atmosphere => true);
 		for i in 0..(num-1) loop
-			AccumulateSamplesThroughPlanet(
+			Accumulate_Samples_Through_Planet(
 					planets_list(ints(i).planet_t), ints(i), r,
 					emission, transmittance);
 			exit when Length2(transmittance) < 0.01;

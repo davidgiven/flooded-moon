@@ -1,5 +1,4 @@
 with Config;
-with GenericVector;
 with ConfigFiles;
 
 use Config;
