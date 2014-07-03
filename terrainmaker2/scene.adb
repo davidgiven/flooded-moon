@@ -198,8 +198,38 @@ package body Scene is
 	-- Coordinates here are *world* based.
 	function Find_Intersection_With_Terrain(planet: planet_t;
 			segment_start: vec3_t; segment_end: in out vec3_t) return boolean is
+		segment_delta: vec3_t;
+		segment_length: number;
+		plo, phi, pmid: number;
+		p: vec3_t;
 	begin
-		return planet.Is_Point_Underground(segment_end - planet.location);
+		-- Bail immediately if the end of the segment isn't underground.
+		if not planet.Is_Point_Underground(segment_end - planet.location) then
+			return false;
+		end if;
+
+		-- So the terrain surface is somewhere inside our segment. We're going
+		-- to binary chop the segment until we get reasonably close to it.
+		segment_delta := segment_end - segment_start;
+		segment_length := Length(segment_delta);
+		plo := 0.0;
+		phi := 1.0;
+		loop
+			-- Calculate our subsegment midpoint; give up if it's too small.
+			pmid := (plo + phi) / 2.0;
+			p := segment_start + segment_delta*pmid;
+			exit when (segment_length * (phi-plo)) < 1.0;
+
+			if planet.Is_Point_Underground(p - planet.location) then
+				phi := pmid;
+			else
+				plo := pmid;
+			end if;
+		end loop;
+
+		-- p is now approximately at the surface.
+		segment_end := p;
+		return true;
 	end;
 
 	-- Coordinates here are *world* based.
