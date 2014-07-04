@@ -10,5 +10,5 @@ let xyzn = (xyz / magnitude(xyz)) * nominal_radius in
 let scale = 3e3 in
 
 let c = (sin(xyzn/scale)/2) + 0.5 in
-let emission = sun_colour*c in
+let emission = (sun_colour+ambient_colour)*c in
 return

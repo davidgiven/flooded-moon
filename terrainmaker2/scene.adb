@@ -31,6 +31,10 @@ package body Scene is
 	camera_right: vec3_t;
 	camera_up: vec3_t;
 
+	function Compute_Light_Visibility(planet: planet_t;
+			int: intersection_t;
+			ray: ray_t) return colour_t;
+
 	procedure Load(filename: string) is
 	begin
 		scene_cf.Load(filename);
@@ -93,14 +97,14 @@ package body Scene is
 	end;
 
 	procedure Compute_Object_Intersections(r: ray_t;
-			ints: out Intersections; num: out natural;
+			ints: out intersection_list_t; num: out natural;
 			include_atmosphere: boolean := true) is
-		procedure TestSingleObject(p: planet_t; i: in out intersection_t;
+		procedure Test_Single_Object(p: planet_t; i: in out intersection_t;
 				index: natural) is
 		begin
 			if p.Test_Intersection(r, i.ray_entry, i.ray_exit,
 					include_atmosphere => include_atmosphere) then
-				i.planet_t := index;
+				i.planet := index;
 				num := num + 1;
 			end if;
 		end;
@@ -126,7 +130,7 @@ package body Scene is
 	begin
 		num := 0;
 		for index in (planets_list.First_Index)..(planets_list.Last_Index) loop
-			TestSingleObject(planets_list(index), ints(num), index);
+			Test_Single_Object(planets_list(index), ints(num), index);
 		end loop;
 
 		if (num > 1) then
@@ -135,26 +139,47 @@ package body Scene is
 	end;
 
 	function Sunlight_From_Point(planet: planet_t;
-			loc: vec3_t; sunDir: vec3_t) return colour_t is
-		r: ray_t;
-		ints: Intersections;
+			here: vec3_t; sun_dir: vec3_t; sunlight: colour_t;
+			allow_self_shadowing: boolean := false) return colour_t is
+		ray: ray_t;
+		ints: intersection_list_t;
+		int: intersection_t renames ints(0);
 		num: natural;
+		transmittance: colour_t;
+		dummy: boolean;
 	begin
-		r.location := loc;
-		r.direction := sunDir;
-		-- Crudely intersect the ray_t of light with our objects
-		-- to see if we're in eclipse.
-		Compute_Object_Intersections(r, ints, num,
+		-- Set up a ray from our sample point towards the sun.
+		ray.location := here;
+		ray.direction := sun_dir;
+
+		-- Crudely intersect it with the object graph.
+		Compute_Object_Intersections(ray, ints, num,
 			include_atmosphere => false);
-		if (num > 0) and (ints(0).planet_t = sun) then
-			return sun_colour;
-		else
+		if (num = 0) or else (ints(0).planet /= sun) then
+			-- No --- we're in eclipse.
 			return Black;
 		end if;
+
+		-- If we haven't been asked to do self-shadowing, which is
+		-- expensive, assume the point is in full sunlight.
+		if not allow_self_shadowing then
+			return sun_colour;
+		end if;
+
+		-- Re-intersect the ray with the planet we're interested in,
+		-- but including the atmosphere this time. This will tell us
+		-- the length of the atmospheric segment.
+		dummy := planet.Test_Intersection(ray, int.ray_entry, int.ray_exit,
+			include_atmosphere => true);
+		
+		-- Now calculate the light colour based on self-shadowing
+		-- and atmospheric scattering from that planet.
+		transmittance := Compute_Light_Visibility(planet, int, ray);
+		return Mix(black, sunlight, transmittance);
 	end;
 
 	-- Coordinates here are *world* based.
-	procedure Calculate_Atmosphere_For_Segment(planet: planet_t;
+	procedure Render_Atmosphere_For_Segment(planet: planet_t;
 			segment_start, segment_end: vec3_t;
 			emission, transmittance: in out colour_t) is
 		here: vec3_t;
@@ -173,7 +198,8 @@ package body Scene is
 
 		-- Calculate sunlight at this point.
 		sun_dir := Normalise(planets_list(sun).location - here);
-		sunlight := Sunlight_From_Point(planet, here, sun_dir);
+		sunlight := Sunlight_From_Point(planet, here, sun_dir, sun_colour,
+			allow_self_shadowing => false);
 
 		-- Sample the atmosphere here.
 		camera_dir := Normalise(camera_location - here);
@@ -237,41 +263,44 @@ package body Scene is
 			here: vec3_t;
 			emission, transmittance: in out colour_t) is
 		camera_dir, sun_dir: vec3_t;
-		sunlight: colour_t;
+		sunlight, directlight, ambient: colour_t;
 		emission_here: colour_t;
 	begin
+		-- Fake a little ambient light.
+		sunlight := sun_colour;
+		ambient := sunlight * 0.5;
+		sunlight := sunlight - ambient;
+
 		sun_dir := Normalise(planets_list(sun).location - here);
-		sunlight := Sunlight_From_Point(planet, here, sun_dir);
+		directlight := Sunlight_From_Point(planet, here,
+				sun_dir, sunlight,
+				allow_self_shadowing => true);
 		camera_dir := Normalise(camera_location - here);
 
 		planet.Sample_Surface(here,
-				camera_dir, sun_dir, sunlight,
+				camera_dir, sun_dir,
+				directlight, ambient,
 				emission_here);
 		emission := emission + transmittance*emission_here;
 		transmittance := Black;
 	end;
 
 	-- Coordinates here are *world* based.
-	procedure Accumulate_Samples_Through_Planet(planet: planet_t;
+	procedure Render_Planet(planet: planet_t;
 			int: intersection_t;
-			r: ray_t; emission, transmittance: in out colour_t) is
+			ray: ray_t; emission, transmittance: in out colour_t) is
 		t: number := 0.0;
 		maxt: number := Length(int.ray_exit - int.ray_entry);
 		segment_start, segment_end: vec3_t;
 		step_size: number;
 		underground: boolean;
-
-		sunlight: colour_t;
-		sunDir, cameraDir: vec3_t;
-		extinctionHere, emissionHere: colour_t;
-		transmittanceHere: colour_t;
 	begin
 		while (t < maxt) loop
 			-- Determine segment under consideration.
 			step_size := 1000.0;
-			segment_start := int.ray_entry + r.direction*t;
+			segment_start := int.ray_entry + ray.direction*t;
 			t := t + step_size;
-			segment_end := int.ray_entry + r.direction*t;
+			segment_end := int.ray_entry + ray.direction*t;
 
 			-- Are we underground? If so, adjust the end of the segment to
 			-- be at ground level.
@@ -279,7 +308,7 @@ package body Scene is
 				segment_start, segment_end);
 
 			-- Render atmosphere for the (possibly adjusted) segment.
-			Calculate_Atmosphere_For_Segment(planet,
+			Render_Atmosphere_For_Segment(planet,
 				segment_start, segment_end,
 				emission, transmittance);
 
@@ -291,29 +320,61 @@ package body Scene is
 			end if;
 
 			-- Stop iterating if we're unlikely to see any more down this
-			-- ray_t.
+			-- ray.
+			exit when Length2(transmittance) < 0.01;
+		end loop;
+	end;
+
+	-- This is a simplified version of Render_Planet used for
+	-- shadow casting. It considers only transmittance.
+	-- Coordinates here are *world* based.
+	function Compute_Light_Visibility(planet: planet_t;
+			int: intersection_t;
+			ray: ray_t) return colour_t is
+		t: number := 0.0;
+		maxt: number := Length(int.ray_exit - int.ray_entry);
+		segment_start, segment_end: vec3_t;
+		step_size: number;
+
+		transmittance: colour_t := white;
+	begin
+		while (t < maxt) loop
+			-- Determine segment under consideration.
+			step_size := 1000.0;
+			segment_start := int.ray_entry + ray.direction*t;
+			t := t + step_size;
+			segment_end := int.ray_entry + ray.direction*t;
+
+			-- Are we underground? If so, give up --- no light here.
+			if Find_Intersection_With_Terrain(planeT,
+				segment_start, segment_end) then
+				return black;
+			end if;
+
+			-- Stop iterating if we're unlikely to see any more down this
+			-- ray.
 			exit when Length2(transmittance) < 0.01;
 		end loop;
 
-		-- Finished with ray.
+		return transmittance;
 	end;
 
-	function Compute_Pixel_Colour(r: ray_t) return colour_t is
-		ints: Intersections;
+	function Compute_Pixel_Colour(ray: ray_t) return colour_t is
+		ints: intersection_list_t;
 		num: natural;
 		emission: colour_t := Black;
 		transmittance: colour_t := White;
 	begin
-		Compute_Object_Intersections(r, ints, num,
+		Compute_Object_Intersections(ray, ints, num,
 					include_atmosphere => true);
 		for i in 0..(num-1) loop
-			Accumulate_Samples_Through_Planet(
-					planets_list(ints(i).planet_t), ints(i), r,
+			Render_Planet(
+					planets_list(ints(i).planet), ints(i), ray,
 					emission, transmittance);
 			exit when Length2(transmittance) < 0.01;
 		end loop;
 
-		return emission; --Mix(emission, RGB(0.0, 0.0, 1.0), transmission);
+		return emission; -- Mix(emission, (0.0, 1.0, 0.0), transmittance);
 	end;
 
 end;

@@ -15,17 +15,18 @@ package Scene is
 	end record;
 
 	type intersection_t is record
-		planet_t: integer;
+		planet: integer;
 		ray_entry: vec3_t;
 		ray_exit: vec3_t;
 	end record;
-	type Intersections is array(natural range 0..Max_Objects) of intersection_t;
+	type intersection_list_t is
+		array(natural range 0..Max_Objects) of intersection_t;
 
 	procedure Load(filename: string);
 	function Compute_Primary_Ray(x, y: integer; img: image_t) return ray_t;
 	procedure Compute_Object_Intersections(r: ray_t;
-		ints: out Intersections; num: out natural;
+		ints: out intersection_list_t; num: out natural;
 		include_atmosphere: boolean := true);
-	function Compute_Pixel_Colour(r: ray_t) return colour_t;
+	function Compute_Pixel_Colour(ray: ray_t) return colour_t;
 end;
 

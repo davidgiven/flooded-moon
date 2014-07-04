@@ -34,6 +34,7 @@ package Planets is
 			camera_direction: vec3_t;
 			sun_direction: vec3_t;
 			sun_colour: colour_t;
+			ambient_colour: colour_t;
 			emission: out colour_t
 		);
 	pragma Convention(C, terrain_surface_f);
@@ -84,6 +85,7 @@ package Planets is
 	procedure Sample_Surface(p: planet_t; xyz: vec3_t;
 			camera_direction, sun_direction: vec3_t;
 			sun_colour: colour_t;
+			ambient_colour: colour_t;
 			emission: out colour_t);
 
 	package Lists is new GenericLists(planet_t);

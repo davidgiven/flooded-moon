@@ -4,17 +4,17 @@ camera:
 {
 	hfov: 60
 	aspect: 1.777
-	location: (0, -1760e3, 0)
+	location: (0, -1750e3, 0)
 	forward: (1, 0, 0)
 	up: (0, 1, 0)
-	pitch: -20
+	pitch: -15
 }
 
 planets: 
 {
 	sun:
 	{
-		nominal_radius: 1695500e4
+		nominal_radius: 695500e3
 		atmospheric_depth: 0
 		location: (149597871e3, 0, 0)
 		colour: (1, 1, 1)

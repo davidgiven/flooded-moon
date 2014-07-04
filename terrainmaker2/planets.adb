@@ -43,7 +43,8 @@ package body Planets is
 				"nominal_radius: real," &
 				"camera_direction: vector*3," &
 				"sun_direction: vector*3," &
-				"sun_colour: vector*3" &
+				"sun_colour: vector*3," &
+				"ambient_colour: vector*3" &
 			"): (" & 
 				"emission: vector*3" &
 			")");
@@ -163,13 +164,14 @@ package body Planets is
 	-- xyz is a *world* coordinate.
 	procedure Sample_Surface(p: planet_t; xyz: vec3_t;
 			camera_direction, sun_direction: vec3_t;
-			sun_colour: colour_t;
+			sun_colour, ambient_colour: colour_t;
 			emission: out colour_t) is
 		xyz_rel_planet: vec3_t := xyz - p.location;
 	begin
 		p.terrain_surface_func.Call.all(xyz_rel_planet,
 				p.nominal_radius,
-				camera_direction, sun_direction, sun_colour,
+				camera_direction, sun_direction,
+				sun_colour, ambient_colour,
 				emission);
 	end;
 end;
