@@ -7,8 +7,8 @@ let magnitude(x: vector*3): real =
 // xyz normalised to the lunar surface (i.e. at altitude 0).
 let xyzn = (xyz / magnitude(xyz)) * nominal_radius in
 
-let scale = 3e3 in
+let scale = 5e3 in
 
-let c = (sin(xyzn/scale)/2) + 0.5 in
+let c = 1 in
 let emission = (sun_colour+ambient_colour)*c in
 return

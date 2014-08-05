@@ -197,9 +197,10 @@ procedure Tests is
 
 	procedure CalculonTest is
 		type TestFunc is access procedure(i: number; r: out number);
-		package TestCalculon is new Calculon(TestFunc);
-		use TestCalculon;
-		func: TestCalculon.Func;
+		pragma convention(C, TestFunc);
+		package TestScript is new Calculon.Script(TestFunc);
+		use TestScript;
+		func: TestScript.Func;
 		n: number;
 	begin
 		Initialise(func, "let i=i+1 in return", "(i: real): (i: real)");
@@ -211,9 +212,10 @@ procedure Tests is
 
 	procedure CalculonVectorTest is
 		type TestFunc is access procedure(i: number; r1, r2: out vec3_t);
-		package TestCalculon is new Calculon(TestFunc);
-		use TestCalculon;
-		func: TestCalculon.Func;
+		pragma convention(C, TestFunc);
+		package TestScript is new Calculon.Script(TestFunc);
+		use TestScript;
+		func: TestScript.Func;
 		n1, n2: vec3_t;
 	begin
 		Initialise(func, "let r1=[1,1,1] in let r2=[2,2,2] in return",
@@ -223,6 +225,29 @@ procedure Tests is
 			(n1.x = 1.0) and (n1.y = 1.0) and (n1.z = 1.0) and
 			(n2.x = 2.0) and (n2.y = 2.0) and (n2.z = 2.0),
 			"CalculonVectorTest fail; n1=" & ToString(n1) & " n2=" & ToString(n2));
+	end;
+
+	function Get_Value return number is
+		(2.0);
+	pragma convention(C, Get_Value);
+
+	procedure CalculonCallbackTest is
+		type TestFunc is access procedure(r: out number);
+		pragma convention(C, TestFunc);
+		package TestScript is new Calculon.Script(TestFunc);
+		use TestScript;
+		func: TestScript.Func;
+		n: number;
+
+	begin
+		-- Get_Value below must be a package toplevel function (or bad stuff
+		-- happens).
+		Calculon.Register_Callback("Get_Value", "(): real", Get_Value'address);
+		Initialise(func, "let i = Get_Value() in return", "(): (i: real)");
+		func.Call.all(n);
+		Check(
+			n = 2.0,
+			"CalculonTest fail; n is" & n & " but should be 2.0");
 	end;
 
 	procedure MapTest is
@@ -249,6 +274,7 @@ begin
 	ListsTest;
 	CalculonTest;
 	CalculonVectorTest;
+	CalculonCallbackTest;
 	MapTest;
 end;
 

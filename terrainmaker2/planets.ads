@@ -26,7 +26,8 @@ package Planets is
 			radius: out number
 		);
 	pragma Convention(C, terrain_radius_f);
-	package terrain_radius_c_f is new Calculon(terrain_radius_f);
+	package terrain_radius_c_f is
+			new Calculon.Script(terrain_radius_f);
 
 	type terrain_surface_f is access procedure(
 			xyz: vec3_t;
@@ -38,7 +39,8 @@ package Planets is
 			emission: out colour_t
 		);
 	pragma Convention(C, terrain_surface_f);
-	package terrain_surface_c_f is new Calculon(terrain_surface_f);
+	package terrain_surface_c_f is
+			new Calculon.Script(terrain_surface_f);
 
 	type atmosphere_media_f is access procedure(
 			xyz: vec3_t;
@@ -51,7 +53,8 @@ package Planets is
 			emission: in out colour_t
 		);
 	pragma Convention(C, atmosphere_media_f);
-	package atmosphere_media_c_t is new Calculon(atmosphere_media_f);
+	package atmosphere_media_c_t is
+			new Calculon.Script(atmosphere_media_f);
 
 	type planet_t is tagged limited record
 		cf: node_t;

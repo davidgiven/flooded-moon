@@ -3,6 +3,7 @@ with Config;
 with Matrices;
 with Utils;
 with BigFiles;
+with Simplex;
 
 use Ada.Text_IO;
 use Config;

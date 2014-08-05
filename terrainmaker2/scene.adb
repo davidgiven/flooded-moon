@@ -268,7 +268,7 @@ package body Scene is
 	begin
 		-- Fake a little ambient light.
 		sunlight := sun_colour;
-		ambient := sunlight * 0.5;
+		ambient := sunlight * 0.1;
 		sunlight := sunlight - ambient;
 
 		sun_dir := Normalise(planets_list(sun).location - here);

@@ -1,3 +1,4 @@
 let radius = nominal_radius in
+let x = 0 in
 return
 

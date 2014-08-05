@@ -7,7 +7,7 @@ camera:
 	location: (0, -1750e3, 0)
 	forward: (1, 0, 0)
 	up: (0, 1, 0)
-	pitch: -15
+	pitch: -10
 }
 
 planets: 
