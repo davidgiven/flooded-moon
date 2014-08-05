@@ -17,8 +17,6 @@ struct Function
 	Function(const char* code, const char* signature):
 		compiledFunction(symbols, code, signature)
 	{}
-
-
 };
 
 extern "C" const char* ada_calculon_last_error(void)
@@ -32,7 +30,6 @@ extern "C" Function* ada_calculon_create(const char* code,
 	try
 	{
 		Function* f = new Function(code, signature);
-		//f->compiledFunction.dump();
 		return f;
 	}
 	catch (const Compiler::CompilationException e)
@@ -51,8 +48,18 @@ extern "C" void ada_calculon_destroy(Function* fn)
 
 typedef void (*Func)();
 
+extern "C" Func ada_calculon_dump(Function* fn)
+{
+	fn->compiledFunction.dump();
+}
+
 extern "C" Func ada_calculon_get_pointer(Function* fn)
 {
 	return fn->compiledFunction;
 }
 
+extern "C" void ada_calculon_register_callback(const char* name,
+		const char* signature, void* callback)
+{
+	symbols.add(name, signature, callback);
+}
