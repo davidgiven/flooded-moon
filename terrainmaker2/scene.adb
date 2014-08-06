@@ -263,6 +263,7 @@ package body Scene is
 			here: vec3_t;
 			emission, transmittance: in out colour_t) is
 		camera_dir, sun_dir: vec3_t;
+		surface_normal: vec3_t;
 		sunlight, directlight, ambient: colour_t;
 		emission_here: colour_t;
 	begin
@@ -277,8 +278,10 @@ package body Scene is
 				allow_self_shadowing => true);
 		camera_dir := Normalise(camera_location - here);
 
+		surface_normal := planet.Get_Surface_Normal(here);
+
 		planet.Sample_Surface(here,
-				camera_dir, sun_dir,
+				camera_dir, sun_dir, surface_normal,
 				directlight, ambient,
 				emission_here);
 		emission := emission + transmittance*emission_here;

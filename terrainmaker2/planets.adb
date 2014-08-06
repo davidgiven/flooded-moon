@@ -44,6 +44,7 @@ package body Planets is
 				"nominal_radius: real," &
 				"camera_direction: vector*3," &
 				"sun_direction: vector*3," &
+				"surface_normal: vector*3," &
 				"sun_colour: vector*3," &
 				"ambient_colour: vector*3" &
 			"): (" & 
@@ -129,9 +130,9 @@ package body Planets is
 		return true;
 	end;
 
-	-- xyz is a *world* coordinate.
-	function Get_Actual_Radius(p: planet_t; xyz: vec3_t) return number is
-		xyz_rel_planet: vec3_t := xyz - p.location;
+	-- xyz_rel_planet is a *planet* coordinate.
+	function Get_Actual_Radius_P(p: planet_t; xyz_rel_planet: vec3_t)
+			return number is
 		normalised_xyz: vec3_t := NormaliseToSphere(xyz_rel_planet,
 			p.nominal_radius);
 		radius: number;
@@ -139,6 +140,44 @@ package body Planets is
 		p.terrain_radius_func.Call.all(normalised_xyz, p.bounding_radius,
 			p.nominal_radius, radius);
 		return radius;
+	end;
+
+	-- xyz_rel_planet is a *planet* coordinate.
+	function Normalise_To_Surface_P(p: planet_t; xyz_rel_planet: vec3_t)
+			return vec3_t is
+	begin
+		return NormaliseToSphere(xyz_rel_planet,
+				Get_Actual_Radius_P(p, xyz_rel_planet));
+	end;
+
+	-- xyz is a *world* coordinate.
+	function Get_Surface_Normal(p: planet_t; xyz: vec3_t) return vec3_t is
+		xyz_rel_planet: vec3_t := xyz - p.location;
+
+		-- u is a normalised radius.
+		u: vec3_t := Normalise(xyz_rel_planet);
+
+		-- v is a vector perpendicular to this.
+		v: vec3_t := Perpendicular(u);
+
+		-- w is a vector perpendicular to both of them.
+		w: vec3_t := Cross(u, v);
+
+		-- (v,w) forms a plane parallel to the nominal surface. By offsetting
+		-- xyz by v and w, we can find two nearby points on the surface. This
+		-- makes a triangle which we map onto the planetary terrain.
+		pxyz: vec3_t := Normalise_To_Surface_P(p, xyz_rel_planet);
+		pxyzv: vec3_t := Normalise_To_Surface_P(p, xyz_rel_planet + v);
+		pxyzw: vec3_t := Normalise_To_Surface_P(p, xyz_rel_planet + w);
+
+		-- Calculate the normal to this triangle in the normal way.
+		n: vec3_t := Cross(Normalise(pxyzv-pxyz), Normalise(pxyzw-pxyz));
+	begin
+		-- Make sure it's pointing outwards.
+		if (Dot(n, u) < 0.0) then
+			return -n;
+		end if;
+		return n;
 	end;
 
 	-- xyz is a *world* coordinate.
@@ -164,14 +203,14 @@ package body Planets is
 
 	-- xyz is a *world* coordinate.
 	procedure Sample_Surface(p: planet_t; xyz: vec3_t;
-			camera_direction, sun_direction: vec3_t;
+			camera_direction, sun_direction, surface_normal: vec3_t;
 			sun_colour, ambient_colour: colour_t;
 			emission: out colour_t) is
 		xyz_rel_planet: vec3_t := xyz - p.location;
 	begin
 		p.terrain_surface_func.Call.all(xyz_rel_planet,
 				p.nominal_radius,
-				camera_direction, sun_direction,
+				camera_direction, sun_direction, surface_normal,
 				sun_colour, ambient_colour,
 				emission);
 	end;

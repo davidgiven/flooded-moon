@@ -62,6 +62,8 @@ package Vectors is
 		(a.y*b.z - a.y*b.y,
 		 a.z*b.y - a.x*b.z,
 		 a.x*b.y - a.y*b.x);
+	function Perpendicular(v: vec3_t) return vec3_t;
+
 	function Load(cf: node_t) return vec3_t;
 
 	function sqrt(a: vec3_t) return vec3_t is

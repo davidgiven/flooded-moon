@@ -9,6 +9,7 @@ let xyzn = (xyz / magnitude(xyz)) * nominal_radius in
 
 let scale = 5e3 in
 
-let c = 1 in
-let emission = (sun_colour+ambient_colour)*c in
+let c = dot(sun_direction, surface_normal) in
+let cplus = if (c>0) then c else 0 in
+let emission = sun_colour*cplus + ambient_colour in
 return

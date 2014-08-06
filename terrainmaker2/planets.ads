@@ -34,6 +34,7 @@ package Planets is
 			nominal_radius: number;
 			camera_direction: vec3_t;
 			sun_direction: vec3_t;
+			surface_normal: vec3_t;
 			sun_colour: colour_t;
 			ambient_colour: colour_t;
 			emission: out colour_t
@@ -76,9 +77,21 @@ package Planets is
 			include_atmosphere: boolean := true)
 			return boolean;
 
-	-- These take planet_t coordinates.
-	function Get_Actual_Radius(p: planet_t; xyz: vec3_t)
+	-- These take PLANET coordinates.
+	function Get_Actual_Radius_P(p: planet_t; xyz_rel_planet: vec3_t)
 			return number;
+	function Normalise_To_Surface_P(p: planet_t; xyz_rel_planet: vec3_t)
+			return vec3_t;
+
+	-- These take WORLD coordinates.
+	function Get_Actual_Radius(p: planet_t; xyz: vec3_t)
+			return number is
+			(Get_Actual_Radius_P(p, xyz - p.location));
+	function Normalise_To_Surface(p: planet_t; xyz: vec3_t)
+			return vec3_t is
+			(Normalise_To_Surface_P(p, xyz - p.location));
+	function Get_Surface_Normal(p: planet_t; xyz: vec3_t)
+			return vec3_t;
 	function Is_Point_Underground(p: planet_t; xyz: vec3_t)
 			return boolean;
 	procedure Sample_Atmosphere(p: planet_t; xyz: vec3_t;
@@ -86,7 +99,7 @@ package Planets is
 			sun_colour: colour_t;
 			extinction, emission: out colour_t);
 	procedure Sample_Surface(p: planet_t; xyz: vec3_t;
-			camera_direction, sun_direction: vec3_t;
+			camera_direction, sun_direction, surface_normal: vec3_t;
 			sun_colour: colour_t;
 			ambient_colour: colour_t;
 			emission: out colour_t);

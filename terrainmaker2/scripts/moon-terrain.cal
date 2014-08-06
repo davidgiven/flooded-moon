@@ -7,7 +7,7 @@ let magnitude(x: vector*3): real =
 // xyz normalised to the lunar surface (i.e. at altitude 0).
 let xyzn = (xyz / magnitude(xyz)) * nominal_radius in
 
-let wobble = 1e3 in
+let wobble = 3e3 in
 let scale = 5e3 in
 
 let delta = noise(xyzn, 1, 1, 1/scale)/2 + 0.5 in
