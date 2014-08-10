@@ -10,7 +10,7 @@ let xyzn = (xyz / magnitude(xyz)) * nominal_radius in
 let wobble = 1e3 in
 let scale = 5e3 in
 
-//let delta = fBm3(xyzn/scale, 2, 5, 1, 1) in
-let delta = fBm(xyzn/scale, 1, 1) in
+let delta = fBm3(xyzn/scale, 2, 5, 1, 1) in
+//let delta = fBm(xyzn/scale, 2, 5) in
 let radius = nominal_radius + delta*wobble in
 return
