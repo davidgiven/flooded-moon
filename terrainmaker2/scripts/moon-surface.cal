@@ -4,12 +4,18 @@ let dot(x: vector*3, y: vector*3): real =
 let magnitude(x: vector*3): real =
 	sqrt(dot(x, x)) in
 
+// up is a unit vector pointing away from the planet's core.
+let up = xyz / magnitude(xyz) in
+
 // xyz normalised to the lunar surface (i.e. at altitude 0).
-let xyzn = (xyz / magnitude(xyz)) * nominal_radius in
+let xyzn = up * nominal_radius in
 
 let scale = 5e3 in
 
-let c = dot(sun_direction, surface_normal) in
+let c = dot(surface_normal, sun_direction) in
 let cplus = if (c>0) then c else 0 in
+//let cplus = fBm3(xyzn/scale, 1, 1, 1, 1) in
+//let cplus = fBm(xyzn/scale, 1.5, 2) in
+//let cplus = 1 in
 let emission = sun_colour*cplus + ambient_colour in
 return

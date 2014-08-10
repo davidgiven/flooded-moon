@@ -6,11 +6,15 @@ use Config.Number_Functions;
 use Vectors;
 
 package Simplex is
-	function Raw_Noise_3D(xyz: vec3_t) return number;
-	pragma convention(C, Raw_Noise_3D);
+	function Simplex_Noise(xyz: vec3_t) return number;
+	pragma convention(C, Simplex_Noise);
 
-	function Octave_Noise_3D(xyz: vec3_t;
-			octaves, persistence, scale: number) return number;
-	pragma convention(C, Octave_Noise_3D);
+	function fBm(xyz: vec3_t; lacunarity, octaves: number)
+			return number;
+	pragma convention(C, fBm);
+
+	function fBm3(xyz: vec3_t; lacunarity, octaves, offset, gain: number)
+		return number;
+	pragma convention(C, fBm3);
 end;
 

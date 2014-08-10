@@ -30,12 +30,12 @@ project TerrainMaker is
 						"-I" & external("llvminc"));
 			when "optimised" =>
 				for Switches("Ada")
-					use ("-O3", "-gnat2012");
+					use ("-O3", "-g", "-gnat2012");
 				for Switches("C")
-					use ("-O3",
+					use ("-O3", "-g",
 						"-I" & external("HOME") & "/homebrew/include");
 				for Switches("C++")
-					use ("-O3",
+					use ("-O3", "-g",
 						"-I" & external("HOME") & "/homebrew/include",
 						"-I" & external("HOME") & "/nonshared/calculon/include",
 						"-I" & external("llvminc"));

@@ -152,6 +152,11 @@ package body Scene is
 		ray.location := here;
 		ray.direction := sun_dir;
 
+		-- Offset the start point a tiny amount above the surface of the
+		-- planet, to avoid edge cases where the planet is flat.
+		ray.location := ray.location + 
+			Normalise(ray.location - planet.location) * 1.0;
+
 		-- Crudely intersect it with the object graph.
 		Compute_Object_Intersections(ray, ints, num,
 			include_atmosphere => false);

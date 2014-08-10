@@ -23,6 +23,7 @@ use ConfigFiles;
 use Transforms;
 use BigFiles;
 use System.Storage_Elements;
+use Utils;
 
 procedure Tests is
 	LF: character := ASCII.LF;
@@ -265,6 +266,29 @@ procedure Tests is
 		end;
 	end;
 
+	procedure ClampTest is
+	begin
+		Check(
+			clamp(-1.0, 0.0, 1.0) = 0.0,
+			"clamp -1 fail");
+
+		Check(
+			clamp(0.0, 0.0, 1.0) = 0.0,
+			"clamp 0 fail");
+
+		Check(
+			clamp(0.5, 0.0, 1.0) = 0.5,
+			"clamp 0.5 fail");
+
+		Check(
+			clamp(1.0, 0.0, 1.0) = 1.0,
+			"clamp 1.0 fail");
+
+		Check(
+			clamp(2.0, 0.0, 1.0) = 1.0,
+			"clamp 2.0 fail");
+	end;
+
 begin
 	MatrixAndVectorSizes;
 	MatrixInversion;
@@ -276,5 +300,6 @@ begin
 	CalculonVectorTest;
 	CalculonCallbackTest;
 	MapTest;
+	ClampTest;
 end;
 

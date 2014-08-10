@@ -154,30 +154,17 @@ package body Planets is
 	function Get_Surface_Normal(p: planet_t; xyz: vec3_t) return vec3_t is
 		xyz_rel_planet: vec3_t := xyz - p.location;
 
-		-- u is a normalised radius.
-		u: vec3_t := Normalise(xyz_rel_planet);
+		-- isosurface function representing the planet:
+		--   |xyz| - r = 0
+		function isosurface(xyz: vec3_t) return number is
+			(Length(xyz) - Get_Actual_Radius_P(p, xyz));
 
-		-- v is a vector perpendicular to this.
-		v: vec3_t := Perpendicular(u);
-
-		-- w is a vector perpendicular to both of them.
-		w: vec3_t := Cross(u, v);
-
-		-- (v,w) forms a plane parallel to the nominal surface. By offsetting
-		-- xyz by v and w, we can find two nearby points on the surface. This
-		-- makes a triangle which we map onto the planetary terrain.
-		pxyz: vec3_t := Normalise_To_Surface_P(p, xyz_rel_planet);
-		pxyzv: vec3_t := Normalise_To_Surface_P(p, xyz_rel_planet + v);
-		pxyzw: vec3_t := Normalise_To_Surface_P(p, xyz_rel_planet + w);
-
-		-- Calculate the normal to this triangle in the normal way.
-		n: vec3_t := Cross(Normalise(pxyzv-pxyz), Normalise(pxyzw-pxyz));
+		value: number := isosurface(xyz_rel_planet);
+		value_x: number := isosurface(xyz_rel_planet + (1.0, 0.0, 0.0)) - value;
+		value_y: number := isosurface(xyz_rel_planet + (0.0, 1.0, 0.0)) - value;
+		value_z: number := isosurface(xyz_rel_planet + (0.0, 0.0, 1.0)) - value;
 	begin
-		-- Make sure it's pointing outwards.
-		if (Dot(n, u) < 0.0) then
-			return -n;
-		end if;
-		return n;
+		return Normalise((value_x, value_y, value_z));
 	end;
 
 	-- xyz is a *world* coordinate.
