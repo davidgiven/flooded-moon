@@ -4,6 +4,11 @@ let dot(x: vector*3, y: vector*3): real =
 let magnitude(x: vector*3): real =
 	sqrt(dot(x, x)) in
 
+let clamp(f: real, min: real, max: real): real =
+	if (f < min) then min else
+		if (f > max) then max else
+			f in
+
 // xyz normalised to the lunar surface (i.e. at altitude 0).
 let xyzn = (xyz / magnitude(xyz)) * nominal_radius in
 
@@ -11,6 +16,7 @@ let wobble = 1e3 in
 let scale = 5e3 in
 
 let delta = fBm3(xyzn/scale, 2, 5, 1, 1) in
+//let delta = clamp(delta, 0.5, 1.0) in
 //let delta = fBm(xyzn/scale, 2, 5) in
 let radius = nominal_radius + delta*wobble in
 return

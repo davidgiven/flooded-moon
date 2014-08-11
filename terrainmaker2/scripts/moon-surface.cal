@@ -14,8 +14,5 @@ let scale = 5e3 in
 
 let c = dot(surface_normal, sun_direction) in
 let cplus = if (c>0) then c else 0 in
-//let cplus = fBm3(xyzn/scale, 1, 1, 1, 1) in
-//let cplus = fBm(xyzn/scale, 1.5, 2) in
-//let cplus = 1 in
-let emission = sun_colour*cplus + ambient_colour in
+let emission = (sun_colour + ambient_colour)*cplus in
 return

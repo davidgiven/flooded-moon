@@ -52,6 +52,18 @@ package body Scene is
 			camera_up := Load(cf("up"));
 			camera_right := Cross(camera_forward, camera_up);
 
+			if cf.Exists("bearing") then
+				declare
+					t: TransformMatrix;
+				begin
+					t.Reset;
+					t.Rotate(camera_up, -cf("bearing").Value);
+					camera_forward := t.Transform(camera_forward);
+					camera_up := t.Transform(camera_up);
+					camera_right := t.Transform(camera_right);
+				end;
+			end if;
+
 			if cf.Exists("pitch") then
 				declare
 					t: TransformMatrix;
@@ -160,7 +172,7 @@ package body Scene is
 		-- Crudely intersect it with the object graph.
 		Compute_Object_Intersections(ray, ints, num,
 			include_atmosphere => false);
-		if (num = 0) or else (ints(0).planet /= sun) then
+		if (num = 0) or else (int.planet /= sun) then
 			-- No --- we're in eclipse.
 			return Black;
 		end if;
@@ -173,7 +185,8 @@ package body Scene is
 
 		-- Re-intersect the ray with the planet we're interested in,
 		-- but including the atmosphere this time. This will tell us
-		-- the length of the atmospheric segment.
+		-- the length of the atmospheric segment. (We throw away the
+		-- result because we already know it intersects.)
 		dummy := planet.Test_Intersection(ray, int.ray_entry, int.ray_exit,
 			include_atmosphere => true);
 		
@@ -354,7 +367,7 @@ package body Scene is
 			segment_end := int.ray_entry + ray.direction*t;
 
 			-- Are we underground? If so, give up --- no light here.
-			if Find_Intersection_With_Terrain(planeT,
+			if Find_Intersection_With_Terrain(planet,
 				segment_start, segment_end) then
 				return black;
 			end if;

@@ -4,10 +4,11 @@ camera:
 {
 	hfov: 60
 	aspect: 1.777
-	location: (0, -1738e3, 0)
-	forward: (-1, 0, 0)
+	location: (0, -1748e3, 0)
+	forward: (1, 0, 0)
 	up: (0, 1, 0)
-	pitch: -10
+	pitch: -20
+	bearing: 0
 }
 
 planets: 
