@@ -4,7 +4,7 @@ with Utils;
 
 use Utils;
 
-package body Simplex is
+package body Noise is
 	type ivec3_t is
 	record
 		x, y, z: integer;
@@ -197,10 +197,10 @@ package body Simplex is
 begin
 	Calculon.Register_Callback("fBm",
 			"(vector*3, real, real): real",
-			Simplex.fBm'address);
+			fBm'address);
 
 	Calculon.Register_Callback("fBm3",
 			"(vector*3, real, real, real, real): real",
-			Simplex.fBm3'address);
+			fBm3'address);
 end;
 

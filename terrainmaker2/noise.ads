@@ -5,7 +5,7 @@ use Config;
 use Config.Number_Functions;
 use Vectors;
 
-package Simplex is
+package Noise is
 	function Simplex_Noise(xyz: vec3_t) return number;
 	pragma convention(C, Simplex_Noise);
 

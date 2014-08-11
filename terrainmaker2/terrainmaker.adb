@@ -6,6 +6,7 @@ with Images;
 with Colours;
 with Renderer;
 with Scene;
+with Noise;
 
 use Ada.Text_IO;
 use Config;
