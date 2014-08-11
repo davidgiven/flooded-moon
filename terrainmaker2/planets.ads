@@ -57,6 +57,18 @@ package Planets is
 	package atmosphere_media_c_t is
 			new Calculon.Script(atmosphere_media_f);
 
+	type sampler_f is access procedure(
+			xyz: vec3_t;
+			bounding_radius: number;
+			nominal_radius: number;
+			camera: vec3_t;
+			fov: vec2_t;
+			distance: in out number
+		);
+	pragma Convention(C, sampler_f);
+	package sampler_c_t is
+			new Calculon.Script(sampler_f);
+
 	type planet_t is tagged limited record
 		cf: node_t;
 		location: vec3_t;
@@ -65,6 +77,7 @@ package Planets is
 		terrain_radius_func: terrain_radius_c_f.Func;
 		terrain_surface_func: terrain_surface_c_f.Func;
 		atmosphere_func: atmosphere_media_c_t.Func;
+		sampler_func: sampler_c_t.Func;
 
 		bounding_radius: number;
 		transform: TransformMatrix;
@@ -103,6 +116,7 @@ package Planets is
 			sun_colour: colour_t;
 			ambient_colour: colour_t;
 			emission: out colour_t);
+	function Get_Sample_Distance(p: planet_t; xyz: vec3_t) return number;
 
 	package Lists is new GenericLists(planet_t);
 	subtype planet_list_t is Lists.List;

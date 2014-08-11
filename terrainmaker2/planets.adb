@@ -64,6 +64,18 @@ package body Planets is
 					"extinction: vector*3," &
 					"emission: vector*3" &
 				")");
+
+			p.sampler_func.Initialise_From_File(
+				cf("sampler_func").Value,
+				"(" &
+					"xyz: vector*3," &
+					"bounding_radius: real," &
+					"nominal_radius: real," &
+					"camera: vector*3," &
+					"fov: vector*2," &
+				"): (" &
+					"distance: real" &
+				")");
 		end if;
 	end;
 
@@ -150,7 +162,8 @@ package body Planets is
 	end;
 
 	-- xyz is a *world* coordinate.
-	function Get_Surface_Normal(p: planet_t; xyz: vec3_t) return vec3_t is
+	function Get_Surface_Normal(p: planet_t; xyz: vec3_t) return vec3_t
+	is
 		xyz_rel_planet: vec3_t := xyz - p.location;
 
 		-- isosurface function representing the planet:
@@ -167,7 +180,8 @@ package body Planets is
 	end;
 
 	-- xyz is a *world* coordinate.
-	function Is_Point_Underground(p: planet_t; xyz: vec3_t) return boolean is
+	function Is_Point_Underground(p: planet_t; xyz: vec3_t) return boolean
+	is
 		xyz_r: number := Length(xyz - p.location);
 		real_r: number := p.Get_Actual_Radius(xyz);
 	begin
@@ -178,7 +192,8 @@ package body Planets is
 	procedure Sample_Atmosphere(p: planet_t; xyz: vec3_t;
 			camera_direction, sun_direction: vec3_t;
 			sun_colour: colour_t;
-			extinction, emission: out colour_t) is
+			extinction, emission: out colour_t)
+	is
 		xyz_rel_planet: vec3_t := xyz - p.location;
 	begin
 		p.atmosphere_func.Call.all(xyz_rel_planet,
@@ -191,7 +206,8 @@ package body Planets is
 	procedure Sample_Surface(p: planet_t; xyz: vec3_t;
 			camera_direction, sun_direction, surface_normal: vec3_t;
 			sun_colour, ambient_colour: colour_t;
-			emission: out colour_t) is
+			emission: out colour_t)
+	is
 		xyz_rel_planet: vec3_t := xyz - p.location;
 	begin
 		p.terrain_surface_func.Call.all(xyz_rel_planet,
@@ -199,6 +215,25 @@ package body Planets is
 				camera_direction, sun_direction, surface_normal,
 				sun_colour, ambient_colour,
 				emission);
+	end;
+
+	-- xyz and camera are *world* coordinates.
+	function Get_Sample_Distance(p: planet_t; xyz: vec3_t) return number
+	is
+		xyz_rel_planet: vec3_t := xyz - p.location;
+		camera_rel_planet: vec3_t := Scene.Get_Camera_Location - p.location;
+		distance: number;
+	begin
+		-- There's only a backend Calculon function if there's an atmosphere.
+		if (p.atmospheric_depth > 0.0) then
+			p.sampler_func.Call.all(xyz_rel_planet,
+					p.bounding_radius, p.nominal_radius,
+					camera_rel_planet, Scene.Get_Field_Of_View,
+					distance);
+		else
+			distance := 1.0;
+		end if;
+		return distance;
 	end;
 end;
 

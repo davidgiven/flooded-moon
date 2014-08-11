@@ -35,6 +35,16 @@ package body Scene is
 			int: intersection_t;
 			ray: ray_t) return colour_t;
 
+	function Get_Camera_Location return vec3_t is
+	begin
+		return camera_location;
+	end;
+
+	function Get_Field_Of_View return vec2_t is
+	begin
+		return (hfov, vfov);
+	end;
+
 	procedure Load(filename: string) is
 	begin
 		scene_cf.Load(filename);
@@ -316,11 +326,14 @@ package body Scene is
 		step_size: number;
 		underground: boolean;
 	begin
+		segment_end := int.ray_entry;
 		while (t < maxt) loop
 			-- Determine segment under consideration.
-			step_size := 1000.0;
-			segment_start := int.ray_entry + ray.direction*t;
-			t := t + step_size;
+			segment_start := segment_end;
+			segment_end := int.ray_entry + ray.direction*t;
+
+			step_size := planet.Get_Sample_Distance(segment_start);
+			t := clamp(t + step_size, 0.0, maxt);
 			segment_end := int.ray_entry + ray.direction*t;
 
 			-- Are we underground? If so, adjust the end of the segment to
@@ -359,11 +372,14 @@ package body Scene is
 
 		transmittance: colour_t := white;
 	begin
+		segment_end := int.ray_entry;
 		while (t < maxt) loop
 			-- Determine segment under consideration.
-			step_size := 1000.0;
+			segment_start := segment_end;
 			segment_start := int.ray_entry + ray.direction*t;
-			t := t + step_size;
+
+			step_size := planet.Get_Sample_Distance(segment_start);
+			t := clamp(t + step_size, 0.0, maxt);
 			segment_end := int.ray_entry + ray.direction*t;
 
 			-- Are we underground? If so, give up --- no light here.

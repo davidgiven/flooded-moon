@@ -7,7 +7,7 @@ camera:
 	location: (0, -1748e3, 0)
 	forward: (1, 0, 0)
 	up: (0, 1, 0)
-	pitch: -20
+	pitch: -15
 	bearing: 0
 }
 
@@ -22,7 +22,6 @@ planets:
 
 		terrain_radius_func: "scripts/sun-terrain.cal"
 		terrain_surface_func: "scripts/sun-surface.cal"
-		atmosphere_func: "scripts/moon-atmosphere.cal"
 	}
 
 	moon:
@@ -39,5 +38,6 @@ planets:
 		terrain_radius_func: "scripts/moon-terrain.cal"
 		terrain_surface_func: "scripts/moon-surface.cal"
 		atmosphere_func: "scripts/moon-atmosphere.cal"
+		sampler_func: "scripts/moon-sampler.cal"
 	}
 }

@@ -28,5 +28,8 @@ package Scene is
 		ints: out intersection_list_t; num: out natural;
 		include_atmosphere: boolean := true);
 	function Compute_Pixel_Colour(ray: ray_t) return colour_t;
+
+	function Get_Camera_Location return vec3_t;
+	function Get_Field_Of_View return vec2_t;
 end;
 
