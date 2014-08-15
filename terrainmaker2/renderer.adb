@@ -6,6 +6,7 @@ with Colours;
 with Scene;
 with System.Multiprocessors;
 with Utils;
+with Script;
 
 use Ada.Text_IO;
 use Config;
@@ -84,22 +85,26 @@ package body Renderer is
 			finished: boolean;
 			r: ray_t;
 		begin
-			-- Keep asking for stuff to do, then do it. When the Scheduler
-			-- has terminated, requesting a work unit will throw an exception and
-			-- the task will safely exit.
-			loop
-				Scheduler.RequestWorkUnit(y, finished);
-				exit when finished;
+			Script.Init_Thread;
+			begin
+				-- Keep asking for stuff to do, then do it. When the Scheduler
+				-- has terminated, requesting a work unit will throw an exception and
+				-- the task will safely exit.
+				loop
+					Scheduler.RequestWorkUnit(y, finished);
+					exit when finished;
 
-				for x in screen.pixels.data'range(1) loop
-					r := Compute_Primary_Ray(x, y, screen);
-					screen(x, y) := Compute_Pixel_Colour(r);
+					for x in screen.pixels.data'range(1) loop
+						r := Compute_Primary_Ray(x, y, screen);
+						screen(x, y) := Compute_Pixel_Colour(r);
+					end loop;
 				end loop;
-			end loop;
-		exception
-			when e: others =>
-				Error("Exception thrown from worker thread!" & LF &
-					Ada.Exceptions.Exception_Information(e));
+			exception
+				when e: others =>
+					Error("Exception thrown from worker thread!" & LF &
+						Ada.Exceptions.Exception_Information(e));
+			end;
+			Script.Deinit_Thread;
 		end;
  
 	begin

@@ -12,6 +12,8 @@ with Transforms;
 with Calculon;
 with BigFiles;
 with System.Storage_Elements;
+with LuaJit;
+with Script;
 
 use Ada.Text_IO;
 use Ada.Strings;
@@ -24,6 +26,9 @@ use Transforms;
 use BigFiles;
 use System.Storage_Elements;
 use Utils;
+use type System.Address;
+use Script;
+use LuaJit;
 
 procedure Tests is
 	LF: character := ASCII.LF;
@@ -289,6 +294,24 @@ procedure Tests is
 			"clamp 2.0 fail");
 	end;
 
+	procedure LuaJitTest is
+		L: lua_state_t := LuaJit.NewState;
+	begin
+		Check(L /= System.Null_Address, "LuaJit.NewState failed");
+		LuaJit.OpenLibs(L);
+
+		Check(LuaJit.DoFile(L, "testdata/script.lua"),
+			"script.lua failed");
+
+		LuaJit.Close(L);
+	end;
+
+	procedure ScriptTest is
+		context: script_t;
+	begin
+		null;
+	end;
+
 begin
 	MatrixAndVectorSizes;
 	MatrixInversion;
@@ -301,5 +324,7 @@ begin
 	CalculonCallbackTest;
 	MapTest;
 	ClampTest;
+	LuaJitTest;
+	ScriptTest;
 end;
 
