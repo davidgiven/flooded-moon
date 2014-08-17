@@ -49,13 +49,13 @@ project TerrainMaker is
 					use ("-g", "-gnat2012",
 						"-L" & external("HOME") & "/homebrew/lib",
 						"-L" & external("llvmlib"),
-						"-lconfig", "-lLLVM-3.3");
+						"-lconfig", "-lLLVM-3.3", "-lgc");
 			when "optimised" =>
 				for Switches("Ada")
 					use ("-O3", "-gnat2012",
 						"-L" & external("HOME") & "/homebrew/lib",
 						"-L" & external("llvmlib"),
-						"-lconfig", "-lLLVM-3.3");
+						"-lconfig", "-lLLVM-3.3", "-lgc");
 		end case;
 	end Linker;
 end TerrainMaker;

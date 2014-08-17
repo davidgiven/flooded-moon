@@ -1,6 +1,7 @@
 with Ada.Text_IO;
 with Ada.Strings;
 with Ada.Finalization;
+with Interfaces.C;
 with Config;
 with Matrices;
 with Vectors;
@@ -12,9 +13,11 @@ with Transforms;
 with Calculon;
 with BigFiles;
 with System.Storage_Elements;
+with Garbage_Collector;
 
 use Ada.Text_IO;
 use Ada.Strings;
+use Interfaces.C;
 use Config;
 use Colours;
 use Vectors;
@@ -24,6 +27,7 @@ use Transforms;
 use BigFiles;
 use System.Storage_Elements;
 use Utils;
+
 
 procedure Tests is
 	LF: character := ASCII.LF;
@@ -289,17 +293,36 @@ procedure Tests is
 			"clamp 2.0 fail");
 	end;
 
+	procedure GCTest
+	is
+		type big_t is array(integer range 0..1000000) of integer;
+		type big_ref_t is access big_t;
+		for big_ref_t'storage_pool use Garbage_Collector.Pool;
+
+		p: big_ref_t;
+		pragma volatile(p);
+	begin
+		Put_Line(Garbage_Collector.Pool.Heap_Size'img);
+		for i in 1..1000 loop
+			p := new big_t;
+			p.all := (others => 0);
+		end loop;
+		Put_Line(Garbage_Collector.Pool.Heap_Size'img);
+		Garbage_Collector.Pool.Collect;
+		Put_Line(Garbage_Collector.Pool.Heap_Size'img);
+	end;
 begin
-	MatrixAndVectorSizes;
-	MatrixInversion;
-	MatrixMultiplyByVector;
-	ConfigTest;
-	ConfigMissingTest;
-	ListsTest;
-	CalculonTest;
-	CalculonVectorTest;
-	CalculonCallbackTest;
-	MapTest;
-	ClampTest;
+	--MatrixAndVectorSizes;
+	--MatrixInversion;
+	--MatrixMultiplyByVector;
+	--ConfigTest;
+	--ConfigMissingTest;
+	--ListsTest;
+	--CalculonTest;
+	--CalculonVectorTest;
+	--CalculonCallbackTest;
+	--MapTest;
+	--ClampTest;
+	GCTest;
 end;
 
