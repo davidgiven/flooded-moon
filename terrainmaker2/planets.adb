@@ -11,6 +11,12 @@ use Utils;
 use BigFiles;
 
 package body Planets is
+	procedure Init(p: in out planet_t)
+	is
+	begin
+		null;
+	end;
+
 	procedure Init(p: in out planet_t; cf: node_t) is
 	begin
 		Put_Line("Loading planet: " & cf.Name);

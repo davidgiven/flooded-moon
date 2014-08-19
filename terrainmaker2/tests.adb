@@ -12,6 +12,7 @@ with Transforms;
 with Calculon;
 with BigFiles;
 with System.Storage_Elements;
+with World.Universe;
 
 use Ada.Text_IO;
 use Ada.Strings;
@@ -289,6 +290,12 @@ procedure Tests is
 			"clamp 2.0 fail");
 	end;
 
+	procedure WorldTest
+	is
+	begin
+		World.Universe.Init;
+	end;
+
 begin
 	MatrixAndVectorSizes;
 	MatrixInversion;
@@ -301,5 +308,6 @@ begin
 	CalculonCallbackTest;
 	MapTest;
 	ClampTest;
+	WorldTest;
 end;
 

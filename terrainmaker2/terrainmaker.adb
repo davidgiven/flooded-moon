@@ -7,6 +7,7 @@ with Colours;
 with Renderer;
 with Scene;
 with Noise;
+with World.Universe;
 
 use Ada.Text_IO;
 use Config;
@@ -19,6 +20,7 @@ procedure TerrainMaker is
 	img: image_t;
 begin
 	Parse_Options;
+	World.Universe.Init;
 	Scene.Load(Config.Options.Scene_Filename);
 
 	img := Renderer.Render(Config.Options.Width, Config.Options.Height);

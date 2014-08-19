@@ -71,6 +71,7 @@ package Planets is
 
 	type planet_t is tagged limited record
 		cf: node_t;
+		is_light_source: boolean := false;
 		location: vec3_t;
 		nominal_radius: number;
 		atmospheric_depth: number;
@@ -83,16 +84,27 @@ package Planets is
 		transform: TransformMatrix;
 	end record;
 
+	subtype Object is planet_t'class;
+
 	procedure Init(p: in out planet_t; cf: node_t);
-	-- These take WORLD coordinates.
+	procedure Init(p: in out planet_t);
+
+	-- Methods which are intended to be overridden by implementations of each
+	-- kind of body. _P methods take planet coordinates. Everything else takes
+	-- world coordinates.
+	
+	function Get_Actual_Radius_P(p: planet_t; xyz_rel_planet: vec3_t)
+			return number;
+
+	-- These shouldn't be overridden; the base clase will do the work and call
+	-- the methods above.
+	
 	function Test_Intersection(p: planet_t; r: ray_t;
 			ray_entry, ray_exit: in out vec3_t;
 			include_atmosphere: boolean := true)
 			return boolean;
 
 	-- These take PLANET coordinates.
-	function Get_Actual_Radius_P(p: planet_t; xyz_rel_planet: vec3_t)
-			return number;
 	function Normalise_To_Surface_P(p: planet_t; xyz_rel_planet: vec3_t)
 			return vec3_t;
 

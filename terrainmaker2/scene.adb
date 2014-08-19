@@ -8,6 +8,7 @@ with Transforms;
 with Images;
 with Utils;
 with Colours;
+with World.Universe;
 
 use Ada.Text_IO;
 use Config;
