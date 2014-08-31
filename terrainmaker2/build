@@ -1,7 +1,5 @@
 #!/bin/sh
 gprbuild -P terrainmaker.gpr -p \
-	-Xprofile=debug \
-	-Xllvmlib=$(llvm-config-3.3 --libdir) \
-	-Xllvminc=$(llvm-config-3.3 --includedir) \
+	-Xprofile=optimised \
 	&& ./tests && echo Tests Passed
 

@@ -1,5 +1,4 @@
 with Ada.Text_IO;
-with Calculon;
 with Utils;
 
 use Utils;
@@ -193,14 +192,5 @@ package body Noise is
 		value := value / max_value;
 		return value;
 	end;
-
-begin
-	Calculon.Register_Callback("fBm",
-			"(vector*3, real, real): real",
-			fBm'address);
-
-	Calculon.Register_Callback("fBm3",
-			"(vector*3, real, real, real, real): real",
-			fBm3'address);
 end;
 

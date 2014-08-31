@@ -6,6 +6,7 @@ with Colours;
 with Scene;
 with System.Multiprocessors;
 with Utils;
+with Rays;
 
 use Ada.Text_IO;
 use Config;
@@ -13,6 +14,7 @@ use Images;
 use Colours;
 use Scene;
 use Utils;
+use Rays;
 
 package body Renderer is
 	function Render(width, height: integer) return image_t is

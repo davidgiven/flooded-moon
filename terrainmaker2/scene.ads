@@ -2,26 +2,17 @@ with Vectors;
 with Images;
 with Config;
 with Colours;
+with Rays;
+with Intersections;
 
 use Vectors;
 use Images;
 use Config;
 use Colours;
+use Rays;
+use Intersections;
 
 package Scene is
-	type ray_t is record
-		location: vec3_t;
-		direction: vec3_t;
-	end record;
-
-	type intersection_t is record
-		planet: integer;
-		ray_entry: vec3_t;
-		ray_exit: vec3_t;
-	end record;
-	type intersection_list_t is
-		array(natural range 0..Max_Objects) of intersection_t;
-
 	procedure Load(filename: string);
 	function Compute_Primary_Ray(x, y: integer; img: image_t) return ray_t;
 	procedure Compute_Object_Intersections(r: ray_t;
@@ -31,5 +22,7 @@ package Scene is
 
 	function Get_Camera_Location return vec3_t;
 	function Get_Field_Of_View return vec2_t;
+
+	camera_location: vec3_t;
 end;
 

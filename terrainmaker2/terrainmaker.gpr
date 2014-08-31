@@ -5,11 +5,7 @@ project TerrainMaker is
 	for Object_Dir use ".obj/" & profile;
 	for Exec_Dir use ".";
 	for Main use ("terrainmaker.adb", "tests.adb");
-	for Languages use ("Ada", "C", "C++");
-
-	package Naming is
-		for Body_Suffix("C++") use ".cc";
-	end Naming;
+	for Languages use ("Ada", "C");
 
 	package Builder is
 		for Switches(others) use ("-j0");
@@ -23,22 +19,12 @@ project TerrainMaker is
 				for Switches("C")
 					use ("-g",
 						"-I" & external("HOME") & "/homebrew/include");
-				for Switches("C++")
-					use ("-g",
-						"-I" & external("HOME") & "/homebrew/include",
-						"-I" & external("HOME") & "/nonshared/calculon/include",
-						"-I" & external("llvminc"));
 			when "optimised" =>
 				for Switches("Ada")
 					use ("-O3", "-g", "-gnat2012");
 				for Switches("C")
 					use ("-O3", "-g",
 						"-I" & external("HOME") & "/homebrew/include");
-				for Switches("C++")
-					use ("-O3", "-g",
-						"-I" & external("HOME") & "/homebrew/include",
-						"-I" & external("HOME") & "/nonshared/calculon/include",
-						"-I" & external("llvminc"));
 		end case;
 	end Compiler;
 
@@ -48,14 +34,12 @@ project TerrainMaker is
 				for Switches("Ada")
 					use ("-g", "-gnat2012",
 						"-L" & external("HOME") & "/homebrew/lib",
-						"-L" & external("llvmlib"),
-						"-lconfig", "-lLLVM-3.3");
+						"-lconfig");
 			when "optimised" =>
 				for Switches("Ada")
 					use ("-O3", "-gnat2012",
 						"-L" & external("HOME") & "/homebrew/lib",
-						"-L" & external("llvmlib"),
-						"-lconfig", "-lLLVM-3.3");
+						"-lconfig");
 		end case;
 	end Linker;
 end TerrainMaker;
