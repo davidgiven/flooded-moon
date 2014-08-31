@@ -326,7 +326,6 @@ package body Planet is
 		ray_direction: vec3_t := (ray_end - ray_start) / maxt;
 		segment_start, segment_end: vec3_t;
 		step_size: number;
-		underground: boolean;
 		transmittance: colour_t := White;
 	begin
 		segment_end := ray_start;

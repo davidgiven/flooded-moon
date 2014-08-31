@@ -9,6 +9,14 @@ use Config.Number_Functions;
 use Ada.Numerics;
 
 package body World.Moon is
+	-- Maximum height of mountains above sea level.
+	max_mountain_height: constant number := 1000.0; -- metres
+
+	-- Sample distance in the upper atmosphere.
+	default_sample_distance: constant number := 10000.0; -- metres
+	-- Sample distance inside mountains.
+	mountain_sample_distance: constant number := 100.0; -- metres
+
 	procedure Init(self: in out Class)
 	is
 	begin
@@ -19,8 +27,23 @@ package body World.Moon is
 				xyz_rel_planet: vec3_t)
 			return number
 	is
+		altitude: number := length(xyz_rel_planet) - self.nominal_radius;
 	begin
-		return 5000.0;
+		-- Inside mountains.
+		if (altitude < max_mountain_height) then
+			-- We're going to assume a maximum gradient of 1. That means
+			-- that we know that there's going to be ground no further away
+			-- than our immediate radar altitude, in any direction.
+			declare
+				radar_altitude: number := self.Get_Actual_Radius_P(xyz_rel_planet);
+			begin
+				return clamp(altitude - radar_altitude,
+					mountain_sample_distance, max_mountain_height - altitude);
+			end;
+		end if;
+
+		return clamp(altitude - max_mountain_height,
+			mountain_sample_distance, default_sample_distance);
 	end;
 
 	function Get_Actual_Radius_P(self: Class;
@@ -33,12 +56,16 @@ package body World.Moon is
 		-- xyz_rel_planet normalised to the lunar surface (i.e. at altitude 0)
 		xyzn: vec3_t := up * self.nominal_radius;
 
-		wobble: constant number := 1.0e3;
-		scale: constant number := 5.0e3;
+		scale: constant number := 20.0e3;
 
 		d: number := Noise.fBm3(xyzn/scale, 2.0, 5.0, 1.0, 1.0);
+
+		function Stretch(value, min: number)
+			return number
+				is ((clamp(value, min, 1.0) - min) * (1.0 / (1.0 - min)));
 	begin
-		return self.nominal_radius + d*wobble;
+		d := Stretch(d, 0.5);
+		return self.nominal_radius + d*max_mountain_height;
 	end;
 
 	procedure Sample_Atmosphere_P(self: Class;
