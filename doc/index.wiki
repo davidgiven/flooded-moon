@@ -1,29 +1,32 @@
 <title>an art project</title>
 
-This is an art project to use CGI to visualise the moon, from really close
-up... after it's been terraformed.
+This is an art project to use CGI to visualise the moon, from really
+close up... after it's been terraformed.
 
-It uses real terrain data from various survey spacecraft to produce accurate as
-possible terrain, plus procedural enhancement to make it more... interesting...
-in the smooth areas. Atmosphere, water and vegetation are added and the results
-rendered with Povray. A reasonable attempt is made to keep things physically
-accurate, at least geometry-wise: you only get to see Earthrise from the parts
-of the moon where can actually see Earthrise, for example.
+It uses real terrain data from various survey spacecraft to produce
+accurate as possible terrain, plus procedural enhancement to make it
+more... interesting...  in the smooth areas. Atmosphere, water and
+vegetation are added and the results rendered with Povray. A
+reasonable attempt is made to keep things physically accurate, at
+least geometry-wise: you only get to see Earthrise from the parts of
+the moon where can actually see Earthrise, for example.
 
 <a href="HowItWorks.wiki">How it works</a><br/>
 <a href="LegalInformation.wiki">Important legal information</a><br/>
 <a href="RenderingYourOwn.wiki">Rendering your own images</a>
 
-Still to do: clouds. A much better atmosphere (the current one has been
-blatantly fiddled until it 'looks right'; I need to think through what an
-Earth-like atmosphere on a body with 0.16g would look like). Better texturing
---- rocks and grass look awfully bland close up, and the maximum forest draw
-distance looks bad. Icecaps (although I'm not sure the moon would have any; a
-big atmosphere would make for a very homogeneous climate).
+Still to do: clouds. A much better atmosphere (the current one has
+been blatantly fiddled until it 'looks right'; I need to think
+through what an Earth-like atmosphere on a body with 0.16g would look
+like). Better texturing --- rocks and grass look awfully bland close
+up, and the maximum forest draw distance looks bad. Icecaps (although
+I'm not sure the moon would have any; a big atmosphere would make for
+a very homogeneous climate).
 
-As an aside: none of these pictures have had any tweaking. I just point the
-camera and render. The only control over the result is the time of day. I have
-an entire planet's worth of scenery to explore. I take requests!
+As an aside: none of these pictures have had any tweaking. I just
+point the camera and render. The only control over the result is the
+time of day. I have an entire planet's worth of scenery to explore. I
+take requests!
 
 Any comments or feedback? Let me know by emailing me at <a
 href="mailto:dg@cowlark.com">dg@cowlark.com</a>. Meanwhile, enjoy the pictures.
@@ -35,58 +38,66 @@ href="mailto:dg@cowlark.com">dg@cowlark.com</a>. Meanwhile, enjoy the pictures.
 </tr>
 </table>
 
-Lunar nearside and farside, respectively. Nearside is low and contains lush
-forests and mountain ranges; farside is all high plateau and barren rock, with
-the Earth peering out from behind her little sister. The sun is immediately
-behind the camera so as to illuminate the entire lunar disc, which makes the
-pictures rather dull but useful for reference.
+Lunar nearside and farside, respectively. Nearside is low and
+contains lush forests and mountain ranges; farside is all high
+plateau and barren rock, with the Earth peering out from behind her
+little sister. The sun is immediately behind the camera so as to
+illuminate the entire lunar disc, which makes the pictures rather
+dull but useful for reference.
 
 <img class="droppedimage" src="north-into-huygens-sound.jpg" alt="North into Huygens Sound"/>
 
-Looking north-north-east over Huygens Sound at an altitude of 5km; you can see
-the lower slopes of Mons Huygens to the right. The lowlands off to the left are
-the Bradley Peninsula. Rima Bradley is the narrow inlet in the top left. Off to
-the right, at the far end of Huygens Sound, are the Mons Bradley range of
-mountains.
+Looking north-north-east over Huygens Sound at an altitude of 5km;
+you can see the lower slopes of Mons Huygens to the right. The
+lowlands off to the left are the Bradley Peninsula. Rima Bradley is
+the narrow inlet in the top left. Off to the right, at the far end of
+Huygens Sound, are the Mons Bradley range of mountains.
 
 <img class="droppedimage" src="kiess-island.jpg" alt="Kiess Island"/>
 
-Nighttime on Kiess Island: trees are silhouetted against the night sky, lit up
-by earthlight. This was taken on the south coast of the Sea of Smyth.
+Nighttime on Kiess Island: trees are silhouetted against the night
+sky, lit up by earthlight. This was taken on the south coast of the
+Sea of Smyth.
+
+Incidentally, this picture was on the cover of <a
+href="http://www.artscatalyst.org/manifesto-republic-moon">A
+Manifesto For The Republic of the Moon</a>, the art book for the
+<i>Republic of the Moon</i> exhibition at the London Bargehouse in
+2014. You can download the epub at the link.
 
 <img class="droppedimage" src="mons-bradley.jpg" alt="Mons Bradley"/>
 
-Further up Huygens Sound. In the foreground are the faceted basalt slopes of
-the Mons Huygens mountain range. In the distance, the snow-tipped peak of Mons
-Bradley towers over everything else.
+Further up Huygens Sound. In the foreground are the faceted basalt
+slopes of the Mons Huygens mountain range. In the distance, the
+snow-tipped peak of Mons Bradley towers over everything else.
 
 <img class="droppedimage" src="epimenides-forest.jpg" alt="Epimenides Forest"/>
 
-Epimenides Forest, on the western limb of the moon: vast plains, covered in the
-characteristic lunar maple woodland.
+Epimenides Forest, on the western limb of the moon: vast plains,
+covered in the characteristic lunar maple woodland.
 
 <img class="droppedimage" src="threequarters-from-space.jpg" alt="Three-quarters view from space"/>
 
-A view from space; lunar nearside is on the right-hand side of the image. The
-big sea top right is partly Mare Imbrium ('Sea of Rains') and partly Oceanus
-Procellarum ('Ocean of Storms'). The island in the middle is Jura. The big bay
-on the eastern side of Jura is Sinus Iridum, the Bay of Rainbows. The Chang'e 3
-lander ditched into the sea just southeast of there.
+A view from space; lunar nearside is on the right-hand side of the
+image. The big sea top right is partly Mare Imbrium ('Sea of Rains')
+and partly Oceanus Procellarum ('Ocean of Storms'). The island in the
+middle is Jura. The big bay on the eastern side of Jura is Sinus
+Iridum, the Bay of Rainbows. The Chang'e 3 lander ditched into the
+sea just southeast of there.
 
 <img class="droppedimage" src="jura.jpg" alt="The island of Jura"/>
 
-A closer look at the island of Jura, looking north. It's about 600km long,
-making it about two-thirds the size of the British Isles. The island is
-dominated by the Bay of Rainbows at the top right; the big crater lake on the
-west side is Mairan, and is about 40km across. The smaller one north-east of it
-is Sharp. On the south side is the massive hump of Mons Gruithuisen, a lava
-dome nearly a kilometre high. At the bottom edge of the picture, the smaller
-island of Dorsum Bucher marks the edge of the island chain which separates Mare
+A closer look at the island of Jura, looking north. It's about 600km
+long, making it about two-thirds the size of the British Isles. The
+island is dominated by the Bay of Rainbows at the top right; the big
+crater lake on the west side is Mairan, and is about 40km across. The
+smaller one north-east of it is Sharp. On the south side is the
+massive hump of Mons Gruithuisen, a lava dome nearly a kilometre
+high. At the bottom edge of the picture, the smaller island of Dorsum
+Bucher marks the edge of the island chain which separates Mare
 Imbrium on the east from Oceanus Procellarum on the west.
 
 <h2 class='comments-title'>Comments on this page</h2>
-<table class='comments' border='0'><tr>
-<td id='commentator-viewer'></td>
-<td id='commentator-poster'></td>
-</tr></table>
+<div id='commentator-viewer'></div>
+<div id='commentator-poster'></div>
 
