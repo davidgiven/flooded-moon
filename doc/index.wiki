@@ -31,12 +31,8 @@ take requests!
 Any comments or feedback? Let me know by emailing me at <a
 href="mailto:dg@cowlark.com">dg@cowlark.com</a>. Meanwhile, enjoy the pictures.
 
-<table>
-<tr>
-<td><img class="droppedimage" src="lunar-nearside-large.jpg" alt="Lunar nearside"/></td>
-<td><img class="droppedimage" src="lunar-farside-large.jpg" alt="Lunar farside"/></td>
-</tr>
-</table>
+<img class="droppedimage" src="lunar-nearside-large.jpg" alt="Lunar nearside"/><br/>
+<img class="droppedimage" src="lunar-farside-large.jpg" alt="Lunar farside"/>
 
 Lunar nearside and farside, respectively. Nearside is low and
 contains lush forests and mountain ranges; farside is all high
