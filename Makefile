@@ -1,7 +1,6 @@
 POVRAY = ../povray/.obj/unix/povray
-PLACE = nearside-from-space
+PLACE = jura
 PARAMS = \
-	--altitude=10000
 
 all: newmoon.png
 
@@ -17,5 +16,5 @@ terrainmaker/terrainmaker: $(wildcard terrainmaker/*.h) $(wildcard terrainmaker/
 	make -C terrainmaker terrainmaker
 
 terrainlib/moon.so: terrainlib/moon.cc $(wildcard terrainlib/include/*.h)
-	gcc -O3 -shared -fpic -fPIC -o terrainlib/moon.so terrainlib/moon.cc
+	gcc -O3 -shared -fpic -fPIC -o terrainlib/moon.so terrainlib/moon.cc -lnoise
 
