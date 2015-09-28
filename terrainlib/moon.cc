@@ -1,7 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <libnoise/noise.h>
+#include <stdexcept>
+#include <cmath>
+#include <string>
+#include <map>
+#include <deque>
+#include <iostream>
+#include <boost/format.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/iostreams/device/mapped_file.hpp>
+#include "utils.h"
+#include "matrix.h"
+#include "map.h"
+#include "pdslabel.h"
+#include "pds.h"
+#include "pdsset.h"
 #include "../../povray/include/povray_plugin.h"
 
 #define km 1000.0

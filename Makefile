@@ -16,5 +16,9 @@ terrainmaker/terrainmaker: $(wildcard terrainmaker/*.h) $(wildcard terrainmaker/
 	make -C terrainmaker terrainmaker
 
 terrainlib/moon.so: terrainlib/moon.cc $(wildcard terrainlib/include/*.h)
-	gcc -O3 -shared -fpic -fPIC -o terrainlib/moon.so terrainlib/moon.cc -lnoise
+	g++ \
+		-O3 -shared -fpic -fPIC -std=c++11 \
+		-Iterrainlib/include \
+		-o terrainlib/moon.so terrainlib/moon.cc \
+		-lnoise
 
