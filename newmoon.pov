@@ -133,18 +133,18 @@ sky_sphere
 {
 	pigment
 	{
-		#if (CameraFieldOfView < 50)
+//		#if (CameraFieldOfView < 50)
 			color rgb <0, 0, 0>
-		#else
-			image_map
-			{
-				png "nightsky/phot-32a-09-fullres.png"
-				map_type 1
-				interpolate 4
-				once
-			}
-			rotate 90*x
-		#end
+//		#else
+//			image_map
+//			{
+//				png "nightsky/phot-32a-09-fullres.png"
+//				map_type 1
+//				interpolate 4
+//				once
+//			}
+//			rotate 90*x
+//		#end
 	}
 	emission 0.15
 }

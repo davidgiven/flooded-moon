@@ -1,3 +1,4 @@
+#declare Nominal_Sphere         = 10000.000 * km; // isosurface scaling factor
 #declare Lunar_Sphere           = 1750.000 * km; // enclosing diameter of terrain object
 #declare Nominal_Terrain_Radius = 1737.400 * km;
 #declare Atmosphere_Base        = -2 * km;
@@ -585,41 +586,54 @@
 /* Really steep. Rock face. */
 
 #local Steep_Surface = Rock_Texture;
+#local Moon_Isosurface = function { dll("terrainlib/moon.so", "terrain_isosurface") };
 
 #local Terrain_Object =
 	object
 	{
-		mesh2
+		isosurface
 		{
-			#include "/tmp/moon.inc"
-		}
-		scale km
-
-		texture
-		{
-			/* u is height, in kilometres, above sealevel.
-			 * v is the slope (0 = horizontal, 1 = steep).
-			 */
-			 
-			pigment_pattern
+			function { Moon_Isosurface(x, y, z).x }
+			max_gradient 3
+			bounded_by
 			{
-				uv_mapping function { y }
-				pigment_map
+				sphere
 				{
-					[0 rgb <0, 0, 0>]
-					[1 rgb <1, 1, 1>]
+					<0, 0, 0>, Lunar_Sphere / Nominal_Sphere
 				}
 			}
-			turbulence 0.2
-
-			texture_map
-			{
-				[0.05 Flat_Surface ]
-				[0.1 Flattish_Surface ]
-				[0.2 Steepish_Surface ]
-				[0.4 Steep_Surface ]
-			}
+			scale Nominal_Sphere
 		}
+
+		pigment
+		{
+			color White
+		}
+//		texture
+//		{
+//			/* u is height, in kilometres, above sealevel.
+//			 * v is the slope (0 = horizontal, 1 = steep).
+//			 */
+//			 
+//			pigment_pattern
+//			{
+//				uv_mapping function { y }
+//				pigment_map
+//				{
+//					[0 rgb <0, 0, 0>]
+//					[1 rgb <1, 1, 1>]
+//				}
+//			}
+//			turbulence 0.2
+//
+//			texture_map
+//			{
+//				[0.05 Flat_Surface ]
+//				[0.1 Flattish_Surface ]
+//				[0.2 Steepish_Surface ]
+//				[0.4 Steep_Surface ]
+//			}
+//		}
 	}
 
 // =======================================================================
@@ -743,11 +757,10 @@
 #local Sea_Object =
 	object
 	{
-		mesh2
+		sphere
 		{
-			#include "/tmp/sea.inc"
+			<0, 0, 0>, 1000.0 * km
 		}
-		scale km
 
 	    material {
 	        Sea_Material
@@ -916,11 +929,11 @@
 	}
 #end
 
-#local Trees_Object =
-	union
-	{
-		#include "/tmp/props.inc"
-	}
+//#local Trees_Object =
+//	union
+//	{
+//		#include "/tmp/props.inc"
+//	}
 
 // ==========================================================================
 //                                 OVERALL
@@ -929,8 +942,8 @@
 #declare Moon_Object =
 	union
 	{
-		object { Terrain_Object }
-		object { Trees_Object }
-		object { Sea_Object }
-		object { Sky_Object }
+	  object { Terrain_Object }
+	  //object { Trees_Object }
+	  object { Sea_Object }
+	  //object { Sky_Object }
 	}

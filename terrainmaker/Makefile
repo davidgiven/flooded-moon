@@ -14,8 +14,8 @@ else
 	LLVM += -lLLVM-3.3
 endif
 
-#CXX = g++-4.8
-CXX = clang++
+CXX = g++-4.8
+#CXX = clang++
 CALCULON = -I$(HOME)/nonshared/calculon/include
 
 DEFS += \
