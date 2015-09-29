@@ -28,8 +28,12 @@ using std::max;
 #define km                1000.0
 
 #define SPHERE          (10000.000*km)
-#define LUNAR_RADIUS     (1737.400*km)
+#define AVERAGE_TERRAIN  (1737.400*km)
 #define SEALEVEL           (-1.850*km)
+
+#define ATMOSPHERE_BASE    (-2.000*km)
+#define ATMOSPHERE_DEPTH  (200.000*km)
+#define ATMOSPHERE_SCALE  (ATMOSPHERE_DEPTH * 2.0)
 
 static PDSSet geoidpds = {
 	"geoid/LDGM_4_GLGM-3_L60.LBL:geoid/LDGM_4_GLGM-3_L60.IMG"
@@ -118,14 +122,40 @@ double slope_of_terrain(const Point& p)
 static double terrain_radius(const Point& p)
 {
 	double t = terrainpds.at(p);
-	if (t < 0.050)
-		return 0.050;
+	if (t < 0.050*km)
+		return 0.050*km;
 	return t;
 }
 
 static double sea_radius(const Point& p)
 {
 	return geoidpds.at(p) + SEALEVEL;
+}
+
+const double bottom_of_atmosphere = AVERAGE_TERRAIN + ATMOSPHERE_BASE;
+const double top_of_atmosphere = bottom_of_atmosphere + ATMOSPHERE_DEPTH;
+
+const double g = 1.622;     // m/s^2 --- note METRES
+const double L = 0.0065/6;  // K/m --- temperature lapse rate. Adjusted, crudely
+const double M = 0.0289644; // kg/mol --- molar mass of dry air
+const double T0 = 293.0;    // kelvin --- STP
+const double R = 8.3144;    // joules / mole kelvin --- gas constant
+const double gM_RL = (g*M) / (R*L);
+const double L_T0 = L / T0;
+
+const double dscale = 1.0;  // from atmospheres to whatever Povray uses
+
+static double pressure(double height)
+{
+	return pow((1 - L_T0*height), gM_RL);
+}
+
+static double rayleigh_density(const Point& p)
+{
+	const double height_from_centre = p.length();
+	const double height_from_bottom = height_from_centre - bottom_of_atmosphere;
+
+	return dscale * pressure(height_from_bottom);
 }
 
 static void isosurface(double data[], double (*callback)(const Point&))
@@ -163,5 +193,12 @@ void terrain_gradient(double data[])
 {
 	Point scaled = {data[0]*SPHERE, data[1]*SPHERE, data[2]*SPHERE};
 	data[0] = slope_of_terrain(scaled);
+}
+
+extern "C" povray_vector_fn rayleigh_density;
+void rayleigh_density(double data[])
+{
+	Point unscaled = {data[0]*km, data[1]*km, data[2]*km};
+	data[0] = rayleigh_density(unscaled);
 }
 

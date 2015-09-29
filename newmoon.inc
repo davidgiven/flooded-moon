@@ -796,6 +796,8 @@
 #local Rayleigh_Scale = 0.5;
 #local Rayleigh_Power = Base_Rayleigh_Power * Rayleigh_Factor;
 
+#local Rayleigh_Density_Function = function { dll("terrainlib/moon.so", "rayleigh_density") };
+
 #local Rayleigh_Density =
 	density
 	{
@@ -835,10 +837,11 @@
 		#warning concat("Pressure at  50km: ", str(pressure(50000), 0, 8))
 		#warning concat("Pressure at 100km: ", str(pressure(100000), 0, 8))
 
-		function
-		{
-			dscale * pressure(height_from_surface(x, y, z)*1000)
-		}
+		function { Rayleigh_Density_Function(x, y, z).x }
+		//function
+		//{
+		//	dscale * pressure(height_from_surface(x, y, z)*1000)
+		//}
 	}
 
 #local Rayleigh_Colour = rgb <0.2061, 0.3933, 1.0>;
@@ -849,7 +852,7 @@
 		method 3
 		//samples 31
 		//jitter 0.1
-		samples 60
+		samples 20
 		scattering
 		{
 			RAYLEIGH_SCATTERING
