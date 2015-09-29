@@ -20,6 +20,17 @@ public:
 	{
 	}
 
+	PDSSet(std::initializer_list<std::string> list)
+	{
+		for (const std::string fn : list)
+			add(fn);
+	}
+
+	PDSSet(std::string fn)
+	{
+		add(fn);
+	}
+
 	void add(PDS* pds)
 	{
 		Record* r = new Record;

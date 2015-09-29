@@ -2,11 +2,15 @@ POVRAY = ../povray/.obj/unix/povray
 PLACE = jura
 PARAMS = \
 
+# \
+	--altitude 50 \
+	--azimuth -30
+
 all: newmoon.png
 
 newmoon.png: Makefile newmoon.ini newmoon.inc newmoon.pov earth.inc \
 		/tmp/camera.inc terrainlib/moon.so $(POVRAY)
-	$(POVRAY) +Inewmoon +A +P +W400 +H300
+	$(POVRAY) +Inewmoon -A +D +P +W400 +H300
 	
 /tmp/camera.inc: Makefile terrainmaker/terrainmaker \
 		$(wildcard scripts/*) $(wildcard places/*)
@@ -15,10 +19,11 @@ newmoon.png: Makefile newmoon.ini newmoon.inc newmoon.pov earth.inc \
 terrainmaker/terrainmaker: $(wildcard terrainmaker/*.h) $(wildcard terrainmaker/*.cc)
 	make -C terrainmaker terrainmaker
 
-terrainlib/moon.so: terrainlib/moon.cc $(wildcard terrainlib/include/*.h)
-	g++ \
-		-O3 -shared -fpic -fPIC -std=c++11 \
-		-Iterrainlib/include \
+terrainlib/moon.so: Makefile terrainlib/moon.cc $(wildcard terrainmaker/*.h)
+	g++-4.9 \
+		-g -Os -shared -fpic -fPIC -std=c++11 \
+		-Iterrainmaker \
 		-o terrainlib/moon.so terrainlib/moon.cc \
-		-lnoise
+		-lnoise \
+		-lboost_iostreams
 

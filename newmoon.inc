@@ -21,6 +21,14 @@
 //                                TERRAIN 
 // =======================================================================
 
+#local Moon_Isosurface = function { dll("terrainlib/moon.so", "terrain_isosurface") };
+
+// This returns km, not m.
+#local Moon_Altitude = function { dll("terrainlib/moon.so", "terrain_altitude") };
+
+// 0 = horizontal, 1 = steep
+#local Moon_Gradient = function { dll("terrainlib/moon.so", "terrain_gradient") };
+
 #local Fields_Texture =
 	texture
 	{
@@ -152,7 +160,7 @@
 	{
 		pigment_pattern
 		{
-			uv_mapping function { y }
+			function { Moon_Gradient(x, y, z).x }
 			pigment_map
 			{
 				[0 rgb <0, 0, 0>]
@@ -374,7 +382,7 @@
 	{
 		pigment_pattern
 		{
-			uv_mapping function { y }
+			function { Moon_Gradient(x, y, z).x }
 		}
 		texture_map
 		{
@@ -502,7 +510,7 @@
     {
 		pigment_pattern
 		{
-			uv_mapping function { map(x, -20, 20) }
+			function { map(Moon_Altitude(x, y, z).x, -20, 20) }
 			pigment_map
 			{
 				[0 rgb <0, 0, 0>]
@@ -531,7 +539,7 @@
     {
 		pigment_pattern
 		{
-			uv_mapping function { map(x, -20, 20) }
+			function { map(Moon_Altitude(x, y, z).x, -20, 20) }
 			pigment_map
 			{
 				[0 rgb <0, 0, 0>]
@@ -564,7 +572,7 @@
     {
 		pigment_pattern
 		{
-			uv_mapping function { map(x, -20, 20) }
+			function { map(Moon_Altitude(x, y, z).x, -20, 20) }
 			pigment_map
 			{
 				[0 rgb <0, 0, 0>]
@@ -586,7 +594,6 @@
 /* Really steep. Rock face. */
 
 #local Steep_Surface = Rock_Texture;
-#local Moon_Isosurface = function { dll("terrainlib/moon.so", "terrain_isosurface") };
 
 #local Terrain_Object =
 	object
@@ -605,35 +612,31 @@
 			scale Nominal_Sphere
 		}
 
-		pigment
+		texture
 		{
-			color White
+			/* u is height, in kilometres, above sealevel.
+			 * v is the slope (0 = horizontal, 1 = steep).
+			 */
+			 
+			pigment_pattern
+			{
+				function { Moon_Gradient(x, y, z).x }
+				pigment_map
+				{
+					[0 rgb <0, 0, 0>]
+					[1 rgb <1, 1, 1>]
+				}
+			}
+			turbulence 0.2
+
+			texture_map
+			{
+				[0.05 Flat_Surface ]
+				[0.1 Flattish_Surface ]
+				[0.2 Steepish_Surface ]
+				[0.4 Steep_Surface ]
+			}
 		}
-//		texture
-//		{
-//			/* u is height, in kilometres, above sealevel.
-//			 * v is the slope (0 = horizontal, 1 = steep).
-//			 */
-//			 
-//			pigment_pattern
-//			{
-//				uv_mapping function { y }
-//				pigment_map
-//				{
-//					[0 rgb <0, 0, 0>]
-//					[1 rgb <1, 1, 1>]
-//				}
-//			}
-//			turbulence 0.2
-//
-//			texture_map
-//			{
-//				[0.05 Flat_Surface ]
-//				[0.1 Flattish_Surface ]
-//				[0.2 Steepish_Surface ]
-//				[0.4 Steep_Surface ]
-//			}
-//		}
 	}
 
 // =======================================================================
@@ -754,18 +757,28 @@
 		}
 	}
 
+#local Sea_Isosurface = function { dll("terrainlib/moon.so", "sea_isosurface") };
+
 #local Sea_Object =
 	object
 	{
-		sphere
+		isosurface
 		{
-			<0, 0, 0>, 1000.0 * km
+			function { Sea_Isosurface(x, y, z).x }
+			max_gradient 3
+			bounded_by
+			{
+				sphere
+				{
+					<0, 0, 0>, Lunar_Sphere / Nominal_Sphere
+				}
+			}
+			scale Nominal_Sphere
 		}
 
 	    material {
 	        Sea_Material
 	    }
-	
 	}
 
 // =======================================================================
@@ -945,5 +958,5 @@
 	  object { Terrain_Object }
 	  //object { Trees_Object }
 	  object { Sea_Object }
-	  //object { Sky_Object }
+	  object { Sky_Object }
 	}
