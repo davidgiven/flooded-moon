@@ -1,0 +1,7 @@
+This directory needs to contain the topography dataset from the Mars Express
+HRSC camera. It's not checked in because. Feel free to download it yourself!
+
+http://europlanet.dlr.de/node/index.php?id=381
+
+You want the base_dtm_phobos.pds file.
+
