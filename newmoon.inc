@@ -1,7 +1,7 @@
 #declare Nominal_Sphere         = 10000.000 * km; // isosurface scaling factor
 #declare Lunar_Sphere           = 1750.000 * km; // enclosing diameter of terrain object
 #declare Nominal_Terrain_Radius = 1737.400 * km;
-#declare Atmosphere_Base        = -2 * km;
+#declare Atmosphere_Base        = -3 * km;
 #declare Atmospheric_Depth      = 200 * km;
 #declare Atmospheric_Scale      = (Atmospheric_Depth * 2);
 
@@ -160,7 +160,7 @@
 	{
 		pigment_pattern
 		{
-			function { Moon_Gradient(x, y, z).x }
+			function { Moon_Gradient(x, y, z) }
 			pigment_map
 			{
 				[0 rgb <0, 0, 0>]
@@ -382,7 +382,7 @@
 	{
 		pigment_pattern
 		{
-			function { Moon_Gradient(x, y, z).x }
+			function { Moon_Gradient(x, y, z) }
 		}
 		texture_map
 		{
@@ -510,7 +510,7 @@
     {
 		pigment_pattern
 		{
-			function { map(Moon_Altitude(x, y, z).x, -20, 20) }
+			function { map(Moon_Altitude(x, y, z), -20, 20) }
 			pigment_map
 			{
 				[0 rgb <0, 0, 0>]
@@ -539,7 +539,7 @@
     {
 		pigment_pattern
 		{
-			function { map(Moon_Altitude(x, y, z).x, -20, 20) }
+			function { map(Moon_Altitude(x, y, z), -20, 20) }
 			pigment_map
 			{
 				[0 rgb <0, 0, 0>]
@@ -572,7 +572,7 @@
     {
 		pigment_pattern
 		{
-			function { map(Moon_Altitude(x, y, z).x, -20, 20) }
+			function { map(Moon_Altitude(x, y, z), -20, 20) }
 			pigment_map
 			{
 				[0 rgb <0, 0, 0>]
@@ -600,8 +600,12 @@
 	{
 		isosurface
 		{
-			function { Moon_Isosurface(x, y, z).x }
+			function { Moon_Isosurface(x, y, z) }
+			#local factor = 0.6;
+			#local maxf = 3;
+			//evaluate maxf*factor, sqrt(maxf/(maxf*factor)), 0.7
 			max_gradient 3
+			accuracy 0.00001
 			bounded_by
 			{
 				sphere
@@ -620,7 +624,7 @@
 			 
 			pigment_pattern
 			{
-				function { Moon_Gradient(x, y, z).x }
+				function { Moon_Gradient(x, y, z) }
 				pigment_map
 				{
 					[0 rgb <0, 0, 0>]
@@ -764,7 +768,7 @@
 	{
 		isosurface
 		{
-			function { Sea_Isosurface(x, y, z).x }
+			function { Sea_Isosurface(x, y, z) }
 			max_gradient 3
 			bounded_by
 			{
@@ -798,52 +802,6 @@
 
 #local Rayleigh_Density_Function = function { dll("terrainlib/moon.so", "rayleigh_density") };
 
-#local Rayleigh_Density =
-	density
-	{
-		#local g = 1.622; // m/s^2 --- note METRES!
-		#local L = 0.0065/6; // K/m --- temperature lapse rate. Adjusted, crudely
-		#local M = 0.0289644; // kg/mol --- molar mass of dry air
-		#local T0 = 293; // kelvin --- STP
-		#local R = 8.3144; // joules / mole kelvin --- gas constant
-		#local gM_RL = (g*M) / (R*L);
-		#local L_T0 = L / T0;
-
-		#local dscale = 1.0; // from atmospheres to whatever Povray uses
-
-        #local height_from_centre =
-	        function(x, y, z) {
-	            sqrt(x*x + y*y + z*z)
-	        }
-	        
-	    #local height_from_surface =
-	        function(x, y, z) {
-	            height_from_centre(x, y, z) - Bottom_Of_Atmosphere
-	        }
-	   
-		// Calculates air pressure at a given height, in atmospheres (1 at
-		// ground level). Heights are in metres.
-
-		#local pressure = 
-			function(h)
-			{
-				pow((1 - L_T0*h), gM_RL)
-			}
-
-		#warning concat("Pressure at   0km: ", str(pressure(0), 0, 8))
-		#warning concat("Pressure at   5km: ", str(pressure(5000), 0, 8))
-		#warning concat("Pressure at  10km: ", str(pressure(10000), 0, 8))
-		#warning concat("Pressure at  15km: ", str(pressure(15000), 0, 8))
-		#warning concat("Pressure at  50km: ", str(pressure(50000), 0, 8))
-		#warning concat("Pressure at 100km: ", str(pressure(100000), 0, 8))
-
-		function { Rayleigh_Density_Function(x, y, z).x }
-		//function
-		//{
-		//	dscale * pressure(height_from_surface(x, y, z)*1000)
-		//}
-	}
-
 #local Rayleigh_Colour = rgb <0.2061, 0.3933, 1.0>;
 
 #local Rayleigh_Media =
@@ -851,8 +809,9 @@
 	{
 		method 3
 		//samples 31
-		//jitter 0.1
-		samples 20
+		jitter 0.1
+		ratio 1
+		samples 3, 30
 		scattering
 		{
 			RAYLEIGH_SCATTERING
@@ -861,9 +820,17 @@
 		}
 		density
 		{
-			Rayleigh_Density
+			function {
+				Rayleigh_Density_Function(x, y, z)
+			}
 		}
 	}
+
+// m3 j0.1 r1 s3, 10: 21s
+// m3 j0.1 r1 s3, 20: 21s
+// m3 j0.1 r1 s3, 30: 21s
+
+// m3 j0.1 r1 s3,30: 104s
 
 #local Sky_Object =
 	difference {
