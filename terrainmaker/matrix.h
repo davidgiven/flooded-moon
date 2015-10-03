@@ -133,6 +133,10 @@ struct Point
 		x(xx), y(yy), z(zz)
 	{}
 
+	Point(double* ptr):
+		x(ptr[0]), y(ptr[1]), z(ptr[2])
+	{}
+
 	Point(const Vector& o):
 		x(o.x), y(o.y), z(o.z)
 	{}
@@ -189,6 +193,16 @@ struct Point
 	Vector operator - (const Point& o) const
 	{
 		return Vector(x-o.x, y-o.y, z-o.z);
+	}
+
+	Vector operator * (double f) const
+	{
+		return Vector(x*f, y*f, z*f);
+	}
+
+	Vector operator / (double f) const
+	{
+		return Vector(x/f, y/f, z/f);
 	}
 
 	double lengthSquared() const

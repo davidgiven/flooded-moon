@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <libnoise/noise.h>
 #include <stdexcept>
 #include <cmath>
 #include <string>
@@ -21,18 +20,17 @@
 #include "pds.h"
 #include "pdsset.h"
 #include "../../povray/include/povray_plugin.h"
+#include "noise.h"
 
 using std::min;
 using std::max;
 
-#define km                1000.0
+#define SPHERE          (10000.000)
+#define AVERAGE_TERRAIN  (1737.400)
+#define SEALEVEL           (-1.850)
 
-#define SPHERE          (10000.000*km)
-#define AVERAGE_TERRAIN  (1737.400*km)
-#define SEALEVEL           (-1.850*km)
-
-#define ATMOSPHERE_BASE    (-2.000*km)
-#define ATMOSPHERE_DEPTH  (200.000*km)
+#define ATMOSPHERE_BASE    (-2.000)
+#define ATMOSPHERE_DEPTH  (200.000)
 #define ATMOSPHERE_SCALE  (ATMOSPHERE_DEPTH * 2.0)
 
 static PDSSet geoidpds = {
@@ -52,20 +50,22 @@ static PDSSet terrainpds = {
 	"lroc/WAC_GLD100_P900S0000_256P.IMG::OFFSET=1737400",
 };
 
-static double perlin(double x, double y, double z)
+static double sea_radius(const Point& p)
 {
-	static noise::module::Perlin noise;
-	return noise.GetValue(x, y, z);
+	return geoidpds.at(p)/1000.0 + SEALEVEL; // km
 }
 
 static double terrain_radius(const Point& p)
 {
-	return terrainpds.at(p);
-}
+	double radius = terrainpds.at(p) / 1000.0; // km
+	Point onsurface = terrainpds.mapToSphere(p, radius);
+	double slope = terrainpds.slope(onsurface);
 
-static double sea_radius(const Point& p)
-{
-	return geoidpds.at(p) + SEALEVEL;
+	return radius
+		+ multifractal(onsurface*3.0, 1.0, 2.0, 6)*0.010
+		+ multifractal(onsurface/2.0, 1.0, 2.0, int(6.0*slope))*0.200 *
+			blend0lo(slope, 0.00, 1.0)
+	;
 }
 
 const double bottom_of_atmosphere = AVERAGE_TERRAIN + ATMOSPHERE_BASE;
@@ -96,8 +96,8 @@ static double rayleigh_density(const Point& p)
 
 static double isosurface(double* data, double (*callback)(const Point&))
 {
-	Point unscaled = {data[0], data[1], data[2]};
-	Point scaled = {data[0]*SPHERE, data[1]*SPHERE, data[2]*SPHERE};
+	Point unscaled(data);
+	Point scaled = unscaled * SPHERE;
 
 	double t = callback(scaled) / SPHERE;
 
@@ -119,21 +119,21 @@ double povray_scalar_function_sea_isosurface(double* data)
 extern "C" povray_scalar_fn povray_scalar_function_terrain_altitude;
 double povray_scalar_function_terrain_altitude(double* data)
 {
-	Point scaled = {data[0]*SPHERE, data[1]*SPHERE, data[2]*SPHERE};
-	return (terrain_radius(scaled) - sea_radius(scaled)) / km;
+	Point scaled = Point(data)*SPHERE;
+	return terrain_radius(scaled) - sea_radius(scaled);
 }
 
 extern "C" povray_scalar_fn povray_scalar_function_terrain_gradient;
 double povray_scalar_function_terrain_gradient(double* data)
 {
-	Point scaled = {data[0]*SPHERE, data[1]*SPHERE, data[2]*SPHERE};
+	Point scaled = Point(data)*SPHERE;
 	return terrainpds.slope(scaled);
 }
 
 extern "C" povray_scalar_fn povray_scalar_function_rayleigh_density;
 double povray_scalar_function_rayleigh_density(double* data)
 {
-	Point scaled = {data[0]*km, data[1]*km, data[2]*km};
+	Point scaled = Point(data) / 1000.0;
 	return rayleigh_density(scaled);
 }
 

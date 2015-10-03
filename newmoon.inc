@@ -602,10 +602,10 @@
 		{
 			function { Moon_Isosurface(x, y, z) }
 			#local factor = 0.6;
-			#local maxf = 3;
+			#local maxf = 30;
 			//evaluate maxf*factor, sqrt(maxf/(maxf*factor)), 0.7
-			max_gradient 3
-			accuracy 0.00001
+			max_gradient 10
+			accuracy 0.00001 // / Lunar_Sphere // 10cm
 			bounded_by
 			{
 				sphere
@@ -821,6 +821,7 @@
 		density
 		{
 			function {
+				
 				Rayleigh_Density_Function(x, y, z)
 			}
 		}
