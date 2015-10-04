@@ -42,13 +42,13 @@ public:
 		        << target.x << ", " << target.y << ", " << target.z << ">;\n"
 		        << "#declare CameraSky = <"
 		        << up.x << ", " << up.y << ", " << up.z << ">;\n"
-				<< "#declare CameraAltitude = " << altitude << ";\n"
-				<< "#declare CameraLongitude = " << longitude << ";\n"
-				<< "#declare CameraLatitude = " << latitude << ";\n"
-				<< "#declare CameraBearing = " << bearing << ";\n"
-				<< "#declare CameraAzimuth = " << azimuth << ";\n"
-				<< "#declare CameraFieldOfView = " << fov << ";\n"
-				<< "#declare Time_Of_Day = " << (time_of_day+6.0) << ";\n"
+				<< "#declare CameraAltitude = " << vars.altitude << ";\n"
+				<< "#declare CameraLongitude = " << vars.longitude << ";\n"
+				<< "#declare CameraLatitude = " << vars.latitude << ";\n"
+				<< "#declare CameraBearing = " << vars.bearing << ";\n"
+				<< "#declare CameraAzimuth = " << vars.azimuth << ";\n"
+				<< "#declare CameraFieldOfView = " << vars.fov << ";\n"
+				<< "#declare Time_Of_Day = " << (vars.time_of_day+6.0) << ";\n"
 			;
 	}
 
@@ -81,7 +81,7 @@ public:
 
 		replace(templates, "<LOOKAT/>", lookatbuffer.str());
 
-		if (altitude > ATMOSPHERE)
+		if (vars.altitude > ATMOSPHERE)
 			replace(templates, "<AIR/>", "");
 		else
 			replace(templates, "<AIR/>", "<ref id=\"air\"/>");

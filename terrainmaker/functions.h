@@ -116,13 +116,13 @@ extern "C" double lookup_slope(Compiler::Vector<3>* xyz)
 
 void initCalculon(void)
 {
-    calculonSymbols.add("LATITUDE", latitude);
-    calculonSymbols.add("LONGITUDE", longitude);
-    calculonSymbols.add("ALTITUDE", altitude);
-    calculonSymbols.add("AZIMUTH", azimuth);
-    calculonSymbols.add("BEARING", bearing);
-	calculonSymbols.add("RADIUS", radius);
-    calculonSymbols.add("SEALEVEL", sealevel);
+    calculonSymbols.add("LATITUDE", vars.latitude);
+    calculonSymbols.add("LONGITUDE", vars.longitude);
+    calculonSymbols.add("ALTITUDE", vars.altitude);
+    calculonSymbols.add("AZIMUTH", vars.azimuth);
+    calculonSymbols.add("BEARING", vars.bearing);
+	calculonSymbols.add("RADIUS", vars.radius);
+    calculonSymbols.add("SEALEVEL", vars.sealevel);
 
 	calculonSymbols.add("SEA", "(vector*3): real", lookup_sea);
 	calculonSymbols.add("TERRAIN", "(vector*3): real", lookup_terrain);
@@ -134,7 +134,7 @@ void initCalculon(void)
 	{
 		std::ifstream f;
 		f.exceptions(std::ifstream::failbit);
-		f.open(seafuncf);
+		f.open(vars.seafuncf);
 		seaFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
 			"(XYZ: vector*3): (HEIGHT: real)");
 	}
@@ -142,7 +142,7 @@ void initCalculon(void)
 	{
 		std::ifstream f;
 		f.exceptions(std::ifstream::failbit);
-		f.open(terrainfuncf);
+		f.open(vars.terrainfuncf);
 		terrainFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
 			"(XYZ: vector*3): (HEIGHT: real)");
 	}
@@ -150,7 +150,7 @@ void initCalculon(void)
 	{
 		std::ifstream f;
 		f.exceptions(std::ifstream::failbit);
-		f.open(texturefuncf);
+		f.open(vars.texturefuncf);
 		textureFunc = new Compiler::Program<UVFunc>(calculonSymbols, f,
 			"(XYZ: vector*3): (U: real, V: real)");
 	}
@@ -158,7 +158,7 @@ void initCalculon(void)
 	{
 		std::ifstream f;
 		f.exceptions(std::ifstream::failbit);
-		f.open(propsfuncf);
+		f.open(vars.propsfuncf);
 		propsFunc = new Compiler::Program<MapFunc>(calculonSymbols, f,
 			"(XYZ: vector*3): (DENSITY: real)");
 	}

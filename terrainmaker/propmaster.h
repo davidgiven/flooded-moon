@@ -88,9 +88,9 @@ private:
 			{
 				_recursionLevel++;
 
-				Point vab = Vector(va.x+vb.x, va.y+vb.y, va.z+vb.z).normalise() * radius;
-				Point vbc = Vector(vb.x+vc.x, vb.y+vc.y, vb.z+vc.z).normalise() * radius;
-				Point vca = Vector(vc.x+va.x, vc.y+va.y, vc.z+va.z).normalise() * radius;
+				Point vab = Vector(va.x+vb.x, va.y+vb.y, va.z+vb.z).normalise() * vars.radius;
+				Point vbc = Vector(vb.x+vc.x, vb.y+vc.y, vb.z+vc.z).normalise() * vars.radius;
+				Point vca = Vector(vc.x+va.x, vc.y+va.y, vc.z+va.z).normalise() * vars.radius;
 
 				facet(va, vab, vca, id*4 + 0);
 				facet(vb, vbc, vab, id*4 + 1);
@@ -104,8 +104,8 @@ private:
 
 	void icosahedron()
 	{
-		double x = 0.525731112119133606 * radius;
-		double z = 0.850650808352039932 * radius;
+		double x = 0.525731112119133606 * vars.radius;
+		double z = 0.850650808352039932 * vars.radius;
 
 		Point v0(-x, 0, z);
 		Point v1(x, 0, z);

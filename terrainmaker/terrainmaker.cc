@@ -26,7 +26,6 @@
 #include <sstream>
 #include <memory>
 #include <unordered_map>
-#include <boost/program_options.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/iostreams/device/array.hpp>
@@ -57,33 +56,9 @@
 const double MAXHEIGHT = 22; // maximum height of any object on the surface
 const double ATMOSPHERE = 20;
 
-unsigned width, height;
-double latitude = 20.0;
-double longitude = -3.5;
-double altitude = 5.0;
-double azimuth = -10.0;
-double bearing = 40.0;
-double fov = 50.0;
-double time_of_day = 0;
-double radius;
-double sealevel;
-std::string cameraf;
-std::string topof;
-std::string seatopof;
-std::string propsf;
-double maxpropdistance = 20.0;
-std::string heightmapf;
-std::string seafuncf = "scripts/waterlevel.cal";
-std::string terrainfuncf = "scripts/terrain.cal";
-std::string texturefuncf = "scripts/texture.cal";
-std::string propsfuncf = "scripts/props.cal";
-double shmixels = 100.0;
-
 using std::min;
 using std::max;
 using std::unique_ptr;
-
-namespace po = boost::program_options;
 
 #include "utils.h"
 #include "matrix.h"
@@ -97,6 +72,10 @@ Transform world;
 
 PDSSet terrainpds;
 PDSSet geoidpds;
+
+#include "variables.h"
+
+Variables vars;
 
 #include "functions.h"
 #include "terrain.h"
@@ -198,106 +177,17 @@ int main(int argc, const char* argv[])
 {
 	std::cerr.precision(10);
 
-    po::options_description options("Allowed options");
-    options.add_options()
-		("help,h",
-				"produce help message")
-		("config", po::value<std::vector<std::string>>()->composing(),
-				"read additional options from config file")
-		("width", po::value<unsigned>(&width)->default_value(2048),
-				"width of output image")
-		("height", po::value<unsigned>(&height)->default_value(2048),
-				"height of output image")
-		("latitude", po::value<double>(&latitude),
-				"latitude")
-		("longitude", po::value<double>(&longitude),
-				"longitude")
-		("altitude", po::value<double>(&altitude),
-				"altitude (above sea level)")
-		("azimuth", po::value<double>(&azimuth),
-				"azimuth (0 looks straight ahead; negative looks down)")
-		("bearing", po::value<double>(&bearing),
-				"bearing")
-		("fov", po::value(&fov),
-				"field of view")
-		("timeofday", po::value(&time_of_day),
-				"time of day (virtual hours)")
-		("shmixels", po::value<double>(&shmixels),
-				"terrain quality")
-		("radius", po::value<double>(&radius),
-				"average planetary radius")
-		("sealevel", po::value<double>(&sealevel),
-				"sealevel (relative to radius)")
-		("geoid", po::value<std::vector<std::string>>()->composing(),
-				"add a geoid PDS file (repeatable)")
-		("terrain", po::value<std::vector<std::string>>()->composing(),
-				"add a terrain PDS file (repeatable)")
-		("seafunc", po::value(&seafuncf),
-				"filename of Calculon script for calculating sea")
-		("terrainfunc", po::value(&terrainfuncf),
-				"filename of Calculon script for calculating terrain")
-		("texturefunc", po::value(&texturefuncf),
-				"filename of Calculon script for calculating texture")
-		("propsfunc", po::value(&propsfuncf),
-				"filename of Calculon script for calculating prop density")
-		("propdistance", po::value(&maxpropdistance),
-				"maximum distance from the camera to render props")
-		("camera", po::value<std::string>(&cameraf),
-				"write camera info to specified file")
-		("topo", po::value<std::string>(&topof),
-				"generate land topography and write to specified file")
-		("seatopo", po::value<std::string>(&seatopof),
-				"generate ocean topography and write to specified file")
-		("props", po::value<std::string>(&propsf),
-				"generate props and write to specified file")
-		("heightmap", po::value<std::string>(&heightmapf),
-				"generate cylindrical heightmap and write to specified file")
-	;
-
-	po::positional_options_description posoptions;
-	posoptions.add("config", -1);
-
-    po::variables_map vm;
-    po::store(
-		po::command_line_parser(argc, argv)
-			.options(options)
-			.positional(posoptions)
-			.run(),
-		vm);
-    po::notify(vm);
-
-    if (vm.count("help"))
-    {
-    	std::cout << "terrainmaker: makes terrain.\n"
-    			  << options;
-    	exit(1);
-    }
-
-	if (vm.count("config") > 0)
-	{
-		for (auto s : vm["config"].as<std::vector<std::string>>())
-		{
-			std::ifstream stream(s);
-			po::store(po::parse_config_file(stream, options), vm);
-		}
-		po::notify(vm);
-	}
+	vars.parse(argc, argv);
 
 	initCalculon();
 
 	try
 	{
-		if (vm.count("terrain") > 0)
-		{
-			for (auto s : vm["terrain"].as<std::vector<std::string>>())
-				terrainpds.add(s);
-		}
+		for (auto s : vars.terrain)
+			terrainpds.add(s);
 
-		if (vm.count("geoid") > 0)
-		{
-			for (auto s : vm["geoid"].as<std::vector<std::string>>())
-				geoidpds.add(s);
-		}
+		for (auto s : vars.geoid)
+			geoidpds.add(s);
 
 		Terrain terrain;
 		Sea sea;
@@ -306,10 +196,10 @@ int main(int argc, const char* argv[])
 		/* Set up the camera position. */
 
 		world = world.lookAt(Point::ORIGIN, Vector::Y, Vector::Z);
-		world = world.rotate(Vector::Y, -longitude);
-		world = world.rotate(Vector::X, -latitude);
+		world = world.rotate(Vector::Y, -vars.longitude);
+		world = world.rotate(Vector::X, -vars.latitude);
 		world = world.rotate(Vector::X, -90);
-		world = world.translate(Vector(0, radius, 0));
+		world = world.translate(Vector(0, vars.radius, 0));
 		
 		/* world is now relative to a point on a normalised sphere. Find out
 		 * what sealevel is at this point and adjust the camera so it's
@@ -320,26 +210,26 @@ int main(int argc, const char* argv[])
 
 		std::cerr << "sealevel at camera is " << sealevel << "km\n";
 
-		world = world.translate(Vector(0, sealevel-radius+altitude, 0));
+		world = world.translate(Vector(0, sealevel-vars.radius+vars.altitude, 0));
 
 		/* Adjust for pointing direction. */
 
-		world = world.rotate(Vector::Y, -bearing);
-		world = world.rotate(Vector::X, 90 + azimuth);
+		world = world.rotate(Vector::Y, -vars.bearing);
+		world = world.rotate(Vector::X, 90 + vars.azimuth);
 
-		if (!cameraf.empty())
+		if (!vars.cameraf.empty())
 		{
 			std::cerr << "writing camera information to: "
-			          << cameraf
+			          << vars.cameraf
 					  << "\n";
 
 			Point camera = world.untransform(Point::ORIGIN);
-			if (boost::algorithm::ends_with(cameraf, ".xml"))
-				CameraWriter().writeMitsuba(cameraf.c_str(), "mitsuba/camera.tmpl.xml");
-			else if (boost::algorithm::ends_with(cameraf, ".py"))
-				CameraWriter().writeBlender(cameraf.c_str());
+			if (boost::algorithm::ends_with(vars.cameraf, ".xml"))
+				CameraWriter().writeMitsuba(vars.cameraf.c_str(), "mitsuba/camera.tmpl.xml");
+			else if (boost::algorithm::ends_with(vars.cameraf, ".py"))
+				CameraWriter().writeBlender(vars.cameraf.c_str());
 			else
-				CameraWriter().writePov(cameraf.c_str());
+				CameraWriter().writePov(vars.cameraf.c_str());
 
 			double sea_at_camera = sea.at(camera);
 			double terrain_at_camera = terrain.at(camera);
@@ -352,14 +242,14 @@ int main(int argc, const char* argv[])
 				;
 		}
 
-		if (!topof.empty())
+		if (!vars.topof.empty())
 		{
 			std::cerr << "writing land topographic information to: "
-			          << topof
+			          << vars.topof
 					  << "\n";
 
-			unique_ptr<Writer> writer(create_writer(topof));
-			SphericalRoam(terrain, sealevel, fov / shmixels).writeTo(*writer);
+			unique_ptr<Writer> writer(create_writer(vars.topof));
+			SphericalRoam(terrain, sealevel, vars.fov / vars.shmixels).writeTo(*writer);
 			std::cerr << "calculating textures\n";
 			writer->applyTextureData(texture);
 			std::cerr << "calculating normals\n";
@@ -368,36 +258,36 @@ int main(int argc, const char* argv[])
 			writer->writeToFile();
 		}
 
-		if (!seatopof.empty())
+		if (!vars.seatopof.empty())
 		{
 			std::cerr << "writing ocean topographic information to: "
-			          << topof
+			          << vars.topof
 					  << "\n";
 
-			unique_ptr<Writer> writer(create_writer(seatopof));
-			SphericalRoam(sea, sealevel, fov / shmixels).writeTo(*writer);
+			unique_ptr<Writer> writer(create_writer(vars.seatopof));
+			SphericalRoam(sea, sealevel, vars.fov / vars.shmixels).writeTo(*writer);
 			std::cerr << "calculating normals\n";
 			writer->calculateNormals();
 			std::cerr << "writing to file\n";
 			writer->writeToFile();
 		}
 
-		if (!propsf.empty())
+		if (!vars.propsf.empty())
 		{
 			std::cerr << "writing props information to: "
-			          << propsf
+			          << vars.propsf
 					  << "\n";
 
-			std::ofstream of(propsf);
-			Propmaster(terrain, 13, maxpropdistance).writeTo(of);
+			std::ofstream of(vars.propsf);
+			Propmaster(terrain, 13, vars.maxpropdistance).writeTo(of);
 		}
 
-		if (!heightmapf.empty())
+		if (!vars.heightmapf.empty())
 		{
 			std::cerr << "writing heightmap to: "
-			          << heightmapf
+			          << vars.heightmapf
 					  << "\n";
-			write_image_map(terrain, heightmapf, width, height);
+			write_image_map(terrain, vars.heightmapf, vars.width, vars.height);
 		}
 	}
 	catch (const std::exception& e)
