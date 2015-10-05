@@ -15,6 +15,9 @@ template <class T> void swap(T& t1, T& t2)
 	t2 = t;
 }
 
+using std::min;
+using std::max;
+
 template <class T> static T min(const T& t1, const T& t2, const T& t3)
 {
 	return min(t1, min(t2, t3));

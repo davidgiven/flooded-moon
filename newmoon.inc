@@ -598,23 +598,28 @@
 #local Terrain_Object =
 	object
 	{
-		isosurface
+		mesh2
 		{
-			function { Moon_Isosurface(x, y, z) }
-			#local factor = 0.6;
-			#local maxf = 30;
-			//evaluate maxf*factor, sqrt(maxf/(maxf*factor)), 0.7
-			max_gradient 10
-			accuracy 0.00001 // / Lunar_Sphere // 10cm
-			bounded_by
-			{
-				sphere
-				{
-					<0, 0, 0>, Lunar_Sphere / Nominal_Sphere
-				}
-			}
-			scale Nominal_Sphere
+			dll "terrainlib/moon.so", "moon"
+			translate CameraLocation
 		}
+//		isosurface
+//		{
+//			function { Moon_Isosurface(x, y, z) }
+//			#local factor = 0.6;
+//			#local maxf = 30;
+//			//evaluate maxf*factor, sqrt(maxf/(maxf*factor)), 0.7
+//			max_gradient 10
+//			accuracy 0.00001 // / Lunar_Sphere // 10cm
+//			bounded_by
+//			{
+//				sphere
+//				{
+//					<0, 0, 0>, Lunar_Sphere / Nominal_Sphere
+//				}
+//			}
+//			scale Nominal_Sphere
+//		}
 
 		texture
 		{

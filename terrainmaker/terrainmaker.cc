@@ -99,9 +99,9 @@ static Point mapToTerrain(const Terrain& terrain, const Point& p)
 static Writer* create_writer(const std::string& filename)
 {
 	if (boost::algorithm::ends_with(filename, ".inc"))
-		return new PovWriter(filename);
+		return new PovWriter();
 	if (boost::algorithm::ends_with(filename, ".ply"))
-		return new PlyWriter(filename);
+		return new PlyWriter();
 
 	std::cout << "terrainmaker: couldn't figure out the type of '"
 	          << filename << "'\n";
@@ -249,13 +249,13 @@ int main(int argc, const char* argv[])
 					  << "\n";
 
 			unique_ptr<Writer> writer(create_writer(vars.topof));
-			SphericalRoam(terrain, sealevel, vars.fov / vars.shmixels).writeTo(*writer);
+			SphericalRoam(terrain, world, sealevel, vars.fov / vars.shmixels).writeTo(*writer);
 			std::cerr << "calculating textures\n";
 			writer->applyTextureData(texture);
 			std::cerr << "calculating normals\n";
 			writer->calculateNormals();
 			std::cerr << "writing to file\n";
-			writer->writeToFile();
+			writer->writeTo(vars.topof);
 		}
 
 		if (!vars.seatopof.empty())
@@ -265,11 +265,11 @@ int main(int argc, const char* argv[])
 					  << "\n";
 
 			unique_ptr<Writer> writer(create_writer(vars.seatopof));
-			SphericalRoam(sea, sealevel, vars.fov / vars.shmixels).writeTo(*writer);
+			SphericalRoam(sea, world, sealevel, vars.fov / vars.shmixels).writeTo(*writer);
 			std::cerr << "calculating normals\n";
 			writer->calculateNormals();
 			std::cerr << "writing to file\n";
-			writer->writeToFile();
+			writer->writeTo(vars.seatopof);
 		}
 
 		if (!vars.propsf.empty())

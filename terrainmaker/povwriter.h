@@ -8,15 +8,14 @@
 class PovWriter : public Writer
 {
 public:
-	PovWriter(const std::string& filename):
-		Writer(filename)
+	PovWriter()
 	{
 	}
 
-	void writeTo(const char* filename)
+	void writeTo(const std::string& filename)
 	{
 		std::ofstream of;
-		of.open(filename, std::ios::out);
+		of.open(filename.c_str(), std::ios::out);
 		of.precision(20);
 
 		of << "vertex_vectors {\n"

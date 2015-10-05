@@ -96,8 +96,19 @@ public:
 
 		po::variables_map vm;
 
-		po::store(po::parse_environment(options, "TERRAINMAKER_"), vm);
-		po::notify(vm);
+		auto optionsvar = getenv("TERRAINMAKER_OPTIONS");
+		if (optionsvar)
+		{
+			std::vector<std::string> split = po::split_unix(optionsvar);
+			split.insert(split.begin(), "dummy");
+			po::store(
+				po::command_line_parser(split)
+					.options(options)
+					.positional(posoptions)
+					.run(),
+				vm);
+			po::notify(vm);
+		}
 
 		if (argc > 0)
 		{
@@ -131,7 +142,7 @@ public:
 			terrain = vm["terrain"].as<std::vector<std::string>>();
 
 		if (vm.count("geoid") > 0)
-			terrain = vm["geoid"].as<std::vector<std::string>>();
+			geoid = vm["geoid"].as<std::vector<std::string>>();
 	}
 };
 

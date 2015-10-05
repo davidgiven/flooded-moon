@@ -19,7 +19,6 @@ CXX = g++-4.8
 CALCULON = -I$(HOME)/nonshared/calculon/include
 
 DEFS += \
-	-Wno-c++11-narrowing
 
 LIBS += \
 	$(CALCULON) \

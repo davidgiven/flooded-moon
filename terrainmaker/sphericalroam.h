@@ -27,7 +27,8 @@ private:
 	class Facet;
 
 public:
-	SphericalRoam(const XYZMap& terrain, double sealevel, double error):
+	SphericalRoam(const XYZMap& terrain, const Transform& world,
+			double sealevel, double error):
 		_terrain(terrain),
 		_sealevel(sealevel),
 		_error(degToRad(error))

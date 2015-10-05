@@ -8,9 +8,8 @@
 class Writer
 {
 public:
-	Writer(const std::string& filename):
-		_hasTextures(false),
-		_filename(filename)
+	Writer():
+		_hasTextures(false)
 	{
 	}
 
@@ -58,11 +57,6 @@ public:
 
 		Triangle t = {pa, pb, pc};
 		_faces.push_back(t);
-	}
-
-	void writeToFile()
-	{
-		writeTo(_filename.c_str());
 	}
 
 	void applyTextureData(Texture& texture)
@@ -116,7 +110,7 @@ public:
 		}
 	}
 
-	virtual void writeTo(const char* filename) = 0;
+	virtual void writeTo(const std::string& filename) = 0;
 
 protected:
 	struct Triangle

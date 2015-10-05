@@ -8,15 +8,14 @@
 class PlyWriter : public Writer
 {
 public:
-	PlyWriter(const std::string& filename):
-		Writer(filename)
+	PlyWriter()
 	{
 	}
 
-	void writeTo(const char* filename)
+	void writeTo(const std::string& filename)
 	{
 		std::ofstream of;
-		of.open(filename, std::ios::out);
+		of.open(filename.c_str(), std::ios::out);
 		of.precision(10);
 
 		of << "ply\n"
