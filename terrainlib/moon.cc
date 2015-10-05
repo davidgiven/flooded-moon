@@ -53,6 +53,7 @@ PluginVariables vars;
 #include "sphericalroam.h"
 #include "povpluginwriter.h"
 #include "terrain.h"
+#include "sea.h"
 
 class Initialiser
 {
@@ -63,6 +64,7 @@ public:
 	}
 };
 
+Sea sea;
 Terrain terrain;
 Initialiser init;
 
@@ -73,16 +75,6 @@ Initialiser init;
 #define ATMOSPHERE_BASE    (-2.000)
 #define ATMOSPHERE_DEPTH  (200.000)
 #define ATMOSPHERE_SCALE  (ATMOSPHERE_DEPTH * 2.0)
-
-static double sea_radius(const Point& p)
-{
-	return geoidpds.at(p)/1000.0 + SEALEVEL; // km
-}
-
-static double terrain_radius(const Point& p)
-{
-	return terrain.at(p) / 1000.0; // km
-}
 
 const double bottom_of_atmosphere = AVERAGE_TERRAIN + ATMOSPHERE_BASE;
 const double top_of_atmosphere = bottom_of_atmosphere + ATMOSPHERE_DEPTH;
@@ -110,51 +102,28 @@ static double rayleigh_density(const Point& p)
 	return dscale * pressure(height_from_bottom);
 }
 
-static double isosurface(double* data, double (*callback)(const Point&))
-{
-	Point unscaled(data);
-	Point scaled = unscaled * SPHERE;
-
-	double t = callback(scaled) / SPHERE;
-
-	return unscaled.lengthSquared() - t*t;
-}
-
-extern "C" povray_scalar_fn povray_scalar_function_terrain_isosurface;
-double povray_scalar_function_terrain_isosurface(double* data)
-{
-	return isosurface(data, terrain_radius);
-}
-
-extern "C" povray_scalar_fn povray_scalar_function_sea_isosurface;
-double povray_scalar_function_sea_isosurface(double* data)
-{
-	return isosurface(data, sea_radius);
-}
-
 extern "C" povray_scalar_fn povray_scalar_function_terrain_altitude;
 double povray_scalar_function_terrain_altitude(double* data)
 {
-	Point scaled = Point(data)*SPHERE;
-	return terrain.at(scaled) - sea_radius(scaled);
+	Point p = Point(data);
+	return terrain.at(p) - sea.at(p);
 }
 
 extern "C" povray_scalar_fn povray_scalar_function_terrain_gradient;
 double povray_scalar_function_terrain_gradient(double* data)
 {
-	Point scaled = Point(data)*SPHERE;
-	return terrain.slope(scaled);
+	Point p = Point(data);
+	return terrain.slope(p);
 }
 
 extern "C" povray_scalar_fn povray_scalar_function_rayleigh_density;
 double povray_scalar_function_rayleigh_density(double* data)
 {
-	Point scaled = Point(data) / 1000.0;
+	Point scaled = Point(data);
 	return rayleigh_density(scaled);
 }
 
-extern "C" povray_mesh_fn povray_mesh_function_moon;
-struct povray_mesh* povray_mesh_function_moon(void)
+struct povray_mesh* mesh_function(XYZMap& shape)
 {
 	Transform world;
 
@@ -171,7 +140,7 @@ struct povray_mesh* povray_mesh_function_moon(void)
 	 * relative to that. */
 
 	Point camera = world.untransform(Point::ORIGIN);
-	double sealevel = sea_radius(camera);
+	double sealevel = sea.at(camera);
 
 	std::cerr << "sealevel at camera is " << sealevel << "km\n";
 
@@ -183,13 +152,22 @@ struct povray_mesh* povray_mesh_function_moon(void)
 	world = world.rotate(Vector::X, 90 + vars.azimuth);
 
 	PovPluginWriter writer;
-	std::cerr << "creating mesh\n";
-	SphericalRoam(terrain, world, sealevel, vars.fov / vars.shmixels).writeTo(writer);
-	std::cerr << "calculating textures\n";
+	SphericalRoam(shape, world, sealevel, vars.fov / vars.shmixels).writeTo(writer);
 	//writer.applyTextureData(texture);
-	std::cerr << "calculating normals\n";
 	writer.calculateNormals();
 
 	return writer.writeToMesh(world);
+}
+
+extern "C" povray_mesh_fn povray_mesh_function_moon;
+struct povray_mesh* povray_mesh_function_moon(void)
+{
+	return mesh_function(terrain);
+}
+
+extern "C" povray_mesh_fn povray_mesh_function_sea;
+struct povray_mesh* povray_mesh_function_sea(void)
+{
+	return mesh_function(sea);
 }
 

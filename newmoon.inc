@@ -1,9 +1,22 @@
-#declare Nominal_Sphere         = 10000.000 * km; // isosurface scaling factor
 #declare Lunar_Sphere           = 1750.000 * km; // enclosing diameter of terrain object
 #declare Nominal_Terrain_Radius = 1737.400 * km;
 #declare Atmosphere_Base        = -3 * km;
 #declare Atmospheric_Depth      = 200 * km;
 #declare Atmospheric_Scale      = (Atmospheric_Depth * 2);
+
+#local Bottom_Of_Atmosphere = Nominal_Terrain_Radius + Atmosphere_Base;
+#local Top_Of_Atmosphere = Bottom_Of_Atmosphere
+	+ Atmospheric_Depth;
+
+#local Height_From_Centre =
+	function(x, y, z) {
+		sqrt(x*x + y*y + z*z)
+	}
+	
+#local Height_From_Surface =
+	function(x, y, z) {
+		Height_From_Centre(x, y, z) - Bottom_Of_Atmosphere
+	}
 
 #local map =
 	function(x, lo, hi)
@@ -20,8 +33,6 @@
 // =======================================================================
 //                                TERRAIN 
 // =======================================================================
-
-#local Moon_Isosurface = function { dll("terrainlib/moon.so", "terrain_isosurface") };
 
 // This returns km, not m.
 #local Moon_Altitude = function { dll("terrainlib/moon.so", "terrain_altitude") };
@@ -603,23 +614,6 @@
 			dll "terrainlib/moon.so", "moon"
 			translate CameraLocation
 		}
-//		isosurface
-//		{
-//			function { Moon_Isosurface(x, y, z) }
-//			#local factor = 0.6;
-//			#local maxf = 30;
-//			//evaluate maxf*factor, sqrt(maxf/(maxf*factor)), 0.7
-//			max_gradient 10
-//			accuracy 0.00001 // / Lunar_Sphere // 10cm
-//			bounded_by
-//			{
-//				sphere
-//				{
-//					<0, 0, 0>, Lunar_Sphere / Nominal_Sphere
-//				}
-//			}
-//			scale Nominal_Sphere
-//		}
 
 		texture
 		{
@@ -766,23 +760,13 @@
 		}
 	}
 
-#local Sea_Isosurface = function { dll("terrainlib/moon.so", "sea_isosurface") };
-
 #local Sea_Object =
 	object
 	{
-		isosurface
+		mesh2
 		{
-			function { Sea_Isosurface(x, y, z) }
-			max_gradient 3
-			bounded_by
-			{
-				sphere
-				{
-					<0, 0, 0>, Lunar_Sphere / Nominal_Sphere
-				}
-			}
-			scale Nominal_Sphere
+			dll "terrainlib/moon.so", "sea"
+			translate CameraLocation
 		}
 
 	    material {
@@ -796,16 +780,45 @@
 
 // Note! Media units are all in kilometres!
 
-#local Bottom_Of_Atmosphere = Nominal_Terrain_Radius + Atmosphere_Base;
-#local Top_Of_Atmosphere = Bottom_Of_Atmosphere
-	+ Atmospheric_Depth;
-
 #local Base_Rayleigh_Power = 6.7;
 #local Rayleigh_Factor = 1 / Atmospheric_Scale;
 #local Rayleigh_Scale = 0.5;
 #local Rayleigh_Power = Base_Rayleigh_Power * Rayleigh_Factor;
 
-#local Rayleigh_Density_Function = function { dll("terrainlib/moon.so", "rayleigh_density") };
+#local Rayleigh_Density =
+	density
+	{
+		#local g = 1.622; // m/s^2 --- note METRES!
+		#local L = 0.0065/6; // K/m --- temperature lapse rate. Adjusted, crudely
+		#local M = 0.0289644; // kg/mol --- molar mass of dry air
+		#local T0 = 293; // kelvin --- STP
+		#local R = 8.3144; // joules / mole kelvin --- gas constant
+		#local gM_RL = (g*M) / (R*L);
+		#local L_T0 = L / T0;
+
+		#local dscale = 1.0; // from atmospheres to whatever Povray uses
+
+		// Calculates air pressure at a given height, in atmospheres (1 at
+		// ground level). Heights are in metres.
+
+		#local pressure = 
+			function(h)
+			{
+				pow((1 - L_T0*h), gM_RL)
+			}
+
+		#warning concat("Pressure at   0km: ", str(pressure(0), 0, 8))
+		#warning concat("Pressure at   5km: ", str(pressure(5000), 0, 8))
+		#warning concat("Pressure at  10km: ", str(pressure(10000), 0, 8))
+		#warning concat("Pressure at  15km: ", str(pressure(15000), 0, 8))
+		#warning concat("Pressure at  50km: ", str(pressure(50000), 0, 8))
+		#warning concat("Pressure at 100km: ", str(pressure(100000), 0, 8))
+
+		function
+		{
+			dscale * pressure(Height_From_Surface(x, y, z)*1000)
+		}
+	}
 
 #local Rayleigh_Colour = rgb <0.2061, 0.3933, 1.0>;
 
@@ -813,10 +826,10 @@
 	media
 	{
 		method 3
-		//samples 31
 		jitter 0.1
 		ratio 1
 		samples 3, 30
+		//samples 60
 		scattering
 		{
 			RAYLEIGH_SCATTERING
@@ -825,18 +838,9 @@
 		}
 		density
 		{
-			function {
-				
-				Rayleigh_Density_Function(x, y, z)
-			}
+			Rayleigh_Density
 		}
 	}
-
-// m3 j0.1 r1 s3, 10: 21s
-// m3 j0.1 r1 s3, 20: 21s
-// m3 j0.1 r1 s3, 30: 21s
-
-// m3 j0.1 r1 s3,30: 104s
 
 #local Sky_Object =
 	difference {
