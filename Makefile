@@ -3,7 +3,7 @@ PLACE = nearside-from-space
 GCC = g++-4.8
 export TERRAINMAKER_OPTIONS = \
 	scripts/data.tm \
-	places/farside-from-space.tm \
+	places/mountainscape.tm \
 	--shmixels 100 \
 
 #\

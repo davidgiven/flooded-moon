@@ -70,8 +70,8 @@ let pand(x, y) = x * y in
 let por(x, y) = x + y - pand(x, y) in
 
 let smallcrags =
-//	MULTIFRACTAL(XYZ*3, 1, 2, 6)*0.050
-	PERLIN(maptosphere(XYZ/0.300, RADIUS)) * 0.010
+	MULTIFRACTAL(XYZ/0.500, 1, 2, 6)*0.050
+//	PERLIN(maptosphere(XYZ/0.300, RADIUS)) * 0.010
 in
 
 let largecrags =

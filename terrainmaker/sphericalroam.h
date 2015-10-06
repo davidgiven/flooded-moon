@@ -90,44 +90,50 @@ public:
 			Facet* facet = *iterator;
 			_pendingFacets.erase(iterator);
 
-			/* Is this facet over the maxsight? (Make an exception for very
-			 * big facets.)
-			 */
-
-			Point va = facet->pa - _camera;
-			Point vb = facet->pb - _camera;
-			Point vc = facet->pc - _camera;
-			Vector vab = facet->pa - facet->pb;
-			Vector vac = facet->pa - facet->pc;
-			Vector vbc = facet->pb - facet->pc;
-
-			double distancesquared = va.lengthSquared();
-			double sizesquared = vab.lengthSquared();
 			bool dosplit = false;
 
-			/* Always consider facets which are very large. */
+			/* Do not split facets behind the camera. */
 
-			if ((sizesquared > maxsightsquared) ||
-					(distancesquared < maxsightsquared))
+			Point va = world.transform(facet->pa);
+			Point vb = world.transform(facet->pb);
+			Point vc = world.transform(facet->pc);
+			if ((va.y > 0) && (vb.y > 0) && (vc.y > 0))
 			{
-				/* Calculate the apparent size of the facet. Don't split
-				 * facets that are smaller than a certain absolute size
-				 * to avoid degenerate cases. */
+				/* Is this facet over the maxsight? (Make an exception for very
+				 * big facets.)
+				 */
 
-				double area = vab.cross(vac).length() / 2.0;
-				if (area > (0.000500*0.000500))
+				Vector vab = facet->pa - facet->pb;
+				Vector vac = facet->pa - facet->pc;
+				Vector vbc = facet->pb - facet->pc;
+
+				double distancesquared = va.lengthSquared();
+				double sizesquared = vab.lengthSquared();
+
+				/* Always consider facets which are very large. */
+
+				if ((sizesquared > maxsightsquared) ||
+						(distancesquared < maxsightsquared))
 				{
-					Vector ca = va.toVector().normalise();
-					Vector cb = vb.toVector().normalise();
-					Vector cc = vc.toVector().normalise();
-					double dab = acos(ca.dot(cb));
-					double dac = acos(ca.dot(cc));
-					double dbc = acos(cb.dot(cc));
+					/* Calculate the apparent size of the facet. Don't split
+					 * facets that are smaller than a certain absolute size
+					 * to avoid degenerate cases. */
 
-					double mx = min(dab, dac, dbc);
+					double area = vab.cross(vac).length() / 2.0;
+					if (area > (0.000500*0.000500))
+					{
+						Vector ca = va.toVector().normalise();
+						Vector cb = vb.toVector().normalise();
+						Vector cc = vc.toVector().normalise();
+						double dab = acos(ca.dot(cb));
+						double dac = acos(ca.dot(cc));
+						double dbc = acos(cb.dot(cc));
 
-					if (mx > _error)
-						dosplit = true;
+						double mx = min(dab, dac, dbc);
+
+						if (mx > _error)
+							dosplit = true;
+					}
 				}
 			}
 
@@ -242,7 +248,7 @@ public:
 		 *            o
 		 */
 
-		const Point& m = f->getRealMidh(_terrain, _camera);
+		const Point& m = f->getRealMidh(_terrain);
 		assert(m != f->pa);
 		assert(m != f->pb);
 		assert(m != f->pc);
@@ -331,7 +337,7 @@ private:
 			return (fh == f) && (f->fh == this);
 		}
 
-		const Point& getRealMidh(const XYZMap& terrain, const Point& camera)
+		const Point& getRealMidh(const XYZMap& terrain)
 		{
 			if (!_realmidh.isValid())
 			{
