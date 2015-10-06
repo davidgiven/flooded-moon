@@ -185,6 +185,11 @@ struct Point
 		return Point(x+o.x, y+o.y, z+o.z);
 	}
 
+	Point operator + (const Point& o) const
+	{
+		return Point(x+o.x, y+o.y, z+o.z);
+	}
+
 	Point operator - (const Vector& o) const
 	{
 		return Point(x-o.x, y-o.y, z-o.z);

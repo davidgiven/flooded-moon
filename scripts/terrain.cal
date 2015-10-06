@@ -35,6 +35,10 @@ let lowtide = water - 5 in
 let easecurve(x) =
 	(x*x) / (x*x + (1-x)*(1-x)) in
 
+let maptosphere(xyz: vector*3, r): vector*3 =
+	(xyz / xyz.length) * r
+in
+
 let blend0lo(x, lo, hi) =
 	if (x < lo) then 0
 	else if (x < hi) then
@@ -66,7 +70,8 @@ let pand(x, y) = x * y in
 let por(x, y) = x + y - pand(x, y) in
 
 let smallcrags =
-	MULTIFRACTAL(XYZ*3, 1, 2, 6)*0.010
+//	MULTIFRACTAL(XYZ*3, 1, 2, 6)*0.050
+	PERLIN(maptosphere(XYZ/0.300, RADIUS)) * 0.010
 in
 
 let largecrags =
@@ -76,14 +81,15 @@ let largecrags =
 in
 
 let hugecrags =
-	MULTIFRACTAL(XYZ/2, 1, 2, 6*slope)*0.200 *
+	MULTIFRACTAL(XYZ/2, 1, 2, 6)*0.200 *
 		blend0lo(slope, 0.00, 1.0)
 in
 	
-let perturbedheight = stockheight
+let perturbedheight = 0
+	+ stockheight
 	+ smallcrags
 //	+ largecrags
-	+ hugecrags
+//	+ hugecrags
 in
 
 let HEIGHT = max(lowtide, perturbedheight) in

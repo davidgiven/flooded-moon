@@ -3,14 +3,12 @@ PLACE = nearside-from-space
 GCC = g++-4.8
 export TERRAINMAKER_OPTIONS = \
 	scripts/data.tm \
-	places/kiess-island.tm \
-	--longitude 83.60 \
-	--shmixels 400 \
-	--altitude 3 \
-	--timeofday 11.3 \
-	--azimuth -10 \
+	places/farside-from-space.tm \
+	--shmixels 100 \
 
 #\
+	--azimuth -20 \
+	--altitude 5 \
 
 all: newmoon.png
 

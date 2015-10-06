@@ -30,6 +30,7 @@ public:
 	SphericalRoam(const XYZMap& terrain, const Transform& world,
 			double sealevel, double error):
 		_terrain(terrain),
+		_camera(world.transform(Point::ORIGIN)),
 		_sealevel(sealevel),
 		_error(degToRad(error))
 	{
@@ -70,9 +71,8 @@ public:
 
 		/* Calculate the maximum sight distance. */
 
-		Point camera = world.transform(Point::ORIGIN);
-		Vector camerav = camera.toVector();
-		double cameradistance = camera.length();
+		Vector camerav = _camera.toVector();
+		double cameradistance = _camera.length();
 		std::cerr << "distance to core is " << cameradistance << "km\n"
 		          << "sealevel here is " << _sealevel << "km\n";
 		double tallest = MAXHEIGHT + sealevel;
@@ -94,9 +94,9 @@ public:
 			 * big facets.)
 			 */
 
-			Point va = world.transform(facet->pa);
-			Point vb = world.transform(facet->pb);
-			Point vc = world.transform(facet->pc);
+			Point va = facet->pa - _camera;
+			Point vb = facet->pb - _camera;
+			Point vc = facet->pc - _camera;
 			Vector vab = facet->pa - facet->pb;
 			Vector vac = facet->pa - facet->pc;
 			Vector vbc = facet->pb - facet->pc;
@@ -242,7 +242,7 @@ public:
 		 *            o
 		 */
 
-		const Point& m = f->getRealMidh(_terrain);
+		const Point& m = f->getRealMidh(_terrain, _camera);
 		assert(m != f->pa);
 		assert(m != f->pb);
 		assert(m != f->pc);
@@ -270,6 +270,7 @@ public:
 
 private:
 	const XYZMap& _terrain;
+	const Point& _camera;
 	double _sealevel;
 	double _error;
 
@@ -330,7 +331,7 @@ private:
 			return (fh == f) && (f->fh == this);
 		}
 
-		const Point& getRealMidh(const XYZMap& terrain)
+		const Point& getRealMidh(const XYZMap& terrain, const Point& camera)
 		{
 			if (!_realmidh.isValid())
 			{
