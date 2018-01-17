@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 
-<scene version="0.4.0">
+<scene version="0.6.0">
 	<integrator type="volpath_simple">
 		<integer name="maxDepth" value="8"/>
 	</integrator>
@@ -61,6 +61,7 @@
 		</bsdf>
 	</shape>
 	
+    <!--
 	<shape type="ply" name="Props">
 		<string name="filename" value="/tmp/props.ply"/>
 		<boolean name="faceNormals" value="true"/>
@@ -71,6 +72,7 @@
 	    	</bsdf>
 	    </bsdf>
 	</shape>
+    -->
 	
 	<shape type="sphere" name="Ocean">
 		<point name="center" x="0" y="0" z="0"/>
@@ -114,7 +116,7 @@
 	</emitter>
 	-->
 	
-	<include filename="camera.xml"/>
+	<include filename="/tmp/camera.xml"/>
 
 	<shape type="sphere">
 		<point name="center" x="-149597871" y="0" z="0"/>
