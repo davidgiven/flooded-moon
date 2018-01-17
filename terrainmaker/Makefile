@@ -1,5 +1,5 @@
 
-LLVM = -I$(shell llvm-config-3.3 --includedir) -L$(shell llvm-config-3.3 --libdir)
+LLVM = -I$(shell llvm-config-5.0 --includedir) -L$(shell llvm-config-5.0 --libdir)
 
 ifneq ($(Apple_PubSub_Socket_Render),)
 	BREWPREFIX := $(shell brew --prefix 2>/dev/null || echo)
@@ -7,15 +7,15 @@ ifneq ($(Apple_PubSub_Socket_Render),)
 	LIBS := -L$(BREWPREFIX)/lib
 	INCS := -I$(BREWPREFIX)/include
 	DEFS := -DOSX -Dsincos=__sincos
-	LLVM += -lLLVM-3.3
+	LLVM += -lLLVM-5.0
 else
 	LIBS :=
 	INCS :=
-	LLVM += -lLLVM-3.3
+	LLVM += -lLLVM-5.0
 endif
 
-CXX = g++-4.8
-#CXX = clang++
+#CXX = g++-4.8
+CXX = clang++
 CALCULON = -I$(HOME)/nonshared/calculon/include
 
 DEFS += \
