@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<scene version="0.4.0">
+	<sensor type="perspective">
+		<float name="focusDistance" value="1.25668"/>
+		<float name="fov" value="45.8402"/>
+		<float name="farClip" value="1e9"/>
+		<string name="fovAxis" value="x"/>
+		<transform name="toWorld">
+			<rotate z="1" angle="180"/>
+			<LOOKAT/>
+		</transform>
+
+		<sampler type="ldsampler">
+			<integer name="sampleCount" value="64"/>
+		</sampler>
+
+		<film type="ldrfilm">
+			<integer name="height" value="512"/>
+			<integer name="width" value="512"/>
+
+			<rfilter type="gaussian"/>
+		</film>
+		
+		<AIR/>
+	</sensor>
+</scene>
