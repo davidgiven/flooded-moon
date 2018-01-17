@@ -2,7 +2,7 @@
 <scene version="0.6.0">
 	<sensor type="perspective">
 		<float name="focusDistance" value="1.25668"/>
-		<float name="fov" value="45.8402"/>
+		<FOV/>
 		<float name="farClip" value="1e9"/>
 		<string name="fovAxis" value="x"/>
 		<transform name="toWorld">
@@ -15,8 +15,8 @@
 		</sampler>
 
 		<film type="ldrfilm">
-			<integer name="height" value="512"/>
-			<integer name="width" value="512"/>
+			<integer name="width" value="800"/>
+			<integer name="height" value="600"/>
 
 			<rfilter type="gaussian"/>
 		</film>

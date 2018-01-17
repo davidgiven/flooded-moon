@@ -16,8 +16,9 @@ private:
 	void replace(std::string& haystack, const std::string& needle,
 			const std::string& subst)
 	{
-		size_t replstart = haystack.find(needle);
-		haystack.replace(replstart, needle.size(), subst);
+		std::string::size_type replstart = haystack.find(needle);
+		if (replstart != std::string::npos)
+			haystack.replace(replstart, needle.size(), subst);
 	}
 
 public:
@@ -78,8 +79,13 @@ public:
 				<< target.x << ", " << target.y << ", " << target.z << "\" "
 				<< "up=\""
 				<< up.x << ", " << up.y << ", " << up.z << "\"/>\n";
-
 		replace(templates, "<LOOKAT/>", lookatbuffer.str());
+
+		std::stringstream fovbuffer;
+		fovbuffer << "<float name=\"fov\" value=\""
+		          << fov
+				  << "\"/>";
+		replace(templates, "<FOV/>", fovbuffer.str());
 
 		if (vars.altitude > ATMOSPHERE)
 			replace(templates, "<AIR/>", "");
