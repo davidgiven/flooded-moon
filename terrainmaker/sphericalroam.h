@@ -276,7 +276,7 @@ public:
 
 private:
 	const XYZMap& _terrain;
-	const Point& _camera;
+	const Point _camera;
 	double _sealevel;
 	double _error;
 

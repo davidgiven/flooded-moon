@@ -83,7 +83,7 @@ public:
 
 		std::stringstream fovbuffer;
 		fovbuffer << "<float name=\"fov\" value=\""
-		          << fov
+		          << vars.fov
 				  << "\"/>";
 		replace(templates, "<FOV/>", fovbuffer.str());
 
