@@ -52,9 +52,6 @@ Transform world;
 #include "pds.h"
 #include "pdsset.h"
 
-PDSSet terrainpds;
-PDSSet geoidpds;
-
 #include "variables.h"
 #include "functions.h"
 #include "terrain.h"

@@ -22,6 +22,10 @@ LIBS += \
 	-lpng
 
 SRCS = \
+	map.cc \
+	pds.cc \
+	pdslabel.cc \
+	pdsset.cc \
 	matrix.cc \
 	variables.cc \
 	functions.cc \
@@ -46,4 +50,6 @@ terrainmaker-dbg: $(RELEASEOBJS) Makefile $(wildcard *.h)
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c -g -o $@ $<
 
-	
+clean:
+	rm -rf .obj
+
