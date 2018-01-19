@@ -5,6 +5,9 @@
  * for the full text.
  */
 
+#ifndef PDSSET_H
+#define PDSSET_H
+
 class PDSSet : public LatLongMap
 {
 private:
@@ -91,4 +94,9 @@ public:
 private:
 	std::deque<Record*> _records;
 };
+
+extern PDSSet terrainpds;
+extern PDSSet geoidpds;
+
+#endif
 

@@ -5,10 +5,6 @@
  * for the full text.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
 #include <assert.h>
 #include <sys/mman.h>
 #include <sys/types.h>
@@ -16,19 +12,11 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <vector>
-#include <map>
-#include <list>
-#include <set>
-#include <deque>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <memory>
-#include <unordered_map>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/iostreams/device/array.hpp>
+#include "globals.h"
+#include "functions.h"
 
 /* Work around GIL bug where they haven't kept up to date with libpng
  * API changes. */
@@ -46,12 +34,6 @@
 #include <boost/ptr_container/ptr_list.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
-
-#if defined(OSX)
-	#include <noise/noise.h>
-#else
-	#include <libnoise/noise.h>
-#endif
 
 const double MAXHEIGHT = 22; // maximum height of any object on the surface
 const double ATMOSPHERE = 20;
@@ -74,9 +56,6 @@ PDSSet terrainpds;
 PDSSet geoidpds;
 
 #include "variables.h"
-
-Variables vars;
-
 #include "functions.h"
 #include "terrain.h"
 #include "sea.h"
@@ -87,6 +66,12 @@ Variables vars;
 #include "camerawriter.h"
 #include "sphericalroam.h"
 #include "propmaster.h"
+
+void fatalError(const std::string& e)
+{
+	std::cerr << "terrainmaker: error: " << e << "\n";
+	exit(1);
+}
 
 static Point mapToTerrain(const Terrain& terrain, const Point& p)
 {

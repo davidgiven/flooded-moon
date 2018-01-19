@@ -5,8 +5,13 @@
  * for the full text.
  */
 
+#ifndef PDSLABEL_H
+#define PDSLABEL_H
+
 /* WARNING. This is not a robust parser and may OOB access on non-well-formed
  * input files. */
+
+#include <boost/iostreams/device/mapped_file.hpp>
 
 class parse_failed_exception : public std::logic_error
 {
@@ -164,4 +169,6 @@ private:
 protected:
 	std::map<std::string, std::string> _stringValues;
 };
+
+#endif
 

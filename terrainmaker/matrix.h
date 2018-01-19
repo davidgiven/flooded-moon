@@ -5,6 +5,9 @@
  * for the full text.
  */
 
+#ifndef MATRIX_H
+#define MATRIX_H
+
 struct Vector
 {
 	static Vector X;
@@ -115,10 +118,6 @@ struct Vector
 	}
 };
 
-Vector Vector::X(1, 0, 0);
-Vector Vector::Y(0, 1, 0);
-Vector Vector::Z(0, 0, 1);
-
 struct Point
 {
 	static Point ORIGIN;
@@ -220,8 +219,6 @@ struct Point
 		return sqrt(lengthSquared());
 	}
 };
-
-Point Point::ORIGIN(0, 0, 0);
 
 struct Matrix
 {
@@ -451,20 +448,6 @@ public:
     }
 };
 
-Matrix Matrix::IDENTITY(
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
-	);
-
-Matrix Matrix::ZERO(
-		0, 0, 0, 0,
-		0, 0, 0, 0,
-		0, 0, 0, 0,
-		0, 0, 0, 0
-	);
-
 struct Transform
 {
 	Matrix t;
@@ -669,3 +652,6 @@ struct Ray
 		return point + direction*t;
 	}
 };
+
+#endif
+

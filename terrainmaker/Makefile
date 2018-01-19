@@ -1,39 +1,49 @@
 
-LLVM = -I$(shell llvm-config-5.0 --includedir) -L$(shell llvm-config-5.0 --libdir)
-
-ifneq ($(Apple_PubSub_Socket_Render),)
-	BREWPREFIX := $(shell brew --prefix 2>/dev/null || echo)
-
-	LIBS := -L$(BREWPREFIX)/lib
-	INCS := -I$(BREWPREFIX)/include
-	DEFS := -DOSX -Dsincos=__sincos
-	LLVM += -lLLVM-5.0
-else
-	LIBS :=
-	INCS :=
-	LLVM += -lLLVM-5.0
-endif
-
-#CXX = g++-4.8
+#CXX = g++
 CXX = clang++
-CALCULON = -I$(HOME)/nonshared/calculon/include
+INCS += -I$(HOME)/nonshared/calculon/include
+INCS += -I$(shell llvm-config-5.0 --includedir)
+
+CXXFLAGS = \
+	-std=c++11 \
+	-I$(HOME)/nonshared/calculon/include \
+	-I/usr/include/llvm-5.0 \
+	-I/usr/include/llvm-c-5.0
 
 DEFS += \
 
 LIBS += \
-	$(CALCULON) \
-	$(LLVM) \
 	$(shell pkg-config libpng --libs) \
+	-L/usr/lib/llvm-5.0 \
+	-lLLVM-5.0 \
 	-lnoise \
 	-lboost_program_options \
-	-lboost_iostreams
+	-lboost_iostreams \
+	-lpng
 
+SRCS = \
+	matrix.cc \
+	variables.cc \
+	functions.cc \
+	terrainmaker.cc
+
+RELEASEOBJS = $(patsubst %.cc,.obj/release/%.o,$(SRCS))
+DEBUGOBJS = $(patsubst %.cc,.obj/debug/%.o,$(SRCS))
+	
 all: terrainmaker terrainmaker-dbg
 
-terrainmaker: terrainmaker.cc Makefile $(wildcard *.h)
-	$(CXX) -std=c++11 -O3 -DNDEBUG -fomit-frame-pointer -o $@ $< $(DEFS) $(INCS) $(LIBS)
+terrainmaker: $(DEBUGOBJS) Makefile $(wildcard *.h)
+	$(CXX) -O3 -DNDEBUG -fomit-frame-pointer -o $@ $(DEBUGOBJS) $(LIBS)
 	
-terrainmaker-dbg: terrainmaker.cc Makefile $(wildcard *.h)
-	$(CXX) -std=c++11 -g -o $@ $< $(DEFS) $(INCS) $(LIBS)
+terrainmaker-dbg: $(RELEASEOBJS) Makefile $(wildcard *.h)
+	$(CXX) -g -o $@ $(RELEASEOBJS) $(LIBS)
 	
+.obj/release/%.o: %.cc
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c -O3 -DNDEBUG -fomit-frame-pointer -o $@ $<
+
+.obj/debug/%.o: %.cc
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c -g -o $@ $<
+
 	

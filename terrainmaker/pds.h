@@ -5,6 +5,11 @@
  * for the full text.
  */
 
+#ifndef PDS_H
+#define PDS_H
+
+#include <boost/algorithm/string.hpp>
+
 const std::map<std::string, std::string> emptyMap;
 
 class PDS : public LatLongMap
@@ -226,4 +231,6 @@ private:
 
 	double _tdash;
 };
+
+#endif
 
