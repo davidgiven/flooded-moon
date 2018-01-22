@@ -21,6 +21,10 @@ public:
 	std::string propsf;
 	double maxpropdistance = 20.0;
 	std::string heightmapf;
+	double heightmapleft = 0.0;
+	double heightmaptop = 90.0;
+	double heightmapright = 360.0;
+	double heightmapbottom = -90.0;
 	std::string seafuncf = "scripts/waterlevel.cal";
 	std::string terrainfuncf = "scripts/terrain.cal";
 	std::string texturefuncf = "scripts/texture.cal";

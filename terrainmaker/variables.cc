@@ -65,6 +65,14 @@ void Variables::parse(int argc, const char* argv[])
 				"generate props and write to specified file")
 		("heightmap", po::value<std::string>(&heightmapf),
 				"generate cylindrical heightmap and write to specified file")
+		("heightmapleft", po::value(&heightmapleft),
+				"left edge of heightmap area (degrees)")
+		("heightmaptop", po::value(&heightmaptop),
+				"top edge of heightmap area (degrees)")
+		("heightmapright", po::value(&heightmapright),
+				"right edge of heightmap area (degrees)")
+		("heightmapbottom", po::value(&heightmapbottom),
+				"bottom edge of heightmap area (degrees)")
 	;
 
 	po::positional_options_description posoptions;

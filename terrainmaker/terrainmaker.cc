@@ -83,8 +83,8 @@ static Writer* create_writer(const std::string& filename)
 static void pixel_to_lat_lon(int x, int y, double& lon, double& lat,
 		unsigned width, unsigned height)
 {
-	lon = 360.0 * (double)x / (double)width;
-	lat = 90.0 - 180.0 * (double)y / (double)height;
+	lon = vars.heightmapleft + (double)(vars.heightmapright - vars.heightmapleft) * (double)x / (double)width;
+	lat = vars.heightmaptop - (double)(vars.heightmaptop - vars.heightmapbottom) * (double)y / (double)height;
 }
 
 static void write_image_map(Map& map, const std::string& filename,
@@ -97,10 +97,19 @@ static void write_image_map(Map& map, const std::string& filename,
 	double min = +std::numeric_limits<double>::infinity();
 	double max = -std::numeric_limits<double>::infinity();
 
-	double data[view.width()][view.height()];
+	double data[height][width];
 	bool found = false;
-	for (int y=0; y<view.height(); y++)
-		for (int x=0; x<view.width(); x++)
+	int progress = 0;
+	for (int y=0; y<height; y++)
+	{
+		int newprogress = (y*100)/height;
+		if (newprogress != progress)
+		{
+			std::cerr << '\r' << newprogress << "%";
+			progress = newprogress;
+		}
+
+		for (int x=0; x<width; x++)
 		{
 			double dx, dy;
 			pixel_to_lat_lon(x, y, dx, dy, width, height);
@@ -113,6 +122,8 @@ static void write_image_map(Map& map, const std::string& filename,
 				data[y][x] = v;
 			}
 		}
+	}
+	std::cerr << '\n';
 
 	if (!found)
 		fatalError("area of coverage for heightmap contains no data, giving up");
@@ -126,8 +137,8 @@ static void write_image_map(Map& map, const std::string& filename,
 	std::cerr << "median sample:  " << median << "\n"
 	          << "sample range:   " << range << "\n";
 
-	for (int y=0; y<view.height(); y++)
-		for (int x=0; x<view.width(); x++)
+	for (int y=0; y<height; y++)
+		for (int x=0; x<width; x++)
 		{
 			double dx, dy;
 			pixel_to_lat_lon(x, y, dx, dy, width, height);
