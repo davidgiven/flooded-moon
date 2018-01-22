@@ -23,6 +23,8 @@ LIBS += \
 
 SRCS = \
 	writer.cc \
+	plywriter.cc \
+	povwriter.cc \
 	map.cc \
 	pds.cc \
 	pdslabel.cc \

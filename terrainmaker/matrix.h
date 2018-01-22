@@ -655,5 +655,7 @@ struct Ray
 	}
 };
 
+extern Transform world;
+
 #endif
 

@@ -29,3 +29,5 @@ Matrix Matrix::ZERO(
 		0, 0, 0, 0
 	);
 
+Transform world;
+

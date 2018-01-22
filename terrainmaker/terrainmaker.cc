@@ -44,9 +44,6 @@ using std::unique_ptr;
 
 #include "utils.h"
 #include "matrix.h"
-
-Transform world;
-
 #include "map.h"
 #include "pdslabel.h"
 #include "pds.h"
