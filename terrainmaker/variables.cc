@@ -59,6 +59,8 @@ void Variables::parse(int argc, const char* argv[])
 				"generate land topography and write to specified file")
 		("seatopo", po::value<std::string>(&seatopof),
 				"generate ocean topography and write to specified file")
+		("topoculling", po::value(&topoculling),
+				"cull invisible topography facets")
 		("props", po::value<std::string>(&propsf),
 				"generate props and write to specified file")
 		("heightmap", po::value<std::string>(&heightmapf),

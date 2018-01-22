@@ -97,7 +97,7 @@ public:
 			Point va = world.transform(facet->pa);
 			Point vb = world.transform(facet->pb);
 			Point vc = world.transform(facet->pc);
-			if ((va.y > 0) && (vb.y > 0) && (vc.y > 0))
+			if (!vars.topoculling || ((va.y > 0) && (vb.y > 0) && (vc.y > 0)))
 			{
 				/* Is this facet over the maxsight? (Make an exception for very
 				 * big facets.)

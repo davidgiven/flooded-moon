@@ -17,6 +17,7 @@ public:
 	std::string cameraf;
 	std::string topof;
 	std::string seatopof;
+	bool topoculling = true;
 	std::string propsf;
 	double maxpropdistance = 20.0;
 	std::string heightmapf;
