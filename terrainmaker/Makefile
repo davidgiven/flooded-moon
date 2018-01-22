@@ -42,11 +42,11 @@ DEPS = $(patsubst %.o,%.d,$(RELEASEOBJS) $(DEBUGOBJS))
 	
 all: terrainmaker terrainmaker-dbg
 
-terrainmaker: $(DEBUGOBJS) Makefile $(wildcard *.h)
-	$(CXX) -O3 -DNDEBUG -fomit-frame-pointer -o $@ $(DEBUGOBJS) $(LIBS)
+terrainmaker-dbg: $(DEBUGOBJS) Makefile $(wildcard *.h)
+	$(CXX) -g -o $@ $(DEBUGOBJS) $(LIBS)
 	
-terrainmaker-dbg: $(RELEASEOBJS) Makefile $(wildcard *.h)
-	$(CXX) -g -o $@ $(RELEASEOBJS) $(LIBS)
+terrainmaker: $(RELEASEOBJS) Makefile $(wildcard *.h)
+	$(CXX) -O3 -DNDEBUG -fomit-frame-pointer -o $@ $(RELEASEOBJS) $(LIBS)
 	
 .obj/release/%.o: %.cc
 	@mkdir -p $(dir $@)
