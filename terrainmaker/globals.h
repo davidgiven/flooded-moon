@@ -26,4 +26,11 @@
 
 extern void fatalError(const std::string& e);
 
+const double MAXHEIGHT = 22; // maximum height of any object on the surface
+const double ATMOSPHERE = 20;
+
+using std::min;
+using std::max;
+using std::unique_ptr;
+
 #endif

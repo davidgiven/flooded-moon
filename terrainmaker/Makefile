@@ -22,6 +22,7 @@ LIBS += \
 	-lpng
 
 SRCS = \
+	sphericalroam.cc \
 	writer.cc \
 	plywriter.cc \
 	povwriter.cc \
