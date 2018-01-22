@@ -5,6 +5,11 @@
  * for the full text.
  */
 
+#ifndef TEXTURE_H
+#define TEXTURE_H
+
+#include "functions.h"
+
 class Texture
 {
 public:
@@ -24,3 +29,6 @@ public:
 		(*textureFunc)(&pv, &u, &v);
 	}
 };
+
+#endif
+

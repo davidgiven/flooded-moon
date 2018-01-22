@@ -22,6 +22,7 @@ LIBS += \
 	-lpng
 
 SRCS = \
+	writer.cc \
 	map.cc \
 	pds.cc \
 	pdslabel.cc \
