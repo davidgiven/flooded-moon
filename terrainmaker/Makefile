@@ -37,6 +37,8 @@ SRCS = \
 
 RELEASEOBJS = $(patsubst %.cc,.obj/release/%.o,$(SRCS))
 DEBUGOBJS = $(patsubst %.cc,.obj/debug/%.o,$(SRCS))
+
+DEPS = $(patsubst %.o,%.d,$(RELEASEOBJS) $(DEBUGOBJS))
 	
 all: terrainmaker terrainmaker-dbg
 
@@ -48,12 +50,14 @@ terrainmaker-dbg: $(RELEASEOBJS) Makefile $(wildcard *.h)
 	
 .obj/release/%.o: %.cc
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c -O3 -DNDEBUG -fomit-frame-pointer -o $@ $<
+	$(CXX) $(CXXFLAGS) -MMD -MF $(patsubst %.o,%.d,$@) -c -O3 -DNDEBUG -fomit-frame-pointer -o $@ $<
 
 .obj/debug/%.o: %.cc
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c -g -o $@ $<
+	$(CXX) $(CXXFLAGS)  -MMD -MF $(patsubst %.o,%.d,$@) -c -g -o $@ $<
 
 clean:
 	rm -rf .obj
+
+-include $(DEPS)
 
