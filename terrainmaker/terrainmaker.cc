@@ -97,18 +97,25 @@ static void write_image_map(Map& map, const std::string& filename,
 	double min = +std::numeric_limits<double>::infinity();
 	double max = -std::numeric_limits<double>::infinity();
 
+	double data[view.width()][view.height()];
+	bool found = false;
 	for (int y=0; y<view.height(); y++)
 		for (int x=0; x<view.width(); x++)
 		{
 			double dx, dy;
 			pixel_to_lat_lon(x, y, dx, dy, width, height);
-			double v = map.at(dx, dy);
 			if (map.contains(dx, dy))
 			{
+				found = true;
+				double v = map.at(dx, dy);
 				min = std::min(min, v);
 				max = std::max(max, v);
+				data[y][x] = v;
 			}
 		}
+
+	if (!found)
+		fatalError("area of coverage for heightmap contains no data, giving up");
 
 	std::cerr << "minimum sample: " << min << "\n"
 	          << "maximum sample: " << max << "\n";
@@ -127,8 +134,7 @@ static void write_image_map(Map& map, const std::string& filename,
 
 			if (map.contains(dx, dy))
 			{
-				double v = map.at(dx, dy);
-
+				double v = data[y][x];
 				double sample = 0.5 + (v - median) / range;
 				sample = std::max(0.0, sample);
 				sample = std::min(1.0, sample);
