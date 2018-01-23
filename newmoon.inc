@@ -1,22 +1,8 @@
 #declare Lunar_Sphere           = 1750.000 * km; // enclosing diameter of terrain object
 #declare Nominal_Terrain_Radius = 1737.400 * km;
-#declare Atmosphere_Base        = -3 * km;
+#declare Atmosphere_Base        = -2 * km;
 #declare Atmospheric_Depth      = 200 * km;
 #declare Atmospheric_Scale      = (Atmospheric_Depth * 2);
-
-#local Bottom_Of_Atmosphere = Nominal_Terrain_Radius + Atmosphere_Base;
-#local Top_Of_Atmosphere = Bottom_Of_Atmosphere
-	+ Atmospheric_Depth;
-
-#local Height_From_Centre =
-	function(x, y, z) {
-		sqrt(x*x + y*y + z*z)
-	}
-	
-#local Height_From_Surface =
-	function(x, y, z) {
-		Height_From_Centre(x, y, z) - Bottom_Of_Atmosphere
-	}
 
 #local map =
 	function(x, lo, hi)
@@ -33,12 +19,6 @@
 // =======================================================================
 //                                TERRAIN 
 // =======================================================================
-
-// This returns km, not m.
-#local Moon_Altitude = function { dll("terrainlib/moon.so", "terrain_altitude") };
-
-// 0 = horizontal, 1 = steep
-#local Moon_Gradient = function { dll("terrainlib/moon.so", "terrain_gradient") };
 
 #local Fields_Texture =
 	texture
@@ -171,7 +151,7 @@
 	{
 		pigment_pattern
 		{
-			function { Moon_Gradient(x, y, z) }
+			uv_mapping function { y }
 			pigment_map
 			{
 				[0 rgb <0, 0, 0>]
@@ -393,7 +373,7 @@
 	{
 		pigment_pattern
 		{
-			function { Moon_Gradient(x, y, z) }
+			uv_mapping function { y }
 		}
 		texture_map
 		{
@@ -521,7 +501,7 @@
     {
 		pigment_pattern
 		{
-			function { map(Moon_Altitude(x, y, z), -20, 20) }
+			uv_mapping function { map(x, -20, 20) }
 			pigment_map
 			{
 				[0 rgb <0, 0, 0>]
@@ -550,7 +530,7 @@
     {
 		pigment_pattern
 		{
-			function { map(Moon_Altitude(x, y, z), -20, 20) }
+			uv_mapping function { map(x, -20, 20) }
 			pigment_map
 			{
 				[0 rgb <0, 0, 0>]
@@ -583,7 +563,7 @@
     {
 		pigment_pattern
 		{
-			function { map(Moon_Altitude(x, y, z), -20, 20) }
+			uv_mapping function { map(x, -20, 20) }
 			pigment_map
 			{
 				[0 rgb <0, 0, 0>]
@@ -611,9 +591,9 @@
 	{
 		mesh2
 		{
-			dll "terrainlib/moon.so", "moon"
-			translate CameraLocation
+			#include "/tmp/moon.inc"
 		}
+		scale km
 
 		texture
 		{
@@ -623,7 +603,7 @@
 			 
 			pigment_pattern
 			{
-				function { Moon_Gradient(x, y, z) }
+				uv_mapping function { y }
 				pigment_map
 				{
 					[0 rgb <0, 0, 0>]
@@ -765,13 +745,14 @@
 	{
 		mesh2
 		{
-			dll "terrainlib/moon.so", "sea"
-			translate CameraLocation
+			#include "/tmp/sea.inc"
 		}
+		scale km
 
 	    material {
 	        Sea_Material
 	    }
+	
 	}
 
 // =======================================================================
@@ -779,6 +760,10 @@
 // =======================================================================
 
 // Note! Media units are all in kilometres!
+
+#local Bottom_Of_Atmosphere = Nominal_Terrain_Radius + Atmosphere_Base;
+#local Top_Of_Atmosphere = Bottom_Of_Atmosphere
+	+ Atmospheric_Depth;
 
 #local Base_Rayleigh_Power = 6.7;
 #local Rayleigh_Factor = 1 / Atmospheric_Scale;
@@ -798,6 +783,16 @@
 
 		#local dscale = 1.0; // from atmospheres to whatever Povray uses
 
+        #local height_from_centre =
+	        function(x, y, z) {
+	            sqrt(x*x + y*y + z*z)
+	        }
+	        
+	    #local height_from_surface =
+	        function(x, y, z) {
+	            height_from_centre(x, y, z) - Bottom_Of_Atmosphere
+	        }
+	   
 		// Calculates air pressure at a given height, in atmospheres (1 at
 		// ground level). Heights are in metres.
 
@@ -816,7 +811,7 @@
 
 		function
 		{
-			dscale * pressure(Height_From_Surface(x, y, z)*1000)
+			dscale * pressure(height_from_surface(x, y, z)*1000)
 		}
 	}
 
@@ -826,10 +821,9 @@
 	media
 	{
 		method 3
-		jitter 0.1
-		ratio 1
-		samples 3, 30
-		//samples 60
+		//samples 31
+		//jitter 0.1
+		samples 60
 		scattering
 		{
 			RAYLEIGH_SCATTERING
@@ -922,11 +916,11 @@
 	}
 #end
 
-//#local Trees_Object =
-//	union
-//	{
-//		#include "/tmp/props.inc"
-//	}
+#local Trees_Object =
+	union
+	{
+		#include "/tmp/props.inc"
+	}
 
 // ==========================================================================
 //                                 OVERALL
@@ -935,8 +929,8 @@
 #declare Moon_Object =
 	union
 	{
-	  object { Terrain_Object }
-	  //object { Trees_Object }
-	  object { Sea_Object }
-	  object { Sky_Object }
+		object { Terrain_Object }
+		object { Trees_Object }
+		object { Sea_Object }
+		object { Sky_Object }
 	}
