@@ -54,12 +54,6 @@
 #include "sphericalroam.h"
 #include "propmaster.h"
 
-void fatalError(const std::string& e)
-{
-	std::cerr << "terrainmaker: error: " << e << "\n";
-	exit(1);
-}
-
 static Point mapToTerrain(const Terrain& terrain, const Point& p)
 {
 	/* p is at the surface of our nominal sphere. */

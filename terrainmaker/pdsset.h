@@ -8,6 +8,10 @@
 #ifndef PDSSET_H
 #define PDSSET_H
 
+#include "map.h"
+
+class PDS;
+
 class PDSSet : public LatLongMap
 {
 private:

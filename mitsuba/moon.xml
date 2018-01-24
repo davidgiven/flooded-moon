@@ -126,7 +126,7 @@
 	<include filename="/tmp/camera.xml"/>
 
 	<shape type="sphere">
-		<point name="center" x="-149597871" y="0" z="0"/>
+		<point name="center" x="149597871" y="0" z="0"/>
 		<float name="radius" value="696342"/>
 
 		<transform name="toWorld">

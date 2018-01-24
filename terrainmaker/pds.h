@@ -29,7 +29,19 @@ public:
 		return true;
 	}
 
-	double at(double lon, double lat) const;
+	double sampleat(unsigned x, unsigned y) const
+	{
+		assert(x < _width);
+		assert(y < _height);
+		double v = _data[y*_width + x];
+		return (v*_scalingFactor) + _offset;
+	}
+
+	void samples(unsigned& width, unsigned& height) const
+	{
+		width = _width;
+		height = _height;
+	}
 
 	void bounds(double& minLon, double& minLat, double& maxLon, double& maxLat) const
 	{
@@ -39,15 +51,10 @@ public:
 		maxLon = _maxLon;
 	}
 
-private:
-	void findsample(double lon, double lat, double& x, double& y) const;
+	double at(double lon, double lat) const;
 
-	double getsample(unsigned x, unsigned y) const
-	{
-		assert(x < _width);
-		assert(y < _height);
-		return _data[y*_width + x];
-	}
+	void unfindsample(double px, double py, double& lon, double& lat) const;
+	void findsample(double lon, double lat, double& x, double& y) const;
 
 private:
 	PDSLabel _label;

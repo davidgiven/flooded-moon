@@ -119,10 +119,10 @@ double PDS::at(double lon, double lat) const
 	double px, py;
 	findsample(lon, lat, px, py);
 
-	double tl = getsample(floor(px), floor(py));
-	double tr = getsample(ceil(px), floor(py));
-	double bl = getsample(floor(px), ceil(py));
-	double br = getsample(ceil(px), ceil(py));
+	double tl = sampleat(floor(px), floor(py));
+	double tr = sampleat(ceil(px), floor(py));
+	double bl = sampleat(floor(px), ceil(py));
+	double br = sampleat(ceil(px), ceil(py));
 
 	px = px - floor(px);
 	py = py - floor(py);
@@ -181,3 +181,22 @@ void PDS::findsample(double lon, double lat, double& x, double& y) const
 	}
 }
 
+void PDS::unfindsample(double px, double py, double& lon, double& lat) const
+{
+	switch (_projection)
+	{
+		case EQUIRECTANGULAR:
+		{
+			double dx = px / (double)(_width-1);
+			double dy = py / (double)(_height-1);
+
+			lon = _minLon + dx * (_maxLon - _minLon);
+			lat = _minLat + dy * (_maxLat - _minLat);
+			break;
+		}
+
+		case POLAR_STEREOGRAPHIC:
+			lon = lat = 0.0;
+			break;
+	}
+}

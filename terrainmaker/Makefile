@@ -1,14 +1,14 @@
 
 #CXX = g++
 CXX = clang++
-INCS += -I$(HOME)/nonshared/calculon/include
-INCS += -I$(shell llvm-config-5.0 --includedir)
 
 CXXFLAGS = \
 	-std=c++11 \
 	-I$(HOME)/nonshared/calculon/include \
 	-I/usr/include/llvm-5.0 \
-	-I/usr/include/llvm-c-5.0
+	-I/usr/include/llvm-c-5.0 \
+	-I/usr/include/pcl-1.8 \
+	-I/usr/include/eigen3 \
 
 DEFS += \
 
@@ -19,9 +19,12 @@ LIBS += \
 	-lnoise \
 	-lboost_program_options \
 	-lboost_iostreams \
-	-lpng
+	-lboost_system \
+	-lpng \
+	-lpcl_io \
+	-lpcl_common \
 
-SRCS = \
+LIBSRCS = \
 	sphericalroam.cc \
 	writer.cc \
 	plywriter.cc \
@@ -33,21 +36,28 @@ SRCS = \
 	matrix.cc \
 	variables.cc \
 	functions.cc \
-	terrainmaker.cc
+	utils.cc
 
-RELEASEOBJS = $(patsubst %.cc,.obj/release/%.o,$(SRCS))
-DEBUGOBJS = $(patsubst %.cc,.obj/debug/%.o,$(SRCS))
+RELEASEOBJS = $(patsubst %.cc,.obj/release/%.o,$(LIBSRCS))
+DEBUGOBJS = $(patsubst %.cc,.obj/debug/%.o,$(LIBSRCS))
 
 DEPS = $(patsubst %.o,%.d,$(RELEASEOBJS) $(DEBUGOBJS))
 	
 all: terrainmaker terrainmaker-dbg
 
-terrainmaker-dbg: $(DEBUGOBJS) Makefile $(wildcard *.h)
-	$(CXX) -g -o $@ $(DEBUGOBJS) $(LIBS)
+terrainmaker-dbg: .obj/debug/terrainmaker.o $(DEBUGOBJS)
+	$(CXX) -g -o $@ $^ $(LIBS)
 	
-terrainmaker: $(RELEASEOBJS) Makefile $(wildcard *.h)
-	$(CXX) -O3 -DNDEBUG -fomit-frame-pointer -o $@ $(RELEASEOBJS) $(LIBS)
+terrainmaker: .obj/release/terrainmaker.o $(RELEASEOBJS)
+	$(CXX) -O3 -DNDEBUG -fomit-frame-pointer -o $@ $^ $(LIBS)
 	
+decloud: .obj/release/decloud.o $(RELEASEOBJS)
+	$(CXX) -O3 -DNDEBUG -fomit-frame-pointer -o $@ $^ $(LIBS)
+
+.obj/decloud/%.o: %.cc
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -MMD -MF $(patsubst %.o,%.d,$@) -c -O3 -DNDEBUG -fomit-frame-pointer -o $@ $<
+
 .obj/release/%.o: %.cc
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -MMD -MF $(patsubst %.o,%.d,$@) -c -O3 -DNDEBUG -fomit-frame-pointer -o $@ $<
