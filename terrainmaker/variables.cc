@@ -116,7 +116,13 @@ void Variables::parse(int argc, const char* argv[])
 	{
 		for (auto s : vm["config"].as<std::vector<std::string>>())
 		{
+			std::cout << "Loading script: " << s << std::endl;
 			std::ifstream stream(s);
+			if (!stream)
+			{
+				std::cerr << "Failed to open script\n";
+				exit(1);
+			}
 			po::store(po::parse_config_file(stream, options), vm);
 		}
 		po::notify(vm);
