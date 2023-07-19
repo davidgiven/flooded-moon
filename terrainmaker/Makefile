@@ -5,17 +5,14 @@ INCS += -I$(HOME)/nonshared/calculon/include
 INCS += -I$(shell llvm-config-5.0 --includedir)
 
 CXXFLAGS = \
-	-std=c++11 \
 	-I$(HOME)/nonshared/calculon/include \
-	-I/usr/include/llvm-5.0 \
-	-I/usr/include/llvm-c-5.0
+	-I$(shell llvm-config --includedir)
 
 DEFS += \
 
 LIBS += \
 	$(shell pkg-config libpng --libs) \
-	-L/usr/lib/llvm-5.0 \
-	-lLLVM-5.0 \
+	$(shell llvm-config --libs) \
 	-lnoise \
 	-lboost_program_options \
 	-lboost_iostreams \

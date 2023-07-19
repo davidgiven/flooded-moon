@@ -1,6 +1,6 @@
 POVRAY = ../povray/.obj/unix/povray
 PLACE = nearside-from-space
-GCC = g++-4.8
+GCC = g++
 export TERRAINMAKER_OPTIONS = \
 	scripts/data.tm \
 	places/mountainscape.tm \
@@ -35,15 +35,13 @@ terrainlib/moon.so: \
 		$(wildcard terrainlib/include/*.h)
 	$(GCC) \
 		-g -O3 -shared -fpic -fPIC -std=c++11 \
-		-I$(shell llvm-config-3.3 --includedir) \
-		-L$(shell llvm-config-3.3 --libdir) \
 		-Iterrainmaker \
 		-Iterrainlib/include \
 		-I../calculon/include \
 		-o terrainlib/moon.so \
 		terrainlib/moon.cc \
-		-lnoise \
+		-lnoise -DNOISEINC=\"libnoise/noise.h\" \
 		-lboost_iostreams \
 		-lboost_program_options \
-		-lLLVM-3.3
+		-I$(shell llvm-config --includedir) $(shell llvm-config --libs)
 

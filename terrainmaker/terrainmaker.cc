@@ -29,8 +29,8 @@
 	#define int_p_NULL (int*)NULL
 #endif
 
-#include <boost/gil/gil_all.hpp>
-#include <boost/gil/extension/io/png_dynamic_io.hpp>
+#include <boost/gil.hpp>
+#include <boost/gil/extension/io/png.hpp>
 #include <boost/ptr_container/ptr_list.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
@@ -154,7 +154,7 @@ static void write_image_map(Map& map, const std::string& filename,
 			}
 		}
 
-	boost::gil::png_write_view(filename, view);
+	boost::gil::write_view(filename, view, boost::gil::png_tag());
 
 	std::cerr << "image function:\n"
               << "    v' = (v - 0.5) * "

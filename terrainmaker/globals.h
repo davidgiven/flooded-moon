@@ -22,6 +22,7 @@
 #include <sstream>
 #include <memory>
 #include <unordered_map>
+#include <math.h>
 #include <boost/format.hpp>
 
 extern void fatalError(const std::string& e);
